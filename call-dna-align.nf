@@ -46,8 +46,8 @@ log.info """\
 
    Tools Used:
       bwa: "biocontainers/bwa:v0.7.15_cv4"
-      samtools: "blcdsdockerregistry/samtools:1.10"
-      picard: "blcdsdockerregistry/picard-tools:2.18.23"
+      samtools: "blcdsdockerregistry/samtools:1.3"
+      picard: "blcdsdockerregistry/picard-tools:1.130"
 
    ------------------------------------
    Starting workflow...
@@ -84,7 +84,7 @@ process align {
 }
 
 process convert_sam_to_bam {
-   container "blcdsdockerregistry/samtools:1.10"
+   container "blcdsdockerregistry/samtools:1.3"
 
    publishDir params.output_dir, enabled: params.save_aligned_bam
 
@@ -109,7 +109,7 @@ process convert_sam_to_bam {
 }
 
 process sort_bam  {
-   container "blcdsdockerregistry/picard-tools:2.18.23"
+   container "blcdsdockerregistry/picard-tools:1.130"
 
    input:
       file(input_bam) from convert_sam_to_bam_output_ch
@@ -131,7 +131,7 @@ process sort_bam  {
 }
 
 process mark_duplicates  {
-   container "blcdsdockerregistry/picard-tools:2.18.23"
+   container "blcdsdockerregistry/picard-tools:1.130"
 
    input:
       file(input_bam) from sort_bam_output_ch
@@ -166,7 +166,7 @@ Channel
      }
 
 process merge_bams  {
-   container "blcdsdockerregistry/picard-tools:2.18.23"
+   container "blcdsdockerregistry/picard-tools:1.130"
 
    input:
       file(input_bams) from merge_bams_input_ch.collect()
@@ -191,7 +191,7 @@ process merge_bams  {
 }
 
 process get_bam_index  {
-   container "blcdsdockerregistry/picard-tools:2.18.23"
+   container "blcdsdockerregistry/picard-tools:1.130"
 
    publishDir params.output_dir, pattern: '*.bam*'
 
