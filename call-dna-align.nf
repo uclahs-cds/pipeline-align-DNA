@@ -193,13 +193,14 @@ process merge_bams  {
 process get_bam_index  {
    container "blcdsdockerregistry/picard-tools:1.130"
 
-   publishDir params.output_dir, pattern: '*.bam*'
+   publishDir params.output_dir
 
    input:
       file(input_bam) from get_bam_index_input_ch.mix(merge_bams_output_ch)
 
    output:
-      file("${input_bam.baseName}.bam.bai") into get_bam_index_output_ch
+      file("${input_bam.baseName}.bam.bai") into final_bam_index
+      file("${input_bam.baseName}.bam") into final_bam
 
    script:
    """
