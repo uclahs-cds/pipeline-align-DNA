@@ -10,3 +10,4 @@ RUN conda update -n base -c defaults conda &&\
       conda config --add channels conda-forge && \
       conda install -q -y samtools==1.3 && \
       conda clean --all -y 
+      
