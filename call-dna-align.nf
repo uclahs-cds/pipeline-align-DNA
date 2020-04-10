@@ -206,6 +206,10 @@ process get_bam_index  {
    """
    set -euo pipefail
 
-   echo ${input_bam} > ${input_bam.baseName}.bam.bai
+   java -Xmx6g -jar /picard-tools/picard.jar \
+      BuildBamIndex \
+      VALIDATION_STRINGENCY=LENIENT \
+      INPUT=${input_bam} \
+      OUTPUT=${input_bam.baseName}.bam.bai
    """
 }
