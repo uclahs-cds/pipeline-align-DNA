@@ -21,4 +21,8 @@ WORKDIR /picard-tools
 
 # get picard 
 # older versions/releases have a zip not a jar (2.5.0) 
-RUN wget https://github.com/broadinstitute/picard/releases/download/2.18.23/picard.jar
+RUN wget https://github.com/broadinstitute/picard/releases/download/1.130/picard-tools-1.130.zip && \
+      unzip picard-tools-1.130.zip && rm -rf picard-tools-1.130.zip && \
+      mv picard-tools-1.130/* . && \
+      rm -rf picard-tools-1.130/
+      
