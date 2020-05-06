@@ -45,7 +45,7 @@ log.info """\
       output_dir: ${params.output_dir}
 
    Tools Used:
-      bwa: "biocontainers/bwa:v0.7.15_cv4"
+      bwa: "blcdsdockerregistry/bwa:0.7.15"
       samtools: "blcdsdockerregistry/samtools:1.3"
       picard: "blcdsdockerregistry/picard-tools:1.130"
 
@@ -65,7 +65,7 @@ process align {
    output:
       file("${sample_name}.aligned.sam") into align_output_ch
 
-   container = "biocontainers/bwa:v0.7.15_cv4"
+   container = "blcdsdockerregistry/bwa:0.7.15"
 
    script:
    """
@@ -155,6 +155,9 @@ process mark_duplicates  {
 }
 
 // get the number of aligned bams and 
+merge_bams_input_ch = Channel.create()
+get_bam_index_input_ch = Channel.create()
+
 mark_duplicates_output_ch.into { mark_duplicates_outputs_count; mark_duplicates_outputs }
 Channel
    .from(mark_duplicates_outputs_count)
