@@ -41,6 +41,7 @@ log.info """\
       reference_fasta_index_files: ${params.reference_fasta_index_files}
       read_group_name = ${params.read_group_name}
       save_aligned_bam = ${params.save_aligned_bam}
+      merge_bams = ${params.merge_bams}
    - output: 
       output_dir: ${params.output_dir}
 
@@ -155,18 +156,9 @@ process mark_duplicates  {
 }
 
 // get the number of aligned bams and 
-merge_bams_input_ch = Channel.create()
-get_bam_index_input_ch = Channel.create()
-
-mark_duplicates_output_ch.into { mark_duplicates_outputs_count; mark_duplicates_outputs }
-Channel
-   .from(mark_duplicates_outputs_count)
-    .count()
-    .subscribe { num_of_aligned_bams ->
-       (merge_bams_input_ch, get_bam_index_input_ch) = ( num_of_aligned_bams > 1
-                     ? [  mark_duplicates_outputs, Channel.empty() ]
-                     : [  Channel.empty(), mark_duplicates_outputs ] )
-     }
+(merge_bams_input_ch, get_bam_index_input_ch) = ( params.merge_bams
+   ? [  mark_duplicates_output_ch, Channel.empty() ]
+   : [  Channel.empty(), mark_duplicates_output_ch ] )
 
 process merge_bams  {
    container "blcdsdockerregistry/picard-tools:1.130"
