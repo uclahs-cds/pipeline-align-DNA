@@ -7,10 +7,35 @@
       - NEEDS COMMENTS
 */
 
-Channel 
-   .fromFilePairs(params.paired_reads)
-   .ifEmpty { error "Cannot find any reads matching: ${params.paired_reads}" }
-   .set { paired_reads_ch }
+Channel
+   .fromPath(params.input_csv)
+   .ifEmpty { error "Cannot find input csv: ${params.input_csv}" }
+   .splitCsv(header:true)
+   .map { row -> 
+      def sample_name = row.read_group_identifier + "-" +
+         row.sequencing_center + "-" +
+         row.library_identifier + "-" +
+         row.platfrom_technology + "-" +
+         row.platform_unit + "-" +
+         row.sample 
+
+      def read_group_name = "@RG" +
+         "\tID:" + row.read_group_identifier + ".Seq" + row.lane +
+         "\tCN:" + row.sequencing_center +
+         "\tLB:" + row.library_identifier +
+         "\tPL:" + row.platfrom_technology +
+         "\tPU:" + row.platform_unit +
+         "\tSM:" + row.sample
+
+      return tuple(sample_name, 
+         row.lane,
+         read_group_name,
+         row.read1_fastq,
+         row.read2_fastq
+      )
+   }
+   .set { input_samples_ch }
+
 
 Channel
    .fromPath(params.reference_fasta)
@@ -35,15 +60,14 @@ log.info """\
 
    Current Configuration:
    - input: 
-      paired_reads: ${params.paired_reads}
+      input_csv: ${params.input_csv}
       reference_fasta: ${params.reference_fasta}
       reference_fasta_dict: ${params.reference_fasta_dict}
       reference_fasta_index_files: ${params.reference_fasta_index_files}
-      read_group_name = ${params.read_group_name}
-      save_aligned_bam = ${params.save_aligned_bam}
-      merge_bams = ${params.merge_bams}
    - output: 
       output_dir: ${params.output_dir}
+   - options:
+      save_aligned_bam = ${params.save_aligned_bam}
 
    Tools Used:
       bwa: "blcdsdockerregistry/bwa:0.7.15"
@@ -57,16 +81,24 @@ log.info """\
    .stripIndent()
 
 process align {
+   container "blcdsdockerregistry/bwa:0.7.15"
+
    input: 
-      tuple val(sample_name), file(paired_reads) from paired_reads_ch
-      file(ref) from reference
-      file(ref_dict) from reference_dict
+      tuple (val(sample_name), 
+         val(lane),
+         val(read_group_name), 
+         path(read1_fastq),
+         path(read2_fastq) 
+      ) from input_samples_ch
+      each file(ref) from reference
+      each file(ref_dict) from reference_dict
       file(ref_idx_files) from reference_index_files.collect()
 
    output:
-      file("${sample_name}.aligned.sam") into align_output_ch
-
-   container = "blcdsdockerregistry/bwa:0.7.15"
+      tuple(val(sample_name), 
+         val(lane),
+         file("${sample_name}.lane-${lane}.aligned.sam")
+      ) into align_output_ch
 
    script:
    """
@@ -76,11 +108,11 @@ process align {
       mem \
       -t 32 \
       -M \
-      -R "${params.read_group_name}" \
+      -R "${read_group_name}" \
       ${ref} \
-      ${paired_reads[0]} \
-      ${paired_reads[1]} > \
-      ${sample_name}.aligned.sam
+      ${read1_fastq} \
+      ${read2_fastq} > \
+      ${sample_name}.lane-${lane}.aligned.sam
    """
 }
 
@@ -90,10 +122,16 @@ process convert_sam_to_bam {
    publishDir params.output_dir, enabled: params.save_aligned_bam
 
    input: 
-      file(input_sam) from align_output_ch
+      tuple(val(sample_name), 
+         val(lane),
+         file(input_sam)
+      ) from align_output_ch
 
    output:
-      file("${input_sam.baseName}.bam") into convert_sam_to_bam_output_ch
+      tuple(val(sample_name), 
+         val(lane), 
+         file("${sample_name}.lane-${lane}.converted.bam")
+      ) into convert_sam_to_bam_output_ch
 
    script:
    """
@@ -105,7 +143,7 @@ process convert_sam_to_bam {
       -S \
       -b \
       ${input_sam} > \
-      ${input_sam.baseName}.bam
+      ${sample_name}.lane-${lane}.converted.bam
    """
 }
 
@@ -113,10 +151,16 @@ process sort_bam  {
    container "blcdsdockerregistry/picard-tools:1.130"
 
    input:
-      file(input_bam) from convert_sam_to_bam_output_ch
+      tuple(val(sample_name), 
+      val(lane),
+      file(input_bam)
+   ) from convert_sam_to_bam_output_ch
    
    output:
-      file("${input_bam.baseName}.sorted.bam") into sort_bam_output_ch
+      tuple(val(sample_name),
+         val(lane),
+         file("${sample_name}.lane-${lane}.sorted.bam")
+      ) into sort_bam_output_ch
 
    script:
    """
@@ -126,7 +170,7 @@ process sort_bam  {
       SortSam \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
-      OUTPUT=${input_bam.baseName}.sorted.bam \
+      OUTPUT=${sample_name}.lane-${lane}.sorted.bam \
       SORT_ORDER=coordinate
    """
 }
@@ -135,11 +179,18 @@ process mark_duplicates  {
    container "blcdsdockerregistry/picard-tools:1.130"
 
    input:
-      file(input_bam) from sort_bam_output_ch
+      tuple(val(sample_name), 
+         val(lane),
+         file(input_bam)
+      ) from sort_bam_output_ch
 
    output:
-      file("${input_bam.baseName}.mark_dup.bam") into mark_duplicates_output_ch
-      file("${input_bam.baseName}.mark_dup.bam.metrics") into mark_duplicates_metrics_ch
+      tuple(
+         val(sample_name),
+         val(lane),
+         file("${sample_name}.lane-${lane}.mark_dup.bam")
+      ) into mark_duplicates_output_ch
+      file("${sample_name}.lane-${lane}.mark_dup.bam.metrics") into mark_duplicates_metrics_ch
 
    script:
    """
@@ -149,25 +200,41 @@ process mark_duplicates  {
       MarkDuplicates \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
-      OUTPUT=${input_bam.baseName}.mark_dup.bam \
-      METRICS_FILE=${input_bam.baseName}.mark_dup.bam.metrics \
+      OUTPUT=${sample_name}.lane-${lane}.mark_dup.bam \
+      METRICS_FILE=${sample_name}.lane-${lane}.mark_dup.bam.metrics \
       PROGRAM_RECORD_ID=MarkDuplicates
    """
 }
 
-// get the number of aligned bams and 
-(merge_bams_input_ch, get_bam_index_input_ch) = ( params.merge_bams
-   ? [  mark_duplicates_output_ch, Channel.empty() ]
-   : [  Channel.empty(), mark_duplicates_output_ch ] )
+mark_duplicates_output_ch
+	.groupTuple()
+	.map { sn, lane, mark_dups_bams ->
+		def sample_name = sn
+		return tuple(sample_name, mark_dups_bams, mark_dups_bams.size())
+	}
+   .branch {
+		merge: it.get(2) > 1
+		index: it.get(2) <= 1
+	}
+	.set { mark_dups_bams_outputs }
+
+mark_dups_bams_outputs.merge.set { merge_bams_input_ch }
+mark_dups_bams_outputs
+   .index
+   .map { sample_name, mark_dups_bams, size ->
+      return tuple(sample_name, mark_dups_bams)
+   }
+   .set { get_bam_index_input_ch }
+
 
 process merge_bams  {
    container "blcdsdockerregistry/picard-tools:1.130"
 
    input:
-      file(input_bams) from merge_bams_input_ch.collect()
+      tuple(val(sample_name), file(input_bams), val(input_bams_size)) from merge_bams_input_ch
 
    output:
-      file("merged.bam") into merge_bams_output_ch
+      tuple(val(sample_name), file("${sample_name}.merged.bam")) into merge_bams_output_ch
 
    shell:
    '''
@@ -181,7 +248,7 @@ process merge_bams  {
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
       $INPUT \
-      OUTPUT=merged.bam
+      OUTPUT=!{sample_name}.merged.bam
    '''
 }
 
@@ -191,7 +258,10 @@ process get_bam_index  {
    publishDir params.output_dir
 
    input:
-      file(input_bam) from get_bam_index_input_ch.mix(merge_bams_output_ch)
+      tuple(
+         val(sample_name), 
+         file(input_bam)
+      ) from get_bam_index_input_ch.mix(merge_bams_output_ch)
 
    output:
       file("${input_bam.baseName}.bam.bai") into final_bam_index
