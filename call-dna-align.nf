@@ -119,7 +119,7 @@ process align {
 process convert_sam_to_bam {
    container "blcdsdockerregistry/samtools:1.3"
 
-   publishDir params.output_dir, enabled: params.save_aligned_bam
+   publishDir params.output_dir, enabled: params.save_aligned_bam, mode: 'move'
 
    input: 
       tuple(val(sample_name), 
@@ -243,7 +243,7 @@ process merge_bams  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / INPUT=/g' | sed '1s/^/INPUT=/')
 
-   java -Xmx6g -jar /picard-tools/picard.jar \
+   java -Xmx10g -jar /picard-tools/picard.jar \
       MergeSamFiles \
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
@@ -255,7 +255,7 @@ process merge_bams  {
 process get_bam_index  {
    container "blcdsdockerregistry/picard-tools:1.130"
 
-   publishDir params.output_dir
+   publishDir params.output_dir, mode: 'move'
 
    input:
       tuple(
