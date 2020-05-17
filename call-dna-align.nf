@@ -130,7 +130,7 @@ process convert_sam_to_bam {
    output:
       tuple(val(sample_name), 
          val(lane), 
-         file("${sample_name}.lane-${lane}.converted.bam")
+         file("${sample_name}.lane-${lane}.bam")
       ) into convert_sam_to_bam_output_ch
 
    script:
@@ -143,7 +143,7 @@ process convert_sam_to_bam {
       -S \
       -b \
       ${input_sam} > \
-      ${sample_name}.lane-${lane}.converted.bam
+      ${sample_name}.lane-${lane}.bam
    """
 }
 
@@ -188,9 +188,9 @@ process mark_duplicates  {
       tuple(
          val(sample_name),
          val(lane),
-         file("${sample_name}.lane-${lane}.mark_dup.bam")
+         file("${sample_name}.lane-${lane}.bam")
       ) into mark_duplicates_output_ch
-      file("${sample_name}.lane-${lane}.mark_dup.bam.metrics") into mark_duplicates_metrics_ch
+      file("${sample_name}.lane-${lane}.mark_dup.metrics") into mark_duplicates_metrics_ch
 
    script:
    """
@@ -200,8 +200,8 @@ process mark_duplicates  {
       MarkDuplicates \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
-      OUTPUT=${sample_name}.lane-${lane}.mark_dup.bam \
-      METRICS_FILE=${sample_name}.lane-${lane}.mark_dup.bam.metrics \
+      OUTPUT=${sample_name}.lane-${lane}.bam \
+      METRICS_FILE=${sample_name}.lane-${lane}.mark_dup.metrics \
       PROGRAM_RECORD_ID=MarkDuplicates
    """
 }
