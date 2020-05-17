@@ -34,13 +34,13 @@ log.info """\
 process compare_bams {
    container "blcdsdockerregistry/jvarkit-cmpbams:1.0"
 
-   publishDir params.output_dir, mode: 'move'
+   publishDir params.output_dir, mode: 'copy'
 
    input: 
       tuple(path(bam_1), path(bam_2)) from input_bams_ch
 
    output:
-     file("${bam_2.baseName}-${bam_2.baseName}-cmp.txt") into compare_bams_output_ch
+     file("${bam_1.baseName}-${bam_2.baseName}-cmp.txt") into compare_bams_output_ch
 
    script:
    """
@@ -49,20 +49,20 @@ process compare_bams {
    java -Xmx24g -jar /jvarkit-cmpbams/cmpbams.jar \
       ${bam_1} \
       ${bam_2} \
-      > ${bam_2.baseName}-${bam_2.baseName}-cmp.txt
+      > ${bam_1.baseName}-${bam_2.baseName}-cmp.txt
    """
 }
 
 process find_different_reads {
    container "ubuntu:latest"
 
-   publishDir params.output_dir, mode: 'move' 
+   publishDir params.output_dir, mode: 'copy' 
 
    input: 
       file(bam_1_bam_2_comparison) from compare_bams_output_ch
 
    output:
-     file("${bam_2.baseName}-${bam_2.baseName}-cmp.txt") into find_different_reads_output_ch
+     file("${bam_1.baseName}-${bam_2.baseName}-cmp-diff.txt") into find_different_reads_output_ch
 
    when: 
       params.get_differences == true
@@ -71,6 +71,6 @@ process find_different_reads {
    """
    cat ${bam_1_bam_2_comparison} \
       | grep -v "EQ" \
-      >  ${bam_1_bam_2_comparison}.diff.txt
+      >  ${bam_1.baseName}-${bam_2.baseName}-cmp-diff.txt
    """
 }

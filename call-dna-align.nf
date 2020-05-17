@@ -119,7 +119,7 @@ process align {
 process convert_sam_to_bam {
    container "blcdsdockerregistry/samtools:1.3"
 
-   gishDir params.output_dir, enabled: params.save_aligned_bam, mode: 'move'
+   publishDir params.output_dir, enabled: params.save_aligned_bam, mode: 'copy'
 
    input: 
       tuple(val(sample_name), 
@@ -255,7 +255,7 @@ process merge_bams  {
 process get_bam_index  {
    container "blcdsdockerregistry/picard-tools:1.130"
 
-   publishDir params.output_dir, mode: 'move'
+   publishDir params.output_dir, mode: 'copy'
 
    input:
       tuple(
