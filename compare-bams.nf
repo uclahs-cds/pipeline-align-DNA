@@ -49,28 +49,7 @@ process compare_bams {
    java -Xmx24g -jar /jvarkit-cmpbams/cmpbams.jar \
       ${bam_1} \
       ${bam_2} \
-      > ${bam_1.baseName}-${bam_2.baseName}-cmp.txt
-   """
-}
-
-process find_different_reads {
-   container "ubuntu:latest"
-
-   publishDir params.output_dir, mode: 'copy' 
-
-   input: 
-      file(bam_1_bam_2_comparison) from compare_bams_output_ch
-
-   output:
-     file("${bam_1.baseName}-${bam_2.baseName}-cmp-diff.txt") into find_different_reads_output_ch
-
-   when: 
-      params.get_differences == true
-
-   script:
-   """
-   cat ${bam_1_bam_2_comparison} \
       | grep -v "EQ" \
-      >  ${bam_1.baseName}-${bam_2.baseName}-cmp-diff.txt
+      > ${bam_1.baseName}-${bam_2.baseName}-diff.txt
    """
 }
