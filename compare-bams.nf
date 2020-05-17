@@ -37,7 +37,7 @@ process compare_bams {
       tuple(path(bam_1), path(bam_2)) from input_bams_ch
 
    output:
-     file("${bam_1.baseName}-${bam_2.baseName}-cmp.txt") into compare_bams_output_ch
+     file("${bam_1.baseName}-${bam_2.baseName}-diff.txt") into compare_bams_output_ch
 
    script:
    """
