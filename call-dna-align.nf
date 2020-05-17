@@ -119,7 +119,7 @@ process align {
 process convert_sam_to_bam {
    container "blcdsdockerregistry/samtools:1.3"
 
-   publishDir params.output_dir, enabled: params.save_aligned_bam, mode: 'move'
+   gishDir params.output_dir, enabled: params.save_aligned_bam, mode: 'move'
 
    input: 
       tuple(val(sample_name), 

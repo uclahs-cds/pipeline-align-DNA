@@ -1,6 +1,6 @@
 FROM alpine:3.8
 
-LABEL maintainer="Boutros Lab <BoutrosLab@mednet.ucla.edu>"
+LABEL maintainer="Ben Carlin <bcarlin@mednet.ucla.edu>"
 
 # ca-certificates (for http requests)
 # libc6 (for Intel GKL)
