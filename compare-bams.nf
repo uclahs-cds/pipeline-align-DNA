@@ -6,7 +6,6 @@ Channel
       return tuple(row.bam_1, row.bam_2)
    }
    .set { input_bams_ch }
-   //.subscribe { println it }
 
 log.info """\
    ==========================================
@@ -19,8 +18,6 @@ log.info """\
       input_csv: ${params.input_csv}
    - output: 
       output_dir: ${params.output_dir}
-   - options:
-      get_differences: ${params.get_differences}
    
    Tools Used:
       jvarkit's cmpbams: "blcdsdockerregistry/jvarkit-cmpbams:1.0"
