@@ -214,7 +214,7 @@ mark_duplicates_output_ch
 	}
    .branch {
 		merge: it.get(2) > 1
-		index: it.get(2) <= 1
+		index: it.get(2) > 0
 	}
 	.set { mark_dups_bams_outputs }
 
@@ -234,7 +234,7 @@ process merge_bams  {
       tuple(val(sample_name), file(input_bams), val(input_bams_size)) from merge_bams_input_ch
 
    output:
-      tuple(val(sample_name), file("${sample_name}.merged.bam")) into merge_bams_output_ch
+      tuple(val(sample_name), file("${sample_name}.bam")) into merge_bams_output_ch
 
    shell:
    '''
@@ -248,7 +248,7 @@ process merge_bams  {
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
       $INPUT \
-      OUTPUT=!{sample_name}.merged.bam
+      OUTPUT=!{sample_name}.bam
    '''
 }
 
