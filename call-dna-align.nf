@@ -207,7 +207,7 @@ process mark_duplicates  {
       MarkDuplicates \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
-      OUTPUT=${library}-${sample}-${lane}.mark_dups.bam \
+      OUTPUT=${library}-${sample}-${lane}.mark_dup.bam \
       METRICS_FILE=${library}-${sample}-${lane}.mark_dup.metrics \
       PROGRAM_RECORD_ID=MarkDuplicates
    """
