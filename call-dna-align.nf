@@ -304,7 +304,7 @@ process merge_bams_from_same_library  {
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
       $INPUT \
-      OUTPUT=!{library}.bam
+      OUTPUT=!{library}.merged.bam
    '''
 }
 
