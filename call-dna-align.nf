@@ -320,8 +320,8 @@ process get_bam_index  {
          .mix(mark_dups_and_merge_from_same_lane_outputs.to_get_bam_index)
 
    output:
-      file("${input_bam.baseName.baseName}.bam.bai")
-      file("${input_bam.baseName.baseName}.bam")
+      file("${ilibrary}.bam")
+      file("${library}.bam.bai")
 
    script:
    """
@@ -331,9 +331,9 @@ process get_bam_index  {
       BuildBamIndex \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
-      OUTPUT=${input_bam.baseName.baseName}.bam.bai
+      OUTPUT=${library}.bam.bai
 
    # rename final output bam
-   mv ${input_bam} ${input_bam.baseName.baseName}.bam 
+   mv ${input_bam} ${library}.bam 
    """
 }
