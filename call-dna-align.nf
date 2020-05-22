@@ -334,6 +334,6 @@ process get_bam_index  {
       OUTPUT=${input_bam.baseName.baseName}.bam.bai
 
    # rename final output bam
-   mv ${input_bam.baseName.baseName}.bam
+   mv ${input_bam} ${input_bam.baseName.baseName}.bam 
    """
 }
