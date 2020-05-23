@@ -231,7 +231,7 @@ process mark_duplicates  {
 // and send those outputs to be merged if there is more than one bam per group
 mark_duplicates_output_ch
 	.groupTuple()
-   .branch { library_and_sample, library, mark_dups_bams
+   .branch { library_and_sample_name, library, mark_dups_bams ->
 		to_merge_from_same_library_and_sample: mark_dups_bams.size() > 1
 
       // when grouping in values besides the first value passed, the key become wrapped in an additional tuple
@@ -290,12 +290,12 @@ merge_bams_from_same_library_and_sample_output_ch
    .mix(mark_dups_bams_outputs.to_merge_from_same_library_or_to_index)
 	.groupTuple()
    .branch { library, bams ->
-		to_merge_from_same_library: it.get(1).size() > 1
+		to_merge_from_same_library: bams.size() > 1
 
       // when grouping in values besides the first value passed, the key become wrapped in an additional tuple
       // and b/c we know that the bams are a tuple of size 1 and the downstream input requires a file 
       // that is not wrapped in a tuple, we just get the 1st element of the tuple, the file itself
-		to_get_bam_index: it.get(1).size() <= 1
+		to_get_bam_index: bams.size() <= 1
          return tuple(library, bams.get(0))
 	}
 	.set { mark_dups_and_merge_from_same_lane_outputs }
