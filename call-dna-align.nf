@@ -4,9 +4,9 @@
    TODO:
       - NEEDS TESTING FOR ALIGNING MULTIPLE BAMS IN PARALLEL
       - NEEDS DOCUMENTATION 
-      - NEEDS COMMENTS
 */
 
+// get the input fastq pairs
 Channel
    .fromPath(params.input_csv)
    .ifEmpty { error "Cannot find input csv: ${params.input_csv}" }
@@ -20,6 +20,8 @@ Channel
          "\tPU:" + row.platform_unit +
          "\tSM:" + row.sample
 
+      // the library, sample and lane are used as keys downstream to group into 
+      // sets of the same key for downstream merging
       return tuple(row.library_identifier,
          row.sample , 
          row.lane,
@@ -30,7 +32,7 @@ Channel
    }
    .set { input_samples_ch }
 
-
+// get the reference and required files for aligning
 Channel
    .fromPath(params.reference_fasta)
    .ifEmpty { error "Cannot find reference: ${params.reference_fasta}" }
@@ -46,6 +48,7 @@ Channel
    .ifEmpty { error "Cannot find reference index files: ${params.reference_fasta_index_files}" }
    .set { reference_index_files }
 
+// output details of the pipeline run to stdout
 log.info """\
    =============================================
    C A L L - D N A - A L I G N  P I P E L I N E
@@ -74,11 +77,13 @@ log.info """\
    """
    .stripIndent()
 
+// align with bwa mem
 process align {
    container "blcdsdockerregistry/bwa:0.7.15"
 
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
+   // use "each" so the the reference files are passed through for each fastq pair alignment 
    input: 
       tuple(val(library), 
          val(sample),
@@ -91,6 +96,8 @@ process align {
       each file(ref_dict) from reference_dict
       file(ref_idx_files) from reference_index_files.collect()
 
+   // output the lane information in the file name to differentiate bewteen aligments of the same
+   // sample but different lanes
    output:
       tuple(val(library), 
          val(sample),
@@ -114,6 +121,7 @@ process align {
    """
 }
 
+// convert with samtools
 process convert_sam_to_bam {
    container "blcdsdockerregistry/samtools:1.3"
 
@@ -147,6 +155,7 @@ process convert_sam_to_bam {
    """
 }
 
+// sort coordinate order with picard
 process sort_bam  {
    container "blcdsdockerregistry/picard-tools:1.130"
 
@@ -179,6 +188,7 @@ process sort_bam  {
    """
 }
 
+// mark duplicates with picard
 process mark_duplicates  {
    container "blcdsdockerregistry/picard-tools:1.130"
 
@@ -191,10 +201,14 @@ process mark_duplicates  {
          file(input_bam)
       ) from sort_bam_output_ch
 
+   // the first value of the tuple will be used as a key to group aligned and filtered bams
+   // from the same sample and library but different lane together
+
+   // the next steps of the pipeline are merging so using a lane to differentiate between files is no londer needed
+   // (files of same lane are merged together) so the lane information is dropped
    output:
       tuple(val("${library}-${sample}"),
          val(library), 
-         val(lane),
          file("${library}-${sample}-${lane}.mark_dup.bam")
       ) into mark_duplicates_output_ch
       file("${library}-${sample}-${lane}.mark_dup.metrics")
@@ -213,28 +227,26 @@ process mark_duplicates  {
    """
 }
 
+// group the aligned and filtered bams the same sample and library
+// and send those outputs to be merged if there is more than one bam per group
 mark_duplicates_output_ch
 	.groupTuple()
-	.map { library_and_sample, library, lane, mark_dups_bams ->
-		return tuple(library_and_sample, 
-         library,
-         mark_dups_bams
-      )
-	}
-   .branch {
-		to_merge_from_same_lane: it.get(2).size() > 1
-		to_merge_from_same_library: it.get(2).size() <= 1
+   .branch { library_and_sample, library, mark_dups_bams
+		to_merge_from_same_library_and_sample: mark_dups_bams.size() > 1
+
+      // when grouping in values besides the first value passed, the key become wrapped in an additional tuple
+      // and b/c we know that the library and bams are a tuple  of size 1 and the downstream input requires a file and library
+      // that are not wrapped in a tuple, we just get the 1st element of the tuple, the file and library themselves
+
+      // samples that are only aligned to one lane will be merged with other samples from the same library
+      //  or indexed if there are no other samples from the same library
+		to_merge_from_same_library_or_to_index: mark_dups_bams.size() <= 1
+         return tuple(library.get(0), mark_dups_bams.get(0))
 	}
 	.set { mark_dups_bams_outputs }
 
-mark_dups_bams_outputs
-   .to_merge_from_same_library
-   .map { library_and_sample, library, mark_dups_bams ->
-      return tuple(library, mark_dups_bams)
-   }
-   .set { mark_dups_outputs_to_merge_bams_from_same_library }
-
-process merge_bams_from_same_lane  {
+// merge bams from the same library and sample with picard
+process merge_bams_from_same_library_and_sample  {
    container "blcdsdockerregistry/picard-tools:1.130"
 
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
@@ -243,12 +255,14 @@ process merge_bams_from_same_lane  {
       tuple(val(library_and_sample), 
          val(library),
          file(input_bams)
-      ) from mark_dups_bams_outputs.to_merge_from_same_lane.collect()
+      ) from mark_dups_bams_outputs.to_merge_from_same_library_and_sample
 
+   // the next steps of the pipeline are merging so using a sample to differentiate between files is no londer needed
+   // (files of same sample are merged together) so the sample information is dropped
    output:
       tuple(val(library),
          file("${library_and_sample}.merged.bam")
-      ) into merge_bams_from_same_lane_output_ch
+      ) into merge_bams_from_same_library_and_sample_output_ch
 
    shell:
    '''
@@ -266,19 +280,27 @@ process merge_bams_from_same_lane  {
    '''
 }
 
-merge_bams_from_same_lane_output_ch
-   .into{ merge_bams_from_same_lane_outputs_to_index_t_ch;
-     merge_bams_from_same_lane_outputs_to_merge_bams_from_same_library }
-
-merge_bams_from_same_lane_outputs_to_merge_bams_from_same_library
-   .mix(mark_dups_outputs_to_merge_bams_from_same_library)
+// the output of merging results in a tuple of libraries; however, each lane that is merged should be
+// from the same library so just get the first value of the tuple becuase they all are the same
+// downstream process depend on just a library not tuples of libraries for input
+merge_bams_from_same_library_and_sample_output_ch
+   .map{ library, bams ->
+      return tuple(library.get(0), bams)
+   }
+   .mix(mark_dups_bams_outputs.to_merge_from_same_library_or_to_index)
 	.groupTuple()
-   .branch {
+   .branch { library, bams ->
 		to_merge_from_same_library: it.get(1).size() > 1
+
+      // when grouping in values besides the first value passed, the key become wrapped in an additional tuple
+      // and b/c we know that the bams are a tuple of size 1 and the downstream input requires a file 
+      // that is not wrapped in a tuple, we just get the 1st element of the tuple, the file itself
 		to_get_bam_index: it.get(1).size() <= 1
+         return tuple(library, bams.get(0))
 	}
 	.set { mark_dups_and_merge_from_same_lane_outputs }
 
+// merge bams from the same library with picard
 process merge_bams_from_same_library  {
    container "blcdsdockerregistry/picard-tools:1.130"
 
@@ -308,6 +330,7 @@ process merge_bams_from_same_library  {
    '''
 }
 
+// index bams with picard
 process get_bam_index  {
    container "blcdsdockerregistry/picard-tools:1.130"
 
@@ -319,8 +342,9 @@ process get_bam_index  {
       ) from merge_bams_from_same_library_output_ch
          .mix(mark_dups_and_merge_from_same_lane_outputs.to_get_bam_index)
 
+   // no need for an output channel becuase this is the final stepp
    output:
-      file("${ilibrary}.bam")
+      file("${library}.bam")
       file("${library}.bam.bai")
 
    script:
