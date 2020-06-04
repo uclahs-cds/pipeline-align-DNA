@@ -1,6 +1,6 @@
 FROM continuumio/miniconda3:4.5.11
 
-LABEL maintainer="Boutros Lab <BoutrosLab@mednet.ucla.edu>"
+LABEL maintainer="Ben Carlin <bcarlin@mednet.ucla.edu>"
 
 # add channels in correct order to avoid missing libcrypto dependency
 # https://github.com/bioconda/bioconda-recipes/issues/12100
