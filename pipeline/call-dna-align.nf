@@ -251,7 +251,7 @@ execute_picard_mark_duplicates_output_ch
 // merge bams from the same library and sample with picard
 process execute_picard_merge_sam_files_from_same_library_and_sample  {
    container picard_docker_image
-
+   
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
    input:
