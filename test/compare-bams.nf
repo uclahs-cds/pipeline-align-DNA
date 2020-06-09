@@ -1,3 +1,5 @@
+def jvarkit_docker_image = "blcdsdockerregistry/jvarkit-cmpbams:1.0"
+
 Channel
    .fromPath(params.input_csv)
    .ifEmpty { error "Cannot find input csv: ${params.input_csv}" }
@@ -20,7 +22,7 @@ log.info """\
       output_dir: ${params.output_dir}
    
    Tools Used:
-      jvarkit's cmpbams: "blcdsdockerregistry/jvarkit-cmpbams:1.0"
+      jvarkit's cmpbams: ${jvarkit_docker_image}
     
    ------------------------------------
    Starting workflow...
@@ -29,7 +31,7 @@ log.info """\
    .stripIndent()
 
 process compare_bams {
-   container "blcdsdockerregistry/jvarkit-cmpbams:1.0"
+   container jvarkit_docker_image
 
    publishDir params.output_dir, mode: 'copy'
 
