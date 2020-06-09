@@ -126,7 +126,7 @@ process execute_bwa_mem {
 
 // convert with samtools
 process execute_samtools_convert_sam_to_bam {
-   container "blcdsdockerregistry/samtools:1.3"
+   container samtools_docker_image
 
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
@@ -160,8 +160,8 @@ process execute_samtools_convert_sam_to_bam {
 
 // sort coordinate order with picard
 process execute_picard_sort_sam  {
-   container samtools_docker_image
-
+   container picard_docker_image
+   
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
    input:
