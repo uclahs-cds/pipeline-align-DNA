@@ -5,6 +5,9 @@
       - NEEDS TESTING FOR ALIGNING MULTIPLE BAMS IN PARALLEL
       - NEEDS SLURM OPTIMIZATION AND CONFIGURATION
 */
+def bwa_docker_image = "blcdsdockerregistry/bwa:0.7.15"
+def samtools_docker_image = "blcdsdockerregistry/samtools:1.3"
+def picard_docker_image = "blcdsdockerregistry/picard-tools:1.130"
 
 // get the input fastq pairs
 Channel
@@ -66,6 +69,11 @@ log.info """\
    - options:
       save_intermediate_files = ${params.save_intermediate_files}
 
+   Tools Used:
+   - BWA: ${bwa_docker_image}
+   - Samtools: ${samtools_docker_image}
+   - Picard Tools: ${picard_docker_image}
+   
    ------------------------------------
    Starting workflow...
    ------------------------------------
@@ -74,7 +82,7 @@ log.info """\
 
 // align with bwa mem
 process execute_bwa_mem {
-   container "blcdsdockerregistry/bwa:0.7.15"
+   container bwa_docker_image
 
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
@@ -152,7 +160,7 @@ process execute_samtools_convert_sam_to_bam {
 
 // sort coordinate order with picard
 process execute_picard_sort_sam  {
-   container "blcdsdockerregistry/picard-tools:1.130"
+   container samtools_docker_image
 
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
@@ -185,7 +193,7 @@ process execute_picard_sort_sam  {
 
 // mark duplicates with picard
 process execute_picard_mark_duplicates  {
-   container "blcdsdockerregistry/picard-tools:1.130"
+   container picard_docker_image
 
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
@@ -242,7 +250,7 @@ execute_picard_mark_duplicates_output_ch
 
 // merge bams from the same library and sample with picard
 process execute_picard_merge_sam_files_from_same_library_and_sample  {
-   container "blcdsdockerregistry/picard-tools:1.130"
+   container picard_docker_image
 
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
@@ -297,7 +305,7 @@ execute_picard_merge_sam_files_from_same_library_and_sample_output_ch
 
 // merge bams from the same library with picard
 process execute_picard_merge_sam_files_from_same_library  {
-   container "blcdsdockerregistry/picard-tools:1.130"
+   container picard_docker_image
 
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
@@ -327,7 +335,7 @@ process execute_picard_merge_sam_files_from_same_library  {
 
 // index bams with picard
 process execute_picard_build_bam_index  {
-   container "blcdsdockerregistry/picard-tools:1.130"
+   container picard_docker_image
 
    publishDir params.output_dir, mode: 'copy'
 
