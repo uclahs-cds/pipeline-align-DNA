@@ -9,6 +9,37 @@ def bwa_docker_image = "blcdsdockerregistry/bwa:0.7.15"
 def samtools_docker_image = "blcdsdockerregistry/samtools:1.3"
 def picard_docker_image = "blcdsdockerregistry/picard-tools:1.130"
 
+// output details of the pipeline run to stdout
+log.info """\
+   =============================================
+   C A L L - D N A - A L I G N  P I P E L I N E
+   =============================================
+   Boutros Lab
+
+   Current Configuration:
+   - input: 
+      input_csv: ${params.input_csv}
+      reference_fasta: ${params.reference_fasta}
+      reference_fasta_dict: ${params.reference_fasta_dict}
+      reference_fasta_index_files: ${params.reference_fasta_index_files}
+
+   - output: 
+      output_dir: ${params.output_dir}
+      
+   - options:
+      save_intermediate_files = ${params.save_intermediate_files}
+
+   Tools Used:
+   - BWA: ${bwa_docker_image}
+   - Samtools: ${samtools_docker_image}
+   - Picard Tools: ${picard_docker_image}
+   
+   ------------------------------------
+   Starting workflow...
+   ------------------------------------
+   """
+   .stripIndent()
+
 // get the input fastq pairs
 Channel
    .fromPath(params.input_csv)
@@ -50,38 +81,9 @@ Channel
    .fromPath(params.reference_fasta_index_files)
    .ifEmpty { error "Cannot find reference index files: ${params.reference_fasta_index_files}" }
    .set { reference_index_files_input_ch }
-
-// output details of the pipeline run to stdout
-log.info """\
-   =============================================
-   C A L L - D N A - A L I G N  P I P E L I N E
-   =============================================
-   Boutros Lab
-
-   Current Configuration:
-   - input: 
-      input_csv: ${params.input_csv}
-      reference_fasta: ${params.reference_fasta}
-      reference_fasta_dict: ${params.reference_fasta_dict}
-      reference_fasta_index_files: ${params.reference_fasta_index_files}
-   - output: 
-      output_dir: ${params.output_dir}
-   - options:
-      save_intermediate_files = ${params.save_intermediate_files}
-
-   Tools Used:
-   - BWA: ${bwa_docker_image}
-   - Samtools: ${samtools_docker_image}
-   - Picard Tools: ${picard_docker_image}
    
-   ------------------------------------
-   Starting workflow...
-   ------------------------------------
-   """
-   .stripIndent()
-
 // align with bwa mem
-process execute_bwa_mem {
+process bwa_mem {
    container bwa_docker_image
 
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
@@ -106,7 +108,7 @@ process execute_bwa_mem {
          val(sample),
          val(lane),
          file("${library}-${sample}-${lane}.aligned.sam")
-      ) into execute_bwa_mem_output_ch
+      ) into bwa_mem_output_ch
 
    script:
    """
@@ -125,7 +127,7 @@ process execute_bwa_mem {
 }
 
 // convert with samtools
-process execute_samtools_convert_sam_to_bam {
+process samtools_convert_sam_to_bam {
    container samtools_docker_image
 
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
@@ -135,14 +137,14 @@ process execute_samtools_convert_sam_to_bam {
          val(sample), 
          val(lane),
          file(input_sam)
-      ) from execute_bwa_mem_output_ch
+      ) from bwa_mem_output_ch
 
    output:
       tuple (val(library), 
          val(sample), 
          val(lane), 
          file("${library}-${sample}-${lane}.aligned.bam")
-      ) into execute_samtools_convert_sam_to_bam_output_ch
+      ) into samtools_convert_sam_to_bam_output_ch
 
    script:
    """
@@ -159,7 +161,7 @@ process execute_samtools_convert_sam_to_bam {
 }
 
 // sort coordinate order with picard
-process execute_picard_sort_sam  {
+process picard_sort_sam  {
    container picard_docker_image
    
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
@@ -169,14 +171,14 @@ process execute_picard_sort_sam  {
          val(sample),
          val(lane),
          file(input_bam)
-      ) from execute_samtools_convert_sam_to_bam_output_ch
+      ) from samtools_convert_sam_to_bam_output_ch
    
    output:
       tuple(val(library), 
          val(sample),
          val(lane),
          file("${library}-${sample}-${lane}.sorted.bam")
-      ) into execute_picard_sort_sam_output_ch
+      ) into picard_sort_sam_output_ch
 
    script:
    """
@@ -192,7 +194,7 @@ process execute_picard_sort_sam  {
 }
 
 // mark duplicates with picard
-process execute_picard_mark_duplicates  {
+process picard_mark_duplicates  {
    container picard_docker_image
 
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
@@ -202,7 +204,7 @@ process execute_picard_mark_duplicates  {
          val(sample), 
          val(lane),
          file(input_bam)
-      ) from execute_picard_sort_sam_output_ch
+      ) from picard_sort_sam_output_ch
 
    // the first value of the tuple will be used as a key to group aligned and filtered bams
    // from the same sample and library but different lane together
@@ -213,7 +215,7 @@ process execute_picard_mark_duplicates  {
       tuple(val("${library}-${sample}"),
          val(library), 
          file("${library}-${sample}-${lane}.mark_dup.bam")
-      ) into execute_picard_mark_duplicates_output_ch
+      ) into picard_mark_duplicates_output_ch
       file("${library}-${sample}-${lane}.mark_dup.metrics")
 
    script:
@@ -232,10 +234,10 @@ process execute_picard_mark_duplicates  {
 
 // group the aligned and filtered bams the same sample and library
 // and send those outputs to be merged if there is more than one bam per group
-execute_picard_mark_duplicates_output_ch
+picard_mark_duplicates_output_ch
 	.groupTuple()
    .branch { library_and_sample_name, library, mark_dups_bams ->
-		execute_picard_merge_sam_files_from_same_library_and_sample_input_ch: mark_dups_bams.size() > 1
+		picard_merge_sam_files_from_same_library_and_sample_input_ch: mark_dups_bams.size() > 1
 
       // when grouping in values besides the first value passed, the key become wrapped in an additional tuple
       // and b/c we know that the library and bams are a tuple  of size 1 and the downstream input requires a file and library
@@ -243,13 +245,13 @@ execute_picard_mark_duplicates_output_ch
 
       // samples that are only aligned to one lane will be merged with other samples from the same library
       //  or indexed if there are no other samples from the same library
-		execute_picard_merge_sam_files_from_same_library_execute_picard_build_bam_index_input_ch: mark_dups_bams.size() <= 1
+		picard_merge_sam_files_from_same_library_picard_build_bam_index_input_ch: mark_dups_bams.size() <= 1
          return tuple(library.get(0), mark_dups_bams.get(0))
 	}
-	.set { execute_picard_mark_duplicates_outputs }
+	.set { picard_mark_duplicates_outputs }
 
 // merge bams from the same library and sample with picard
-process execute_picard_merge_sam_files_from_same_library_and_sample  {
+process picard_merge_sam_files_from_same_library_and_sample  {
    container picard_docker_image
    
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
@@ -258,14 +260,14 @@ process execute_picard_merge_sam_files_from_same_library_and_sample  {
       tuple(val(library_and_sample), 
          val(library),
          file(input_bams)
-      ) from execute_picard_mark_duplicates_outputs.execute_picard_merge_sam_files_from_same_library_and_sample_input_ch
+      ) from picard_mark_duplicates_outputs.picard_merge_sam_files_from_same_library_and_sample_input_ch
 
    // the next steps of the pipeline are merging so using a sample to differentiate between files is no londer needed
    // (files of same sample are merged together) so the sample information is dropped
    output:
       tuple(val(library),
          file("${library_and_sample}.merged.bam")
-      ) into execute_picard_merge_sam_files_from_same_library_and_sample_output_ch
+      ) into picard_merge_sam_files_from_same_library_and_sample_output_ch
 
    shell:
    '''
@@ -286,25 +288,25 @@ process execute_picard_merge_sam_files_from_same_library_and_sample  {
 // the output of merging results in a tuple of libraries; however, each lane that is merged should be
 // from the same library so just get the first value of the tuple becuase they all are the same
 // downstream process depend on just a library not tuples of libraries for input
-execute_picard_merge_sam_files_from_same_library_and_sample_output_ch
+picard_merge_sam_files_from_same_library_and_sample_output_ch
    .map{ library, bams ->
       return tuple(library.get(0), bams)
    }
-   .mix(execute_picard_mark_duplicates_outputs.execute_picard_merge_sam_files_from_same_library_execute_picard_build_bam_index_input_ch)
+   .mix(picard_mark_duplicates_outputs.picard_merge_sam_files_from_same_library_picard_build_bam_index_input_ch)
 	.groupTuple()
    .branch { library, bams ->
-		execute_picard_merge_sam_files_from_same_library_input_ch: bams.size() > 1
+		picard_merge_sam_files_from_same_library_input_ch: bams.size() > 1
 
       // when grouping in values besides the first value passed, the key become wrapped in an additional tuple
       // and b/c we know that the bams are a tuple of size 1 and the downstream input requires a file 
       // that is not wrapped in a tuple, we just get the 1st element of the tuple, the file itself
-		execute_picard_build_bam_index_input_ch: bams.size() <= 1
+		picard_build_bam_index_input_ch: bams.size() <= 1
          return tuple(library, bams.get(0))
 	}
-	.set { execute_picard_mark_duplicates_execute_picard_merge_sam_files_from_same_library_and_sample_outputs }
+	.set { picard_mark_duplicates_picard_merge_sam_files_from_same_library_and_sample_outputs }
 
 // merge bams from the same library with picard
-process execute_picard_merge_sam_files_from_same_library  {
+process picard_merge_sam_files_from_same_library  {
    container picard_docker_image
 
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
@@ -312,10 +314,10 @@ process execute_picard_merge_sam_files_from_same_library  {
    input:
       tuple(val(library), 
          file(input_bams)
-      ) from execute_picard_mark_duplicates_execute_picard_merge_sam_files_from_same_library_and_sample_outputs.execute_picard_merge_sam_files_from_same_library_input_ch.collect()
+      ) from picard_mark_duplicates_picard_merge_sam_files_from_same_library_and_sample_outputs.picard_merge_sam_files_from_same_library_input_ch.collect()
 
    output:
-      tuple(val(library), file("${library}.merged.bam")) into execute_picard_merge_sam_files_from_same_library_output_ch
+      tuple(val(library), file("${library}.merged.bam")) into picard_merge_sam_files_from_same_library_output_ch
 
    shell:
    '''
@@ -334,7 +336,7 @@ process execute_picard_merge_sam_files_from_same_library  {
 }
 
 // index bams with picard
-process execute_picard_build_bam_index  {
+process picard_build_bam_index  {
    container picard_docker_image
 
    publishDir params.output_dir, mode: 'copy'
@@ -342,8 +344,8 @@ process execute_picard_build_bam_index  {
    input:
       tuple(val(library), 
          file(input_bam)
-      ) from execute_picard_merge_sam_files_from_same_library_output_ch
-         .mix(execute_picard_mark_duplicates_execute_picard_merge_sam_files_from_same_library_and_sample_outputs.execute_picard_build_bam_index_input_ch)
+      ) from picard_merge_sam_files_from_same_library_output_ch
+         .mix(picard_mark_duplicates_picard_merge_sam_files_from_same_library_and_sample_outputs.picard_build_bam_index_input_ch)
 
    // no need for an output channel becuase this is the final stepp
    output:
