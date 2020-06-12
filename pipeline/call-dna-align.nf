@@ -248,7 +248,7 @@ output_ch_picard_mark_duplicates
 		input_ch_picard_merge_sam_files_from_same_library_picard_build_bam_index: mark_dups_bams.size() <= 1
          return tuple(library.get(0), mark_dups_bams.get(0))
 	}
-	.set { output_ch_2_spicard_mark_duplicates }
+	.set { output_ch_2_picard_mark_duplicates }
 
 // merge bams from the same library and sample with picard
 process picard_merge_sam_files_from_same_library_and_sample  {
