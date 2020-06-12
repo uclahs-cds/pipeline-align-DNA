@@ -18,6 +18,7 @@ log.info """\
    Current Configuration:
    - input: 
       input_csv: ${params.input_csv}
+
    - output: 
       output_dir: ${params.output_dir}
    
@@ -30,7 +31,7 @@ log.info """\
    """
    .stripIndent()
 
-process compare_bams {
+process jvarkit_compare_bams {
    container jvarkit_docker_image
 
    publishDir params.output_dir, mode: 'copy'
