@@ -7,7 +7,7 @@ Channel
    .map { row -> 
       return tuple(row.bam_1, row.bam_2)
    }
-   .set { input_bams_ch }
+   .set { input_ch_input_bams }
 
 log.info """\
    ==========================================
@@ -37,10 +37,10 @@ process jvarkit_compare_bams {
    publishDir params.output_dir, mode: 'copy'
 
    input: 
-      tuple(path(bam_1), path(bam_2)) from input_bams_ch
+      tuple(path(bam_1), path(bam_2)) from input_ch_input_bams
 
    output:
-     file("${bam_1.baseName}-${bam_2.baseName}-diff.txt") into compare_bams_output_ch
+     file("${bam_1.baseName}-${bam_2.baseName}-diff.txt")
 
    script:
    """
