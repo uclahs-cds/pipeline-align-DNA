@@ -83,7 +83,7 @@ Channel
    .set { input_ch_reference_index_files }
    
 // align with bwa mem
-process bwa_mem {
+process BWA_mem {
    container docker_image_BWA
 
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
@@ -236,8 +236,8 @@ process PicardTools_MarkDuplicates  {
 // and send those outputs to be merged if there is more than one bam per group
 output_ch_PicardTools_MarkDuplicates
 	.groupTuple()
-   .branch { library_and_sample_name, library, mark_dups_bams ->
-		input_ch_PicardTools_MergeSamFiles_from_same_library_and_sample: mark_dups_bams.size() > 1
+   .branch { sample_and_library_name, library, mark_dups_bams ->
+		input_ch_PicardTools_MergeSamFiles_from_same_sample_and_library: mark_dups_bams.size() > 1
 
       // when grouping in values besides the first value passed, the key become wrapped in an additional tuple
       // and b/c we know that the library and bams are a tuple  of size 1 and the downstream input requires a file and library
@@ -251,23 +251,23 @@ output_ch_PicardTools_MarkDuplicates
 	.set { output_ch_2_PicardTools_MarkDuplicates }
 
 // merge bams from the same library and sample with picard
-process PicardTools_MergeSamFiles_from_same_library_and_sample  {
+process PicardTools_MergeSamFiles_from_same_sample_and_library  {
    container docker_image_PicardTools
    
    publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
    input:
-      tuple(val(library_and_sample), 
+      tuple(val(sample_and_library), 
          val(library),
          file(input_bams)
-      ) from output_ch_2_PicardTools_MarkDuplicates.input_ch_PicardTools_MergeSamFiles_from_same_library_and_sample
+      ) from output_ch_2_PicardTools_MarkDuplicates.input_ch_PicardTools_MergeSamFiles_from_same_sample_and_library
 
    // the next steps of the pipeline are merging so using a sample to differentiate between files is no londer needed
    // (files of same sample are merged together) so the sample information is dropped
    output:
       tuple(val(library),
-         file("${library_and_sample}.merged.bam")
-      ) into output_ch_PicardTools_MergeSamFiles_from_same_library_and_sample
+         file("${sample_and_library}.merged.bam")
+      ) into output_ch_PicardTools_MergeSamFiles_from_same_sample_and_library
 
    shell:
    '''
@@ -281,14 +281,14 @@ process PicardTools_MergeSamFiles_from_same_library_and_sample  {
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
       $INPUT \
-      OUTPUT=!{library_and_sample}.merged.bam
+      OUTPUT=!{sample_and_library}.merged.bam
    '''
 }
 
 // the output of merging results in a tuple of libraries; however, each lane that is merged should be
 // from the same library so just get the first value of the tuple becuase they all are the same
 // downstream process depend on just a library not tuples of libraries for input
-output_ch_PicardTools_MergeSamFiles_from_same_library_and_sample
+output_ch_PicardTools_MergeSamFiles_from_same_sample_and_library
    .map{ library, bams ->
       return tuple(library.get(0), bams)
    }
@@ -303,7 +303,7 @@ output_ch_PicardTools_MergeSamFiles_from_same_library_and_sample
 		input_ch_PicardTools_BuildBamIndex: bams.size() <= 1
          return tuple(library, bams.get(0))
 	}
-	.set { output_ch_2_PicardTools_MarkDuplicates_PicardTools_MergeSamFiles_from_same_library_and_sample }
+	.set { output_ch_2_PicardTools_MarkDuplicates_PicardTools_MergeSamFiles_from_same_sample_and_library }
 
 // merge bams from the same library with picard
 process PicardTools_MergeSamFiles_from_same_library  {
@@ -314,7 +314,7 @@ process PicardTools_MergeSamFiles_from_same_library  {
    input:
       tuple(val(library), 
          file(input_bams)
-      ) from output_ch_2_PicardTools_MarkDuplicates_PicardTools_MergeSamFiles_from_same_library_and_sample.input_ch_PicardTools_MergeSamFiles_from_same_library.collect()
+      ) from output_ch_2_PicardTools_MarkDuplicates_PicardTools_MergeSamFiles_from_same_sample_and_library.input_ch_PicardTools_MergeSamFiles_from_same_library.collect()
 
    output:
       tuple(val(library), file("${library}.merged.bam")) into output_ch_PicardTools_MergeSamFiles_from_same_library
@@ -345,7 +345,7 @@ process PicardTools_BuildBamIndex  {
       tuple(val(library), 
          file(input_bam)
       ) from output_ch_PicardTools_MergeSamFiles_from_same_library
-         .mix(output_ch_2_PicardTools_MarkDuplicates_PicardTools_MergeSamFiles_from_same_library_and_sample.input_ch_PicardTools_BuildBamIndex)
+         .mix(output_ch_2_PicardTools_MarkDuplicates_PicardTools_MergeSamFiles_from_same_sample_and_library.input_ch_PicardTools_BuildBamIndex)
 
    // no need for an output channel becuase this is the final stepp
    output:
