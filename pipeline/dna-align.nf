@@ -86,7 +86,7 @@ Channel
 process BWA_mem {
    container docker_image_BWA
 
-   publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
    // use "each" so the the reference files are passed through for each fastq pair alignment 
    input: 
@@ -130,7 +130,7 @@ process BWA_mem {
 process SAMTools_convert_sam_to_bam {
    container docker_image_SAMTools
 
-   publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
    input: 
       tuple(val(library), 
@@ -164,7 +164,7 @@ process SAMTools_convert_sam_to_bam {
 process PicardTools_SortSam  {
    container docker_image_PicardTools
    
-   publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
    input:
       tuple(val(library), 
@@ -197,7 +197,7 @@ process PicardTools_SortSam  {
 process PicardTools_MarkDuplicates  {
    container docker_image_PicardTools
 
-   publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
    input:
       tuple(val(library), 
@@ -254,7 +254,7 @@ output_ch_PicardTools_MarkDuplicates
 process PicardTools_MergeSamFiles_from_same_sample_and_library  {
    container docker_image_PicardTools
    
-   publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
    input:
       tuple(val(sample_and_library), 
@@ -309,7 +309,7 @@ output_ch_PicardTools_MergeSamFiles_from_same_sample_and_library
 process PicardTools_MergeSamFiles_from_same_library  {
    container docker_image_PicardTools
 
-   publishDir params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
    input:
       tuple(val(library), 
@@ -339,7 +339,7 @@ process PicardTools_MergeSamFiles_from_same_library  {
 process PicardTools_BuildBamIndex  {
    container docker_image_PicardTools
 
-   publishDir params.output_dir, mode: 'copy'
+   publishDir path: params.output_dir, mode: 'copy'
 
    input:
       tuple(val(library), 

@@ -34,7 +34,7 @@ log.info """\
 process Jvarkit_cmpbams {
    container docker_image_Jvarkit
 
-   publishDir params.output_dir, mode: 'copy'
+   publishDir path: params.output_dir, mode: 'copy'
 
    input: 
       tuple(path(bam_1), path(bam_2)) from input_ch_input_bams
