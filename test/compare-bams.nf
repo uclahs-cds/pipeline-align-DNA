@@ -1,4 +1,4 @@
-def jvarkit_docker_image = "blcdsdockerregistry/jvarkit-cmpbams:1.0"
+def docker_image_Jvarkit = "blcdsdockerregistry/jvarkit-cmpbams:1.0"
 
 Channel
    .fromPath(params.input_csv)
@@ -23,7 +23,7 @@ log.info """\
       output_dir: ${params.output_dir}
    
    Tools Used:
-      jvarkit's cmpbams: ${jvarkit_docker_image}
+      jvarkit's cmpbams: ${docker_image_Jvarkit}
     
    ------------------------------------
    Starting workflow...
@@ -31,8 +31,8 @@ log.info """\
    """
    .stripIndent()
 
-process jvarkit_compare_bams {
-   container jvarkit_docker_image
+process Jvarkit_cmpbams {
+   container docker_image_Jvarkit
 
    publishDir params.output_dir, mode: 'copy'
 
