@@ -24,6 +24,7 @@ log.info """\
       reference_fasta_index_files: ${params.reference_fasta_index_files}
 
    - output: 
+      temp_dir: ${params.temp_dir}
       output_dir: ${params.output_dir}
       
    - options:
@@ -184,7 +185,8 @@ process PicardTools_SortSam  {
    """
    set -euo pipefail
 
-   java -Xmx14g -jar /picard-tools/picard.jar \
+   java -Xmx24g -jar -Djava.io.tmpdir=${params.temp_dir} \
+      /picard-tools/picard.jar \
       SortSam \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
@@ -222,7 +224,8 @@ process PicardTools_MarkDuplicates  {
    """
    set -euo pipefail
 
-   java -Xmx10g -jar /picard-tools/picard.jar \
+   java -Xmx10g -jar -Djava.io.tmpdir=${params.temp_dir} \
+      /picard-tools/picard.jar \
       MarkDuplicates \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
@@ -276,7 +279,8 @@ process PicardTools_MergeSamFiles_from_same_sample_and_library  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / INPUT=/g' | sed '1s/^/INPUT=/')
 
-   java -Xmx10g -jar /picard-tools/picard.jar \
+   java -Xmx10g -jar -Djava.io.tmpdir=!{params.temp_dir} \
+      /picard-tools/picard.jar \
       MergeSamFiles \
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
@@ -326,7 +330,8 @@ process PicardTools_MergeSamFiles_from_same_library  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / INPUT=/g' | sed '1s/^/INPUT=/')
 
-   java -Xmx10g -jar /picard-tools/picard.jar \
+   java -Xmx10g -jar -Djava.io.tmpdir=!{params.temp_dir} \
+      /picard-tools/picard.jar \
       MergeSamFiles \
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
@@ -356,7 +361,8 @@ process PicardTools_BuildBamIndex  {
    """
    set -euo pipefail
 
-   java -Xmx6g -jar /picard-tools/picard.jar \
+   java -Xmx10g -jar -Djava.io.tmpdir=${params.temp_dir} \
+      /picard-tools/picard.jar \
       BuildBamIndex \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
