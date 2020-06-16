@@ -11,9 +11,9 @@ def docker_image_PicardTools = "blcdsdockerregistry/picard-tools:1.130"
 
 // output details of the pipeline run to stdout
 log.info """\
-   =============================================
-   C A L L - D N A - A L I G N  P I P E L I N E
-   =============================================
+   ===================================
+   P I P E L I N E - A L I G N - D N A
+   ===================================
    Boutros Lab
 
    Current Configuration:
