@@ -1,4 +1,4 @@
-def jvarkit_docker_image = "blcdsdockerregistry/jvarkit-cmpbams:1.0"
+def docker_image_Jvarkit = "blcdsdockerregistry/jvarkit-cmpbams:1.0"
 
 Channel
    .fromPath(params.input_csv)
@@ -7,7 +7,7 @@ Channel
    .map { row -> 
       return tuple(row.bam_1, row.bam_2)
    }
-   .set { input_bams_ch }
+   .set { input_ch_input_bams }
 
 log.info """\
    ==========================================
@@ -18,11 +18,12 @@ log.info """\
    Current Configuration:
    - input: 
       input_csv: ${params.input_csv}
+
    - output: 
       output_dir: ${params.output_dir}
    
    Tools Used:
-      jvarkit's cmpbams: ${jvarkit_docker_image}
+      jvarkit's cmpbams: ${docker_image_Jvarkit}
     
    ------------------------------------
    Starting workflow...
@@ -30,16 +31,16 @@ log.info """\
    """
    .stripIndent()
 
-process compare_bams {
-   container jvarkit_docker_image
+process Jvarkit_cmpbams {
+   container docker_image_Jvarkit
 
-   publishDir params.output_dir, mode: 'copy'
+   publishDir path: params.output_dir, mode: 'copy'
 
    input: 
-      tuple(path(bam_1), path(bam_2)) from input_bams_ch
+      tuple(path(bam_1), path(bam_2)) from input_ch_input_bams
 
    output:
-     file("${bam_1.baseName}-${bam_2.baseName}-diff.txt") into compare_bams_output_ch
+     file("${bam_1.baseName}-${bam_2.baseName}-diff.txt")
 
    script:
    """
