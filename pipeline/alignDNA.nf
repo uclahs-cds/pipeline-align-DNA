@@ -325,8 +325,8 @@ process PicardTools_BuildBamIndex  {
 
    // no need for an output channel becuase this is the final stepp
    output:
-      file("${library}.bam")
-      file("${library}.bam.bai")
+      tuple(file("${library}.bam"),
+         file("${library}.bam.bai"))
 
    script:
    """
