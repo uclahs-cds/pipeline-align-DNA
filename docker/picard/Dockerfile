@@ -25,4 +25,7 @@ RUN wget https://github.com/broadinstitute/picard/releases/download/1.130/picard
       unzip picard-tools-1.130.zip && rm -rf picard-tools-1.130.zip && \
       mv picard-tools-1.130/* . && \
       rm -rf picard-tools-1.130/
+
+# ps and command for reporting mertics 
+RUN apt-get update && apt-get install -y procps
       

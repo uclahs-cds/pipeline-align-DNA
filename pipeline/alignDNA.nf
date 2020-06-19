@@ -37,10 +37,8 @@ log.info """\
    - BWA and SAMtools: ${docker_image_BWA_and_SAMTools}
    - Picard Tools: ${docker_image_PicardTools}
 
-
-   
    ------------------------------------
-   Starting workflow...
+   Executing workflow...
    ------------------------------------
    """
    .stripIndent()
@@ -149,10 +147,14 @@ process PicardTools_SortSam  {
          file(input_bam)
       ) from output_ch_BWA_mem_SAMTools_Convert_Sam_to_Bam
    
+   // the first value of the tuple will be used as a key to group aligned and filtered bams
+   // from the same sample and library but different lane together
+
+   // the next steps of the pipeline are merging so using a lane to differentiate between files is no londer needed
+   // (files of same lane are merged together) so the lane information is dropped
    output:
-      tuple(val(library), 
-         val(sample),
-         val(lane),
+      tuple(val("${library}-${sample}"),
+         val(library), 
          file("${library}-${sample}-${lane}.sorted.bam")
       ) into output_ch_PicardTools_SortSam
 
@@ -288,11 +290,6 @@ process PicardTools_MarkDuplicates  {
       ) from output_ch_PicardTools_MergeSamFiles_from_same_library
          .mix(output_ch_PicardTools_SortSam_PicardTools_MergeSamFiles_from_same_sample_and_library.input_ch_PicardTools_MarkDuplicates)
 
-   // the first value of the tuple will be used as a key to group aligned and filtered bams
-   // from the same sample and library but different lane together
-
-   // the next steps of the pipeline are merging so using a lane to differentiate between files is no londer needed
-   // (files of same lane are merged together) so the lane information is dropped
    output:
       tuple(val(library), 
          file("${library}.mark_dup.bam")

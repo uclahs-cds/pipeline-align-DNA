@@ -17,3 +17,6 @@ RUN conda update -n base -c defaults conda &&\
       conda config --add channels conda-forge && \
       conda install -q -y samtools==1.3 && \
       conda clean --all -y 
+
+# ps and command for reporting mertics 
+RUN apt-get update && apt-get install -y procps
