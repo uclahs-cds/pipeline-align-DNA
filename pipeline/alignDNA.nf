@@ -5,8 +5,7 @@
       - NEEDS TESTING FOR ALIGNING MULTIPLE BAMS IN PARALLEL
       - NEEDS SLURM OPTIMIZATION AND CONFIGURATION
 */
-def docker_image_BWA = "blcdsdockerregistry/bwa:0.7.15"
-def docker_image_SAMTools = "blcdsdockerregistry/samtools:1.3"
+def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-0.7.15_samtools-1.3"
 def docker_image_PicardTools = "blcdsdockerregistry/picard-tools:1.130"
 
 // output details of the pipeline run to stdout
@@ -31,8 +30,7 @@ log.info """\
       save_intermediate_files = ${params.save_intermediate_files}
 
    Tools Used:
-   - BWA: ${docker_image_BWA}
-   - Samtools: ${docker_image_SAMTools}
+   - BWA and SAMtools: ${docker_image_BWA_and_SAMTools}
    - Picard Tools: ${docker_image_PicardTools}
    
    ------------------------------------
@@ -51,7 +49,7 @@ Channel
          "\tID:" + row.read_group_identifier + ".Seq" + row.lane +
          "\tCN:" + row.sequencing_center +
          "\tLB:" + row.library_identifier +
-         "\tPL:" + row.platfrom_technology +
+         "\tPL:" + row.platform_technology +
          "\tPU:" + row.platform_unit +
          "\tSM:" + row.sample
 
@@ -83,9 +81,9 @@ Channel
    .ifEmpty { error "Cannot find reference index files: ${params.reference_fasta_index_files}" }
    .set { input_ch_reference_index_files }
    
-// align with bwa mem
-process BWA_mem {
-   container docker_image_BWA
+// align with bwa mem and convert with samtools
+process BWA_mem_SAMTools_Convert_Sam_to_Bam {
+   container docker_image_BWA_and_SAMTools
 
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
@@ -108,8 +106,8 @@ process BWA_mem {
       tuple(val(library), 
          val(sample),
          val(lane),
-         file("${library}-${sample}-${lane}.aligned.sam")
-      ) into output_ch_bwa_mem
+         file("${library}-${sample}-${lane}.aligned.bam")
+      ) into output_ch_BWA_mem_SAMTools_Convert_Sam_to_Bam
 
    script:
    """
@@ -122,41 +120,12 @@ process BWA_mem {
       -R "${read_group_name}" \
       ${ref_fasta} \
       ${read1_fastq} \
-      ${read2_fastq} > \
-      ${library}-${sample}-${lane}.aligned.sam
-   """
-}
-
-// convert with samtools
-process SAMTools_convert_sam_to_bam {
-   container docker_image_SAMTools
-
-   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
-
-   input: 
-      tuple(val(library), 
-         val(sample), 
-         val(lane),
-         file(input_sam)
-      ) from output_ch_bwa_mem
-
-   output:
-      tuple (val(library), 
-         val(sample), 
-         val(lane), 
-         file("${library}-${sample}-${lane}.aligned.bam")
-      ) into output_ch_SAMTools_convert_sam_to_bam
-
-   script:
-   """
-   set -euo pipefail
-
+      ${read2_fastq} | \
    samtools \
       view \
       -@ 4 \
       -S \
-      -b \
-      ${input_sam} > \
+      -b > \
       ${library}-${sample}-${lane}.aligned.bam
    """
 }
@@ -172,7 +141,7 @@ process PicardTools_SortSam  {
          val(sample),
          val(lane),
          file(input_bam)
-      ) from output_ch_SAMTools_convert_sam_to_bam
+      ) from output_ch_BWA_mem_SAMTools_Convert_Sam_to_Bam
    
    output:
       tuple(val(library), 
@@ -195,49 +164,9 @@ process PicardTools_SortSam  {
    """
 }
 
-// mark duplicates with picard
-process PicardTools_MarkDuplicates  {
-   container docker_image_PicardTools
-
-   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
-
-   input:
-      tuple(val(library), 
-         val(sample), 
-         val(lane),
-         file(input_bam)
-      ) from output_ch_PicardTools_SortSam
-
-   // the first value of the tuple will be used as a key to group aligned and filtered bams
-   // from the same sample and library but different lane together
-
-   // the next steps of the pipeline are merging so using a lane to differentiate between files is no londer needed
-   // (files of same lane are merged together) so the lane information is dropped
-   output:
-      tuple(val("${library}-${sample}"),
-         val(library), 
-         file("${library}-${sample}-${lane}.mark_dup.bam")
-      ) into output_ch_PicardTools_MarkDuplicates
-      file("${library}-${sample}-${lane}.mark_dup.metrics")
-
-   script:
-   """
-   set -euo pipefail
-
-   java -Xmx10g -jar -Djava.io.tmpdir=${params.temp_dir} \
-      /picard-tools/picard.jar \
-      MarkDuplicates \
-      VALIDATION_STRINGENCY=LENIENT \
-      INPUT=${input_bam} \
-      OUTPUT=${library}-${sample}-${lane}.mark_dup.bam \
-      METRICS_FILE=${library}-${sample}-${lane}.mark_dup.metrics \
-      PROGRAM_RECORD_ID=MarkDuplicates
-   """
-}
-
 // group the aligned and filtered bams the same sample and library
 // and send those outputs to be merged if there is more than one bam per group
-output_ch_PicardTools_MarkDuplicates
+output_ch_PicardTools_SortSam
 	.groupTuple()
    .branch { sample_and_library_name, library, mark_dups_bams ->
 		input_ch_PicardTools_MergeSamFiles_from_same_sample_and_library: mark_dups_bams.size() > 1
@@ -248,10 +177,10 @@ output_ch_PicardTools_MarkDuplicates
 
       // samples that are only aligned to one lane will be merged with other samples from the same library
       //  or indexed if there are no other samples from the same library
-		input_ch_PicardTools_MergeSamFiles_from_same_library_PicardTools_BuildBamIndex: mark_dups_bams.size() <= 1
+		input_ch_PicardTools_MergeSamFiles_from_same_library_PicardTools_MarkDuplicates: mark_dups_bams.size() <= 1
          return tuple(library.get(0), mark_dups_bams.get(0))
 	}
-	.set { output_ch_2_PicardTools_MarkDuplicates }
+	.set { output_ch_2_PicardTools_SortSam }
 
 // merge bams from the same library and sample with picard
 process PicardTools_MergeSamFiles_from_same_sample_and_library  {
@@ -263,7 +192,7 @@ process PicardTools_MergeSamFiles_from_same_sample_and_library  {
       tuple(val(sample_and_library), 
          val(library),
          file(input_bams)
-      ) from output_ch_2_PicardTools_MarkDuplicates.input_ch_PicardTools_MergeSamFiles_from_same_sample_and_library
+      ) from output_ch_2_PicardTools_SortSam.input_ch_PicardTools_MergeSamFiles_from_same_sample_and_library
 
    // the next steps of the pipeline are merging so using a sample to differentiate between files is no londer needed
    // (files of same sample are merged together) so the sample information is dropped
@@ -296,7 +225,7 @@ output_ch_PicardTools_MergeSamFiles_from_same_sample_and_library
    .map{ library, bams ->
       return tuple(library.get(0), bams)
    }
-   .mix(output_ch_2_PicardTools_MarkDuplicates.input_ch_PicardTools_MergeSamFiles_from_same_library_PicardTools_BuildBamIndex)
+   .mix(output_ch_2_PicardTools_SortSam.input_ch_PicardTools_MergeSamFiles_from_same_library_PicardTools_MarkDuplicates)
 	.groupTuple()
    .branch { library, bams ->
 		input_ch_PicardTools_MergeSamFiles_from_same_library: bams.size() > 1
@@ -304,10 +233,10 @@ output_ch_PicardTools_MergeSamFiles_from_same_sample_and_library
       // when grouping in values besides the first value passed, the key become wrapped in an additional tuple
       // and b/c we know that the bams are a tuple of size 1 and the downstream input requires a file 
       // that is not wrapped in a tuple, we just get the 1st element of the tuple, the file itself
-		input_ch_PicardTools_BuildBamIndex: bams.size() <= 1
+		input_ch_PicardTools_MarkDuplicates: bams.size() <= 1
          return tuple(library, bams.get(0))
 	}
-	.set { output_ch_2_PicardTools_MarkDuplicates_PicardTools_MergeSamFiles_from_same_sample_and_library }
+	.set { output_ch_PicardTools_SortSam_PicardTools_MergeSamFiles_from_same_sample_and_library }
 
 // merge bams from the same library with picard
 process PicardTools_MergeSamFiles_from_same_library  {
@@ -318,7 +247,7 @@ process PicardTools_MergeSamFiles_from_same_library  {
    input:
       tuple(val(library), 
          file(input_bams)
-      ) from output_ch_2_PicardTools_MarkDuplicates_PicardTools_MergeSamFiles_from_same_sample_and_library.input_ch_PicardTools_MergeSamFiles_from_same_library.collect()
+      ) from output_ch_PicardTools_SortSam_PicardTools_MergeSamFiles_from_same_sample_and_library.input_ch_PicardTools_MergeSamFiles_from_same_library.collect()
 
    output:
       tuple(val(library), file("${library}.merged.bam")) into output_ch_PicardTools_MergeSamFiles_from_same_library
@@ -340,6 +269,46 @@ process PicardTools_MergeSamFiles_from_same_library  {
    '''
 }
 
+
+// mark duplicates with picard
+process PicardTools_MarkDuplicates  {
+   container docker_image_PicardTools
+
+   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+
+   input:
+      tuple(val(library), 
+         file(input_bam)
+      ) from output_ch_PicardTools_MergeSamFiles_from_same_library
+         .mix(output_ch_PicardTools_SortSam_PicardTools_MergeSamFiles_from_same_sample_and_library.input_ch_PicardTools_MarkDuplicates)
+
+   // the first value of the tuple will be used as a key to group aligned and filtered bams
+   // from the same sample and library but different lane together
+
+   // the next steps of the pipeline are merging so using a lane to differentiate between files is no londer needed
+   // (files of same lane are merged together) so the lane information is dropped
+   output:
+      tuple(val(library), 
+         file("${library}.mark_dup.bam")
+      ) into output_ch_PicardTools_MarkDuplicates
+      file("${library}.mark_dup.metrics")
+
+   script:
+   """
+   set -euo pipefail
+
+   java -Xmx10g -jar -Djava.io.tmpdir=${params.temp_dir} \
+      /picard-tools/picard.jar \
+      MarkDuplicates \
+      VALIDATION_STRINGENCY=LENIENT \
+      INPUT=${input_bam} \
+      OUTPUT=${library}.mark_dup.bam \
+      METRICS_FILE=${library}.mark_dup.metrics \
+      PROGRAM_RECORD_ID=MarkDuplicates
+   """
+}
+
+
 // index bams with picard
 process PicardTools_BuildBamIndex  {
    container docker_image_PicardTools
@@ -349,8 +318,7 @@ process PicardTools_BuildBamIndex  {
    input:
       tuple(val(library), 
          file(input_bam)
-      ) from output_ch_PicardTools_MergeSamFiles_from_same_library
-         .mix(output_ch_2_PicardTools_MarkDuplicates_PicardTools_MergeSamFiles_from_same_sample_and_library.input_ch_PicardTools_BuildBamIndex)
+      ) from output_ch_PicardTools_MarkDuplicates
 
    // no need for an output channel becuase this is the final stepp
    output:
