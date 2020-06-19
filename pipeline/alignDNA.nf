@@ -4,7 +4,10 @@
    TODO:
       - NEEDS TESTING FOR ALIGNING MULTIPLE BAMS IN PARALLEL
       - NEEDS SLURM OPTIMIZATION AND CONFIGURATION
+      - NEEDS LOGGING UPDATE FOR OUTPUS, LOGS AND REPORTS
+      - NEEDS VALIDATION PROCESS/STEP
 */
+
 def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-0.7.15_samtools-1.3"
 def docker_image_PicardTools = "blcdsdockerregistry/align-dna:picardtools-1.130"
 
