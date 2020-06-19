@@ -26,9 +26,9 @@ log.info """\
       reference_fasta_index_files: ${params.reference_fasta_index_files}
 
    - output: 
+      java_temp_dir: ${params.java_temp_dir}
       temp_dir: ${params.temp_dir}
       output_dir: ${params.output_dir}
-      working directory: $workflow.workDir
       
    - options:
       save_intermediate_files = ${params.save_intermediate_files}
@@ -160,7 +160,7 @@ process PicardTools_SortSam  {
    """
    set -euo pipefail
 
-   java -Xmx24g -jar -Djava.io.tmpdir=${params.temp_dir} \
+   java -Xmx24g -jar -Djava.io.tmpdir=${params.java_temp_dir} \
       /picard-tools/picard.jar \
       SortSam \
       VALIDATION_STRINGENCY=LENIENT \
@@ -214,7 +214,7 @@ process PicardTools_MergeSamFiles_from_same_sample_and_library  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / INPUT=/g' | sed '1s/^/INPUT=/')
 
-   java -Xmx10g -jar -Djava.io.tmpdir=!{params.temp_dir} \
+   java -Xmx10g -jar -Djava.io.tmpdir=!{params.java_temp_dir} \
       /picard-tools/picard.jar \
       MergeSamFiles \
       USE_THREADING=true \
@@ -265,7 +265,7 @@ process PicardTools_MergeSamFiles_from_same_library  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / INPUT=/g' | sed '1s/^/INPUT=/')
 
-   java -Xmx10g -jar -Djava.io.tmpdir=!{params.temp_dir} \
+   java -Xmx10g -jar -Djava.io.tmpdir=!{params.java_temp_dir} \
       /picard-tools/picard.jar \
       MergeSamFiles \
       USE_THREADING=true \
@@ -303,7 +303,7 @@ process PicardTools_MarkDuplicates  {
    """
    set -euo pipefail
 
-   java -Xmx10g -jar -Djava.io.tmpdir=${params.temp_dir} \
+   java -Xmx10g -jar -Djava.io.tmpdir=${params.java_temp_dir} \
       /picard-tools/picard.jar \
       MarkDuplicates \
       VALIDATION_STRINGENCY=LENIENT \
@@ -335,7 +335,7 @@ process PicardTools_BuildBamIndex  {
    """
    set -euo pipefail
 
-   java -Xmx10g -jar -Djava.io.tmpdir=${params.temp_dir} \
+   java -Xmx10g -jar -Djava.io.tmpdir=${params.java_temp_dir} \
       /picard-tools/picard.jar \
       BuildBamIndex \
       VALIDATION_STRINGENCY=LENIENT \
