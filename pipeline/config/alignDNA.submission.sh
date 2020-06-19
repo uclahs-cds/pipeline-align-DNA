@@ -20,34 +20,24 @@ function generate_sbatch_options() {
     echo $sbatch_options
 }
 
-# create temp directory for /work and intermediates file
-function create_work_dir() {
-    # get the pipeline run name 
-    declare -r pipeline_run_name=$1
-
-    # create temp directory for /work and intermediates file 
-    declare -a work_dir=$(mktemp -d /scratch/$pipeline_run_name-temp-XXXXXX)
-
-    # return path of the work dir
-    echo $work_dir
-}
-
 # create the nextflow run command
 function execute_nextflow_run_command() {
     # get the nextflow script, configuration file and work dir
     declare -r nextflow_script=$1
     declare -r config_file=$2
-    declare -r work_dir=$3
 
     # nextflow run command
-    declare -r nextflow_run_command="nextflow run $nextflow_script -config $config_file -work-dir $work_dir"
+    declare -r nextflow_run_command="nextflow run $nextflow_script -config $config_file"
 
-    # execute nextflow run command
+    # output and then execute nextflow run command
     echo $nextflow_run_command
     eval $nextflow_run_command
 }
 
 function main() {
+    # make sure you are on local disk
+    cd /scratch
+
     # get the pipeline run name, nextflow script, configuration file and email
     declare -r nextflow_script=$1
     declare -r config_file=$2
@@ -57,14 +47,8 @@ function main() {
     # generate SBATCH/Slurm options
     generate_sbatch_options $pipeline_run_name $email
 
-    # create temp directory for /work and intermediates file 
-    declare -a work_dir=$(create_work_dir $pipeline_run_name)
-
     # get the nextflow run command and execute the pipeline
-    execute_nextflow_run_command $nextflow_script $config_file $work_dir
-
-    # clean the work directory
-    rm -r $work_dir
+    execute_nextflow_run_command $nextflow_script $config_file
 }
 
 # 1st input ($1): nextflow script (.nf)

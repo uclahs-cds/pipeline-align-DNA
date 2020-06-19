@@ -6,7 +6,7 @@
       - NEEDS SLURM OPTIMIZATION AND CONFIGURATION
 */
 def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-0.7.15_samtools-1.3"
-def docker_image_PicardTools = "blcdsdockerregistry/picard-tools:1.130"
+def docker_image_PicardTools = "blcdsdockerregistry/align-dna:picardtools-1.130"
 
 // output details of the pipeline run to stdout
 log.info """\
@@ -25,6 +25,7 @@ log.info """\
    - output: 
       temp_dir: ${params.temp_dir}
       output_dir: ${params.output_dir}
+      working directory: $workflow.workDir
       
    - options:
       save_intermediate_files = ${params.save_intermediate_files}
@@ -32,6 +33,8 @@ log.info """\
    Tools Used:
    - BWA and SAMtools: ${docker_image_BWA_and_SAMTools}
    - Picard Tools: ${docker_image_PicardTools}
+
+
    
    ------------------------------------
    Starting workflow...

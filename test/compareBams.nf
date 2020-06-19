@@ -1,4 +1,4 @@
-def docker_image_Jvarkit = "blcdsdockerregistry/jvarkit-cmpbams:1.0"
+def docker_image_Jvarkit = "blcdsdockerregistry/compare-bams:jvarkit-cmpbams-1.0"
 
 Channel
    .fromPath(params.input_csv)
@@ -21,6 +21,8 @@ log.info """\
 
    - output: 
       output_dir: ${params.output_dir}
+      working directory: $workflow.workDir
+
    
    Tools Used:
       jvarkit's cmpbams: ${docker_image_Jvarkit}
