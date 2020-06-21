@@ -4,10 +4,10 @@
 ##########################################################################################
 #SBATCH --exclusive # reserve an entire node
 #SBATCH --partition=midmem # worker node partition type (e.g: midmem or execute)
-#SBATCH -J alignDNA-a-partial- # name of the run in the queue 
-#SBATCH -e alignDNA-a-partial-.error # name of the stderror file 
-#SBATCH -o alignDNA-a-partial-.log # name of stdout file 
-#SBATCH --mail-user=bcarlin # Where to send email
+#SBATCH -J <pipeline_run_name> # name of the run in the queue 
+#SBATCH -e <pipeline_run_name>.error # name of the stderror file 
+#SBATCH -o <pipeline_run_name>.log # name of stdout file 
+#SBATCH --mail-user=<email address> # Where to send email
 #SBATCH --mail-type=ALL  # Mail events (NONE, BEGIN, END, FAIL, ALL)
 ##########################################################################################
 
@@ -34,6 +34,9 @@ function main() {
     declare -r config_file=$2
     declare -r pipeline_run_name=$3
     declare -r email=$4
+
+    # generate SBATCH/Slurm options
+    generate_sbatch_options $pipeline_run_name $email
 
     # get the nextflow run command and execute the pipeline
     execute_nextflow_run_command $nextflow_script $config_file
