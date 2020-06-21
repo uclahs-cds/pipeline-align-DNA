@@ -32,11 +32,6 @@ function main() {
     # get the pipeline run name, nextflow script, configuration file and email
     declare -r nextflow_script=$1
     declare -r config_file=$2
-    declare -r pipeline_run_name=$3
-    declare -r email=$4
-
-    # generate SBATCH/Slurm options
-    generate_sbatch_options $pipeline_run_name $email
 
     # get the nextflow run command and execute the pipeline
     execute_nextflow_run_command $nextflow_script $config_file
@@ -44,6 +39,4 @@ function main() {
 
 # 1st input ($1): nextflow script (.nf)
 # 2nd  input ($2): config file (.config)
-# 3rd input ($3): pipeline run name (alignDNA-<dataset name>)
-# 4th input ($4): email (<AD>@mednet.ucla.edu) 
-main $1 $2 $3 $4
+main $1 $2
