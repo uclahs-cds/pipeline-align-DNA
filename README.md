@@ -7,4 +7,4 @@ For docker images, please view our Dockerhub repository [here](https://hub.docke
 ## How to run the pipeline
 On the head/submitter node run:
 
-sbatch /path/to/alignDNA.submission.sh /path/to/alignDNA.nf /path/to/alignDNA.config name_of_pipeline_run your_email
+sbatch /path/to/alignDNA.submission.sh /path/to/alignDNA.nf /path/to/alignDNA.config
