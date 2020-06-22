@@ -21,7 +21,6 @@ function execute_nextflow_run_command() {
     declare -r nextflow_run_command="nextflow run $nextflow_script -config $config_file"
 
     # output and then execute nextflow run command
-    echo $nextflow_run_command
     eval $nextflow_run_command
 }
 
