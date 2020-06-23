@@ -9,3 +9,14 @@ RUN conda update -n base -c defaults conda && \
     conda clean --all -y 
 
 CMD ["bwa"]
+
+# https://github.com/bioconda/bioconda-recipes/issues/12100
+RUN conda update -n base -c defaults conda &&\
+      conda config --add channels defaults && \
+      conda config --add channels bioconda && \
+      conda config --add channels conda-forge && \
+      conda install -q -y samtools==1.3 && \
+      conda clean --all -y 
+
+# ps and command for reporting mertics 
+RUN apt-get update && apt-get install -y procps
