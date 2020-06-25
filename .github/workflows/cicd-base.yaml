@@ -1,0 +1,24 @@
+name: cicd-base
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  cicd-base:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 15
+
+    steps:
+      # Checkout codebase
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      # Run cicd-base
+      - name: cicd-base
+        uses: docker://blcdsdockerregistry/cicd-base:latest
