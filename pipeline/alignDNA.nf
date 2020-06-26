@@ -32,6 +32,7 @@ log.info """\
       
    - options:
       save_intermediate_files = ${params.save_intermediate_files}
+      number_of_parallel_jobs = ${params.number_of_parallel_jobs}
 
    Tools Used:
    - BWA and SAMtools: ${docker_image_BWA_and_SAMTools}
