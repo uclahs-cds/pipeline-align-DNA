@@ -32,7 +32,14 @@ log.info """\
       
    - options:
       save_intermediate_files = ${params.save_intermediate_files}
-      number_of_parallel_jobs = ${params.number_of_parallel_jobs}
+      max_number_of_parallel_jobs = ${params.max_number_of_parallel_jobs}
+      max_number_of_cpus = ${params.max_number_of_cpus}
+      max_memory = ${params.max_memory}
+      number_of_cpus_for_BWA_mem = ${params.number_of_cpus_for_BWA_mem}
+      number_of_cpus_for_SAMTools_Convert_Sam_to_Bam = ${params.number_of_cpus_for_SAMTools_Convert_Sam_to_Bam}
+      memory_for_BWA_mem_SAMTools_Convert_Sam_to_Bam = ${params.memmory_for_BWA_mem_SAMTools_Convert_Sam_to_Bam}
+      number_of_cpus_for_PicardTools = ${params.max_number_of_parallel_jobs}
+      memory_for_PicardTools = ${params.memmory_for_PicardTools}
 
    Tools Used:
    - BWA and SAMtools: ${docker_image_BWA_and_SAMTools}
@@ -92,6 +99,8 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
 
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
+   label "resource_allocation_for_BWA_mem_SAMTools_Convert_Sam_to_Bam"
+
    // use "each" so the the reference files are passed through for each fastq pair alignment 
    input: 
       tuple(val(library), 
@@ -120,7 +129,7 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
 
    bwa \
       mem \
-      -t 32 \
+      -t ${params.number_of_cpus_for_BWA_mem} \
       -M \
       -R "${read_group_name}" \
       ${ref_fasta} \
@@ -128,7 +137,7 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
       ${read2_fastq} | \
    samtools \
       view \
-      -@ 4 \
+      -@ ${params.number_of_cpus_for_SAMTools_Convert_Sam_to_Bam} \
       -S \
       -b > \
       ${library}-${sample}-${lane}.aligned.bam
@@ -140,6 +149,8 @@ process PicardTools_SortSam  {
    container docker_image_PicardTools
    
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+
+   label "resource_allocation_for_PicardTools"
 
    input:
       tuple(val(library), 
@@ -197,6 +208,8 @@ process PicardTools_MergeSamFiles_from_same_sample_and_library  {
    
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
+   label "resource_allocation_for_PicardTools"
+
    input:
       tuple(val(sample_and_library), 
          val(library),
@@ -253,6 +266,8 @@ process PicardTools_MergeSamFiles_from_same_library  {
 
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
+   label "resource_allocation_for_PicardTools"
+
    input:
       tuple(val(library), 
          file(input_bams)
@@ -284,6 +299,8 @@ process PicardTools_MarkDuplicates  {
    container docker_image_PicardTools
 
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+
+   label "resource_allocation_for_PicardTools"
 
    input:
       tuple(val(library), 
@@ -319,6 +336,8 @@ process PicardTools_BuildBamIndex  {
 
    publishDir path: params.output_dir, mode: 'copy'
 
+   label "resource_allocation_for_PicardTools"
+   
    input:
       tuple(val(library), 
          file(input_bam)
