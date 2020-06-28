@@ -174,8 +174,8 @@ process PicardTools_SortSam  {
    """
    set -euo pipefail
 
-   java -Xmx24g -jar -Djava.io.tmpdir=${params.java_temp_dir} \
-      /picard-tools/picard.jar \
+   java -Xmx${params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=${params.java_temp_dir} \
+      -jar /picard-tools/picard.jar \
       SortSam \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
@@ -230,8 +230,8 @@ process PicardTools_MergeSamFiles_from_same_sample_and_library  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / INPUT=/g' | sed '1s/^/INPUT=/')
 
-   java -Xmx10g -jar -Djava.io.tmpdir=!{params.java_temp_dir} \
-      /picard-tools/picard.jar \
+   java -Xmx!{params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=!{params.java_temp_dir} \
+      -jar /picard-tools/picard.jar \
       MergeSamFiles \
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
@@ -283,8 +283,8 @@ process PicardTools_MergeSamFiles_from_same_library  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / INPUT=/g' | sed '1s/^/INPUT=/')
 
-   java -Xmx10g -jar -Djava.io.tmpdir=!{params.java_temp_dir} \
-      /picard-tools/picard.jar \
+   java -Xmx!{params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=!{params.java_temp_dir} \
+      -jar /picard-tools/picard.jar \
       MergeSamFiles \
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
@@ -318,8 +318,8 @@ process PicardTools_MarkDuplicates  {
    """
    set -euo pipefail
 
-   java -Xmx10g -jar -Djava.io.tmpdir=${params.java_temp_dir} \
-      /picard-tools/picard.jar \
+   java -Xmx${params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=${params.java_temp_dir} \
+      -jar /picard-tools/picard.jar \
       MarkDuplicates \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
@@ -352,8 +352,8 @@ process PicardTools_BuildBamIndex  {
    """
    set -euo pipefail
 
-   java -Xmx10g -jar -Djava.io.tmpdir=${params.java_temp_dir} \
-      /picard-tools/picard.jar \
+   java -Xmx${params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=${params.java_temp_dir} \
+      -jar /picard-tools/picard.jar \
       BuildBamIndex \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
