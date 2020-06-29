@@ -37,9 +37,9 @@ log.info """\
       max_memory = ${params.max_memory}
       number_of_cpus_for_BWA_mem = ${params.number_of_cpus_for_BWA_mem}
       number_of_cpus_for_SAMTools_Convert_Sam_to_Bam = ${params.number_of_cpus_for_SAMTools_Convert_Sam_to_Bam}
-      memory_for_BWA_mem_SAMTools_Convert_Sam_to_Bam = ${params.memmory_for_BWA_mem_SAMTools_Convert_Sam_to_Bam}
+      memory_for_BWA_mem_SAMTools_Convert_Sam_to_Bam = ${params.memory_for_BWA_mem_SAMTools_Convert_Sam_to_Bam}
       number_of_cpus_for_PicardTools = ${params.max_number_of_parallel_jobs}
-      memory_for_PicardTools = ${params.memmory_for_PicardTools}
+      memory_for_PicardTools = ${params.memory_for_PicardTools}
 
    Tools Used:
    - BWA and SAMtools: ${docker_image_BWA_and_SAMTools}
