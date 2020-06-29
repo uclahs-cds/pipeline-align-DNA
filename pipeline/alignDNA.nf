@@ -32,6 +32,7 @@ log.info """\
       
    - options:
       save_intermediate_files = ${params.save_intermediate_files}
+      cache_intermediate_pipeline_steps = ${params.cache_intermediate_pipeline_steps}
       max_number_of_parallel_jobs = ${params.max_number_of_parallel_jobs}
       max_number_of_cpus = ${params.max_number_of_cpus}
       max_memory = ${params.max_memory}
