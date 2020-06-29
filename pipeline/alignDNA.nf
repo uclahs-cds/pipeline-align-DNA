@@ -32,14 +32,15 @@ log.info """\
       
    - options:
       save_intermediate_files = ${params.save_intermediate_files}
+      cache_intermediate_pipeline_steps = ${params.cache_intermediate_pipeline_steps}
       max_number_of_parallel_jobs = ${params.max_number_of_parallel_jobs}
       max_number_of_cpus = ${params.max_number_of_cpus}
       max_memory = ${params.max_memory}
       number_of_cpus_for_BWA_mem = ${params.number_of_cpus_for_BWA_mem}
       number_of_cpus_for_SAMTools_Convert_Sam_to_Bam = ${params.number_of_cpus_for_SAMTools_Convert_Sam_to_Bam}
-      memory_for_BWA_mem_SAMTools_Convert_Sam_to_Bam = ${params.memmory_for_BWA_mem_SAMTools_Convert_Sam_to_Bam}
+      memory_for_BWA_mem_SAMTools_Convert_Sam_to_Bam = ${params.memory_for_BWA_mem_SAMTools_Convert_Sam_to_Bam}
       number_of_cpus_for_PicardTools = ${params.max_number_of_parallel_jobs}
-      memory_for_PicardTools = ${params.memmory_for_PicardTools}
+      memory_for_PicardTools = ${params.memory_for_PicardTools}
 
    Tools Used:
    - BWA and SAMtools: ${docker_image_BWA_and_SAMTools}
@@ -174,8 +175,8 @@ process PicardTools_SortSam  {
    """
    set -euo pipefail
 
-   java -Xmx24g -jar -Djava.io.tmpdir=${params.java_temp_dir} \
-      /picard-tools/picard.jar \
+   java -Xmx${params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=${params.java_temp_dir} \
+      -jar /picard-tools/picard.jar \
       SortSam \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
@@ -230,8 +231,8 @@ process PicardTools_MergeSamFiles_from_same_sample_and_library  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / INPUT=/g' | sed '1s/^/INPUT=/')
 
-   java -Xmx10g -jar -Djava.io.tmpdir=!{params.java_temp_dir} \
-      /picard-tools/picard.jar \
+   java -Xmx!{params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=!{params.java_temp_dir} \
+      -jar /picard-tools/picard.jar \
       MergeSamFiles \
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
@@ -283,8 +284,8 @@ process PicardTools_MergeSamFiles_from_same_library  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / INPUT=/g' | sed '1s/^/INPUT=/')
 
-   java -Xmx10g -jar -Djava.io.tmpdir=!{params.java_temp_dir} \
-      /picard-tools/picard.jar \
+   java -Xmx!{params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=!{params.java_temp_dir} \
+      -jar /picard-tools/picard.jar \
       MergeSamFiles \
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
@@ -318,8 +319,8 @@ process PicardTools_MarkDuplicates  {
    """
    set -euo pipefail
 
-   java -Xmx10g -jar -Djava.io.tmpdir=${params.java_temp_dir} \
-      /picard-tools/picard.jar \
+   java -Xmx${params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=${params.java_temp_dir} \
+      -jar /picard-tools/picard.jar \
       MarkDuplicates \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
@@ -352,8 +353,8 @@ process PicardTools_BuildBamIndex  {
    """
    set -euo pipefail
 
-   java -Xmx10g -jar -Djava.io.tmpdir=${params.java_temp_dir} \
-      /picard-tools/picard.jar \
+   java -Xmx${params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=${params.java_temp_dir} \
+      -jar /picard-tools/picard.jar \
       BuildBamIndex \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
