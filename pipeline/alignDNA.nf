@@ -2,10 +2,12 @@
 
 /* 
    TODO:
-      - NEEDS TESTING FOR ALIGNING MULTIPLE BAMS IN PARALLEL
-      - NEEDS SLURM OPTIMIZATION AND CONFIGURATION
       - NEEDS LOGGING UPDATE FOR OUTPUS, LOGS AND REPORTS
-      - NEEDS VALIDATION PROCESS/STEP
+      - NEEDS A VALIDATION PROCESS/STEP
+      - NEEDS AN UPDATE OF TOOLS
+      - AFTER SEP 2015 PICARD TOOLS MARK DUPS IS LIBRARY AWARE
+      AS A RESULT, WE CAN COMBINE MERGE AND MARK DUPS STEPS INTO 
+      1 PROCESS
 */
 
 def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-0.7.15_samtools-1.3"
@@ -52,12 +54,20 @@ log.info """\
    """
    .stripIndent()
 
+// initialize sample name 
+def SAMPLE_NAME = "alignDNA"
+
 // get the input fastq pairs
 Channel
    .fromPath(params.input_csv)
    .ifEmpty { error "Cannot find input csv: ${params.input_csv}" }
    .splitCsv(header:true)
    .map { row -> 
+      // every row.sample should be the same (currently only 1 sample per input csv)
+      // and because we are already iterating through each row of the csv, just set
+      // the sample name here (NOT more computationally expensive)
+      SAMPLE_NAME = row.sample
+
       def read_group_name = "@RG" +
          "\tID:" + row.read_group_identifier + ".Seq" + row.lane +
          "\tCN:" + row.sequencing_center +
@@ -181,7 +191,7 @@ process PicardTools_SortSam  {
 }
 
 // group the aligned and filtered bams by the same library
-// and send those outputs to be merged if there is more than one bam per group
+// and send those outputs to be merged if there is more than one bam per group (this means there are multiple lanes)
 output_ch_PicardTools_SortSam
 	.groupTuple()
    .branch { library, output_SortSam_bams ->
@@ -212,7 +222,7 @@ process PicardTools_MergeSamFiles_across_lanes  {
 
    output:
       tuple(val(library),
-         file("${library}.merged.bam")
+         file("${library}.merged-lanes.bam")
       ) into output_ch_PicardTools_MergeSamFiles_across_lanes
 
    shell:
@@ -228,7 +238,7 @@ process PicardTools_MergeSamFiles_across_lanes  {
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
       $INPUT \
-      OUTPUT=!{library}.merged.bam
+      OUTPUT=!{library}.merged-lanes.bam
    '''
 }
 
@@ -255,10 +265,10 @@ process PicardTools_MarkDuplicates  {
          file(input_bam)
       ) from input_ch_PicardTools_MarkDuplicates
 
+   // after marking duplicates, bams will be merged by library so the library name is not needed
+   // just the sample name (global variable), do not pass it as a val
    output:
-      tuple(val(library), 
-         file("${library}.mark_dup.bam")
-      ) into output_ch_PicardTools_MarkDuplicates
+      file("${library}.mark_dup.bam") into output_ch_PicardTools_MarkDuplicates
       file("${library}.mark_dup.metrics")
 
    script:
@@ -285,9 +295,9 @@ int num_of_libraries = output_ch_PicardTools_MarkDuplicates_count
 	.count()
 	.get()
 
-// send to merge across lanes if more than one libraru
+// send to merge across lanes if more than one library
 output_ch_2_PicardTools_MarkDuplicates
-   .branch { library, bams ->
+   .branch { bams ->
 		input_ch_PicardTools_MergeSamFiles_across_libraries: num_of_libraries > 1
       
       // if only one library
@@ -304,12 +314,10 @@ process PicardTools_MergeSamFiles_across_libraries  {
    label "resource_allocation_for_PicardTools"
 
    input:
-      tuple(val(library), 
-         file(input_bams)
-      ) from output_ch_3_PicardTools_MarkDuplicates.input_ch_PicardTools_MergeSamFiles_across_libraries.collect()
+      file(input_bams) from output_ch_3_PicardTools_MarkDuplicates.input_ch_PicardTools_MergeSamFiles_across_libraries.collect()
 
    output:
-      tuple(val(library), file("${library}.merged.bam")) into output_ch_PicardTools_MergeSamFiles_across_libraries
+      file("${SAMPLE_NAME}.merged-libraries.bam") into output_ch_PicardTools_MergeSamFiles_across_libraries
 
    shell:
    '''
@@ -324,7 +332,7 @@ process PicardTools_MergeSamFiles_across_libraries  {
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
       $INPUT \
-      OUTPUT=!{library}.merged.bam
+      OUTPUT=!{SAMPLE_NAME}.merged-libraries.bam
    '''
 }
 
@@ -337,9 +345,7 @@ process PicardTools_BuildBamIndex  {
    label "resource_allocation_for_PicardTools"
    
    input:
-      tuple(val(library), 
-         file(input_bam)
-      ) from output_ch_3_PicardTools_MarkDuplicates.input_ch_PicardTools_BuildBamIndex
+      file(input_bam) from output_ch_3_PicardTools_MarkDuplicates.input_ch_PicardTools_BuildBamIndex
          .mix(output_ch_PicardTools_MergeSamFiles_across_libraries)
 
    // no need for an output channel becuase this is the final stepp
@@ -356,9 +362,9 @@ process PicardTools_BuildBamIndex  {
       BuildBamIndex \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
-      OUTPUT=${library}.bam.bai
+      OUTPUT=${SAMPLE_NAME}.bam.bai
 
    # rename final output bam
-   mv ${input_bam} ${library}.bam 
+   mv ${input_bam} ${SAMPLE_NAME}.bam 
    """
 }
