@@ -286,7 +286,7 @@ process PicardTools_MarkDuplicates  {
    """
 }
 
-// copy into 2 channels to use one to get the size of the channel
+// copy into 2 channels and use one to get the size of the channel
 output_ch_PicardTools_MarkDuplicates
    .into { output_ch_PicardTools_MarkDuplicates_count; output_ch_2_PicardTools_MarkDuplicates }
 
