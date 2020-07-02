@@ -3,7 +3,7 @@
 # generate SBATCH/Slurm options
 ##########################################################################################
 #SBATCH --exclusive # reserve an entire node
-#SBATCH --partition=midmem # worker node partition type (e.g: midmem or execute)
+#SBATCH --partition=<partition type> # worker node partition type (e.g: midmem or execute)
 #SBATCH -J <pipeline_run_name> # name of the run in the queue 
 #SBATCH -e <pipeline_run_name>.error # name of the stderror file 
 #SBATCH -o <pipeline_run_name>.log # name of stdout file 
