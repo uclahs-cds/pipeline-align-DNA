@@ -242,13 +242,7 @@ process PicardTools_MergeSamFiles_across_lanes  {
    '''
 }
 
-// the output of merging results in a tuple of libraries; however, each lane that is merged should be
-// from the same library so just get the first value of the tuple becuase they all are the same
-// downstream process depend on just a library not tuples of libraries for input
 output_ch_PicardTools_MergeSamFiles_across_lanes
-   .map{ library, bams ->
-      return tuple(library.get(0), bams)
-   }
    .mix(output_ch_2_PicardTools_SortSam.input_ch_PicardTools_MergeSamFiles_across_libraries_PicardTools_MarkDuplicates)
    .set { input_ch_PicardTools_MarkDuplicates }
 
