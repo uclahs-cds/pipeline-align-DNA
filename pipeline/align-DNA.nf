@@ -242,13 +242,7 @@ process PicardTools_MergeSamFiles_across_lanes  {
    '''
 }
 
-// the output of merging results in a tuple of libraries; however, each lane that is merged should be
-// from the same library so just get the first value of the tuple becuase they all are the same
-// downstream process depend on just a library not tuples of libraries for input
 output_ch_PicardTools_MergeSamFiles_across_lanes
-   .map{ library, bams ->
-      return tuple(library.get(0), bams)
-   }
    .mix(output_ch_2_PicardTools_SortSam.input_ch_PicardTools_MergeSamFiles_across_libraries_PicardTools_MarkDuplicates)
    .set { input_ch_PicardTools_MarkDuplicates }
 
@@ -286,7 +280,7 @@ process PicardTools_MarkDuplicates  {
    """
 }
 
-// copy into 2 channels to use one to get the size of the channel
+// copy into 2 channels and use one to get the size of the channel
 output_ch_PicardTools_MarkDuplicates
    .into { output_ch_PicardTools_MarkDuplicates_count; output_ch_2_PicardTools_MarkDuplicates }
 
@@ -350,8 +344,8 @@ process PicardTools_BuildBamIndex  {
 
    // no need for an output channel becuase this is the final stepp
    output:
-      tuple(file("${library}.bam"),
-         file("${library}.bam.bai"))
+      tuple(file("${SAMPLE_NAME}.bam"),
+         file("${SAMPLE_NAME}.bam.bai"))
 
    script:
    """
