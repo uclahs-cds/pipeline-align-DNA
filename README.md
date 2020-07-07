@@ -11,7 +11,7 @@ For docker images, please view our Dockerhub repository [here](https://hub.docke
 
 2. Update the input csv
 
-3. Update the Slurm or SGE header of the .submission script
+3. Update the Slurm or SGE header of the submission .sh script
 
 4. On your submitter node run:
 sbatch or qsub /path/to/align-DNA.submission.sh /path/to/align-DNA.nf /path/to/align-DNA.config
