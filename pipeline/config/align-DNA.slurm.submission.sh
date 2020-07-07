@@ -25,9 +25,6 @@ function execute_nextflow_run_command() {
 }
 
 function main() {
-    # make sure you are on local disk
-    cd /scratch
-
     # get the pipeline run name, nextflow script, configuration file and email
     declare -r nextflow_script=$1
     declare -r config_file=$2
