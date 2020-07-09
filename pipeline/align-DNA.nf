@@ -22,6 +22,7 @@ log.info """\
 
    Current Configuration:
    - input: 
+      sample_name: ${params.sample_name}
       input_csv: ${params.input_csv}
       reference_fasta: ${params.reference_fasta}
       reference_fasta_dict: ${params.reference_fasta_dict}
@@ -54,20 +55,12 @@ log.info """\
    """
    .stripIndent()
 
-// initialize sample name 
-def SAMPLE_NAME = "alignDNA"
-
 // get the input fastq pairs
 Channel
    .fromPath(params.input_csv)
    .ifEmpty { error "Cannot find input csv: ${params.input_csv}" }
    .splitCsv(header:true)
    .map { row -> 
-      // every row.sample should be the same (currently only 1 sample per input csv)
-      // and because we are already iterating through each row of the csv, just set
-      // the sample name here (NOT more computationally expensive)
-      SAMPLE_NAME = row.sample
-
       def read_group_name = "@RG" +
          "\tID:" + row.read_group_identifier + ".Seq" + row.lane +
          "\tCN:" + row.sequencing_center +
@@ -311,7 +304,7 @@ process PicardTools_MergeSamFiles_across_libraries  {
       file(input_bams) from output_ch_3_PicardTools_MarkDuplicates.input_ch_PicardTools_MergeSamFiles_across_libraries.collect()
 
    output:
-      file("${SAMPLE_NAME}.merged-libraries.bam") into output_ch_PicardTools_MergeSamFiles_across_libraries
+      file("${params.sample_name}.merged-libraries.bam") into output_ch_PicardTools_MergeSamFiles_across_libraries
 
    shell:
    '''
@@ -326,7 +319,7 @@ process PicardTools_MergeSamFiles_across_libraries  {
       USE_THREADING=true \
       VALIDATION_STRINGENCY=LENIENT \
       $INPUT \
-      OUTPUT=!{SAMPLE_NAME}.merged-libraries.bam
+      OUTPUT=!{params.sample_name}.merged-libraries.bam
    '''
 }
 
@@ -344,8 +337,8 @@ process PicardTools_BuildBamIndex  {
 
    // no need for an output channel becuase this is the final stepp
    output:
-      tuple(file("${SAMPLE_NAME}.bam"),
-         file("${SAMPLE_NAME}.bam.bai"))
+      tuple(file("${params.sample_name}.bam"),
+         file("${params.sample_name}.bam.bai"))
 
    script:
    """
@@ -356,9 +349,9 @@ process PicardTools_BuildBamIndex  {
       BuildBamIndex \
       VALIDATION_STRINGENCY=LENIENT \
       INPUT=${input_bam} \
-      OUTPUT=${SAMPLE_NAME}.bam.bai
+      OUTPUT=${params.sample_name}.bam.bai
 
    # rename final output bam
-   mv ${input_bam} ${SAMPLE_NAME}.bam 
+   mv ${input_bam} ${params.sample_name}.bam 
    """
 }
