@@ -3,7 +3,7 @@
 # generate SGE options
 #########################################################################################
 #$ -S /bin/bash 
-#$ -l exclusive=true,slot_type=midmem # reserve an entire node
+#$ -l exclusive=true,slot_type=<partition type> # reserve an entire node
 #$ -cwd # place the log files/output in the current working directory 
 #$ -N <pipeline_run_name> # name of the run in the queue 
 #$ -e <pipeline_run_name> # name of the stderror file 
