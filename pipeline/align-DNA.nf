@@ -4,14 +4,13 @@
    TODO:
       - NEEDS LOGGING UPDATE FOR OUTPUS, LOGS AND REPORTS
       - NEEDS A VALIDATION PROCESS/STEP
-      - NEEDS AN UPDATE OF TOOLS
       - AFTER SEP 2015 PICARD TOOLS MARK DUPS IS LIBRARY AWARE
       AS A RESULT, WE CAN COMBINE MERGE AND MARK DUPS STEPS INTO 
       1 PROCESS
 */
 
-def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-0.7.15_samtools-1.3"
-def docker_image_PicardTools = "blcdsdockerregistry/align-dna:picardtools-1.130"
+def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-0.7.17_samtools-1.10"
+def docker_image_PicardTools = "blcdsdockerregistry/align-dna:picardtools-2.23.3"
 
 // output details of the pipeline run to stdout
 log.info """\
@@ -62,12 +61,12 @@ Channel
    .splitCsv(header:true)
    .map { row -> 
       def read_group_name = "@RG" +
-         "\tID:" + row.read_group_identifier + ".Seq" + row.lane +
-         "\tCN:" + row.sequencing_center +
-         "\tLB:" + row.library_identifier +
-         "\tPL:" + row.platform_technology +
-         "\tPU:" + row.platform_unit +
-         "\tSM:" + row.sample
+         "\\tID:" + row.read_group_identifier + ".Seq" + row.lane +
+         "\\tCN:" + row.sequencing_center +
+         "\\tLB:" + row.library_identifier +
+         "\\tPL:" + row.platform_technology +
+         "\\tPU:" + row.platform_unit +
+         "\\tSM:" + row.sample
 
       // the library, sample and lane are used as keys downstream to group into 
       // sets of the same key for downstream merging
