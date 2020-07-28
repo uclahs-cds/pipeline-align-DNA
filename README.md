@@ -12,4 +12,4 @@ For docker images, please view our Dockerhub repository [here](https://hub.docke
 
 2. Update the input csv
 
-3. See the submission script, [here](https://github.com/uclahs-cds/tool-submit-nf/blob/bc-add-submission-script/README.md), to submit your pipeline
+3. See the submission script, [here](https://github.com/uclahs-cds/tool-submit-nf/blob/bc-add-submission-script/), to submit your pipeline
