@@ -5,11 +5,13 @@ LABEL maintainer="Ben Carlin <bcarlin@mednet.ucla.edu>"
 # ca-certificates (for http requests)
 # libc6 (for Intel GKL)
 # R for picard
+# ps and command for reporting mertics 
 RUN apk --update add \
       bash \
       openjdk8 \
       ca-certificates \
       libc6-compat \
+      procps \
       unzip \
       curl \
       R \
@@ -19,13 +21,4 @@ RUN apk --update add \
 
 WORKDIR /picard-tools
 
-# get picard 
-# older versions/releases have a zip not a jar (2.5.0) 
-RUN wget https://github.com/broadinstitute/picard/releases/download/1.130/picard-tools-1.130.zip && \
-      unzip picard-tools-1.130.zip && rm -rf picard-tools-1.130.zip && \
-      mv picard-tools-1.130/* . && \
-      rm -rf picard-tools-1.130/
-
-# ps and command for reporting mertics 
-RUN apt-get update && apt-get install -y procps
-      
+RUN wget https://github.com/broadinstitute/picard/releases/download/2.23.3/picard.jar
