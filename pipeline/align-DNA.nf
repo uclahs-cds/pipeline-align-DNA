@@ -4,13 +4,14 @@
    TODO:
       - NEEDS LOGGING UPDATE FOR OUTPUS, LOGS AND REPORTS
       - NEEDS A VALIDATION PROCESS/STEP
+      - NEEDS AN UPDATE OF TOOLS
       - AFTER SEP 2015 PICARD TOOLS MARK DUPS IS LIBRARY AWARE
       AS A RESULT, WE CAN COMBINE MERGE AND MARK DUPS STEPS INTO 
       1 PROCESS
 */
 
-def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-0.7.17_samtools-1.10"
-def docker_image_PicardTools = "blcdsdockerregistry/align-dna:picardtools-2.23.3"
+def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-0.7.15_samtools-1.3"
+def docker_image_PicardTools = "blcdsdockerregistry/align-dna:picardtools-1.130"
 
 // output details of the pipeline run to stdout
 log.info """\
@@ -61,12 +62,12 @@ Channel
    .splitCsv(header:true)
    .map { row -> 
       def read_group_name = "@RG" +
-         "\\tID:" + row.read_group_identifier + ".Seq" + row.lane +
-         "\\tCN:" + row.sequencing_center +
-         "\\tLB:" + row.library_identifier +
-         "\\tPL:" + row.platform_technology +
-         "\\tPU:" + row.platform_unit +
-         "\\tSM:" + row.sample
+         "\tID:" + row.read_group_identifier + ".Seq" + row.lane +
+         "\tCN:" + row.sequencing_center +
+         "\tLB:" + row.library_identifier +
+         "\tPL:" + row.platform_technology +
+         "\tPU:" + row.platform_unit +
+         "\tSM:" + row.sample
 
       // the library, sample and lane are used as keys downstream to group into 
       // sets of the same key for downstream merging
@@ -147,7 +148,6 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
 // sort coordinate order with picard
 process PicardTools_SortSam  {
    container docker_image_PicardTools
-   containerOptions "--volume ${params.java_temp_dir}:/java_temp_dir"
    
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
@@ -173,13 +173,13 @@ process PicardTools_SortSam  {
    """
    set -euo pipefail
 
-   java -Xmx100g -Djava.io.tmpdir=/java_temp_dir \
+   java -Xmx${params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=${params.java_temp_dir} \
       -jar /picard-tools/picard.jar \
       SortSam \
-      --VALIDATION_STRINGENCY LENIENT \
-      --INPUT ${input_bam} \
-      --OUTPUT ${library}-${lane}.sorted.bam \
-      --SORT_ORDER coordinate
+      VALIDATION_STRINGENCY=LENIENT \
+      INPUT=${input_bam} \
+      OUTPUT=${library}-${lane}.sorted.bam \
+      SORT_ORDER=coordinate
    """
 }
 
@@ -203,7 +203,6 @@ output_ch_PicardTools_SortSam
 // merge bams from across lanes from the same library with picard
 process PicardTools_MergeSamFiles_across_lanes  {
    container docker_image_PicardTools
-   containerOptions "--volume ${params.java_temp_dir}:/java_temp_dir"
    
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
@@ -224,15 +223,15 @@ process PicardTools_MergeSamFiles_across_lanes  {
    set -euo pipefail
 
    # add picard option prefix, 'INPUT=' to each input bam
-   declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
+   declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / INPUT=/g' | sed '1s/^/INPUT=/')
 
-   java -Xmx100g -Djava.io.tmpdir=/java_temp_dir \
+   java -Xmx!{params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=!{params.java_temp_dir} \
       -jar /picard-tools/picard.jar \
       MergeSamFiles \
-      --USE_THREADING true \
-      --VALIDATION_STRINGENCY LENIENT \
+      USE_THREADING=true \
+      VALIDATION_STRINGENCY=LENIENT \
       $INPUT \
-      --OUTPUT !{library}.merged-lanes.bam
+      OUTPUT=!{library}.merged-lanes.bam
    '''
 }
 
@@ -243,7 +242,6 @@ output_ch_PicardTools_MergeSamFiles_across_lanes
 // mark duplicates with picard
 process PicardTools_MarkDuplicates  {
    container docker_image_PicardTools
-   containerOptions "--volume ${params.java_temp_dir}:/java_temp_dir"
 
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
@@ -260,18 +258,18 @@ process PicardTools_MarkDuplicates  {
       file("${library}.mark_dup.bam") into output_ch_PicardTools_MarkDuplicates
       file("${library}.mark_dup.metrics")
 
-   shell:
+   script:
    """
    set -euo pipefail
 
-   java -Xmx100g -Djava.io.tmpdir=/java_temp_dir/ \
+   java -Xmx${params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=${params.java_temp_dir} \
       -jar /picard-tools/picard.jar \
       MarkDuplicates \
-      --VALIDATION_STRINGENCY LENIENT \
-      --INPUT ${input_bam} \
-      --OUTPUT ${library}.mark_dup.bam \
-      --METRICS_FILE ${library}.mark_dup.metrics \
-      --PROGRAM_RECORD_ID MarkDuplicates
+      VALIDATION_STRINGENCY=LENIENT \
+      INPUT=${input_bam} \
+      OUTPUT=${library}.mark_dup.bam \
+      METRICS_FILE=${library}.mark_dup.metrics \
+      PROGRAM_RECORD_ID=MarkDuplicates
    """
 }
 
@@ -297,7 +295,6 @@ output_ch_2_PicardTools_MarkDuplicates
 // merge bams from the same library with picard
 process PicardTools_MergeSamFiles_across_libraries  {
    container docker_image_PicardTools
-   containerOptions "--volume ${params.java_temp_dir}:/java_temp_dir"
 
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
@@ -314,22 +311,21 @@ process PicardTools_MergeSamFiles_across_libraries  {
    set -euo pipefail
 
    # add picard option prefix, 'INPUT=' to each input bam
-   declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
+   declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / INPUT=/g' | sed '1s/^/INPUT=/')
 
-   java -Xmx100g -Djava.io.tmpdir=/java_temp_dir \
+   java -Xmx!{params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=!{params.java_temp_dir} \
       -jar /picard-tools/picard.jar \
       MergeSamFiles \
-      --USE_THREADING true \
-      --VALIDATION_STRINGENCY LENIENT \
+      USE_THREADING=true \
+      VALIDATION_STRINGENCY=LENIENT \
       $INPUT \
-      --OUTPUT !{params.sample_name}.merged-libraries.bam
+      OUTPUT=!{params.sample_name}.merged-libraries.bam
    '''
 }
 
 // index bams with picard
 process PicardTools_BuildBamIndex  {
    container docker_image_PicardTools
-   containerOptions "--volume ${params.java_temp_dir}:/java_temp_dir"
 
    publishDir path: params.output_dir, mode: 'copy'
 
@@ -348,12 +344,12 @@ process PicardTools_BuildBamIndex  {
    """
    set -euo pipefail
 
-   java -Xmx100g -Djava.io.tmpdir=/java_temp_dir \
+   java -Xmx${params.memory_for_PicardTools.split().first()}g -Djava.io.tmpdir=${params.java_temp_dir} \
       -jar /picard-tools/picard.jar \
       BuildBamIndex \
-      --VALIDATION_STRINGENCY LENIENT \
-      --INPUT ${input_bam} \
-      --OUTPUT ${params.sample_name}.bam.bai
+      VALIDATION_STRINGENCY=LENIENT \
+      INPUT=${input_bam} \
+      OUTPUT=${params.sample_name}.bam.bai
 
    # rename final output bam
    mv ${input_bam} ${params.sample_name}.bam 
