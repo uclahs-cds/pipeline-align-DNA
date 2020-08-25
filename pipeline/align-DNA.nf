@@ -11,6 +11,12 @@
 
 def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-0.7.17_samtools-1.10"
 def docker_image_PicardTools = "blcdsdockerregistry/align-dna:picardtools-2.23.3"
+def docker_image_sha512sum = "blcdsdockerregistry/align-dna:sha512sum-1.0"
+
+// resource information
+def number_of_cpus = Runtime.getRuntime().availableProcessors()
+def total_memory = ((int) ((java.lang.management.ManagementFactory.getOperatingSystemMXBean()
+   .getTotalPhysicalMemorySize() / (1024.0 * 1024.0 * 1024.0)) * 0.9)).toString() + " GB"
 
 // output details of the pipeline run to stdout
 log.info """\
@@ -28,7 +34,6 @@ log.info """\
       reference_fasta_index_files: ${params.reference_fasta_index_files}
 
    - output: 
-      java_temp_dir: ${params.java_temp_dir}
       temp_dir: ${params.temp_dir}
       output_dir: ${params.output_dir}
       
@@ -36,17 +41,11 @@ log.info """\
       save_intermediate_files = ${params.save_intermediate_files}
       cache_intermediate_pipeline_steps = ${params.cache_intermediate_pipeline_steps}
       max_number_of_parallel_jobs = ${params.max_number_of_parallel_jobs}
-      max_number_of_cpus = ${params.max_number_of_cpus}
-      max_memory = ${params.max_memory}
-      number_of_cpus_for_BWA_mem = ${params.number_of_cpus_for_BWA_mem}
-      number_of_cpus_for_SAMTools_Convert_Sam_to_Bam = ${params.number_of_cpus_for_SAMTools_Convert_Sam_to_Bam}
-      memory_for_BWA_mem_SAMTools_Convert_Sam_to_Bam = ${params.memory_for_BWA_mem_SAMTools_Convert_Sam_to_Bam}
-      number_of_cpus_for_PicardTools = ${params.max_number_of_parallel_jobs}
-      memory_for_PicardTools = ${params.memory_for_PicardTools}
 
    Tools Used:
    - BWA and SAMtools: ${docker_image_BWA_and_SAMTools}
    - Picard Tools: ${docker_image_PicardTools}
+   - sha512sum: ${docker_image_sha512sum}
 
    ------------------------------------
    Executing workflow...
@@ -94,14 +93,15 @@ Channel
    .fromPath(params.reference_fasta_index_files)
    .ifEmpty { error "Cannot find reference index files: ${params.reference_fasta_index_files}" }
    .set { input_ch_reference_index_files }
-   
+
 // align with bwa mem and convert with samtools
 process BWA_mem_SAMTools_Convert_Sam_to_Bam {
    container docker_image_BWA_and_SAMTools
 
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
-   label "resource_allocation_for_BWA_mem_SAMTools_Convert_Sam_to_Bam"
+   memory total_memory
+   cpus number_of_cpus
 
    // use "each" so the the reference files are passed through for each fastq pair alignment 
    input: 
@@ -129,7 +129,7 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
 
    bwa \
       mem \
-      -t ${params.number_of_cpus_for_BWA_mem} \
+      -t ${number_of_cpus} \
       -M \
       -R "${read_group_name}" \
       ${ref_fasta} \
@@ -137,7 +137,7 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
       ${read2_fastq} | \
    samtools \
       view \
-      -@ ${params.number_of_cpus_for_SAMTools_Convert_Sam_to_Bam} \
+      -@ ${number_of_cpus} \
       -S \
       -b > \
       ${library}-${lane}.aligned.bam
@@ -147,11 +147,12 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
 // sort coordinate order with picard
 process PicardTools_SortSam  {
    container docker_image_PicardTools
-   containerOptions "--volume ${params.java_temp_dir}:/java_temp_dir"
+   containerOptions "--volume ${params.temp_dir}:/temp_dir"
    
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
-   label "resource_allocation_for_PicardTools"
+   memory total_memory
+   cpus number_of_cpus
 
    input:
       tuple(val(library), 
@@ -173,7 +174,7 @@ process PicardTools_SortSam  {
    """
    set -euo pipefail
 
-   java -Xmx100g -Djava.io.tmpdir=/java_temp_dir \
+   java -Xmx24g -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       SortSam \
       --VALIDATION_STRINGENCY LENIENT \
@@ -203,11 +204,12 @@ output_ch_PicardTools_SortSam
 // merge bams from across lanes from the same library with picard
 process PicardTools_MergeSamFiles_across_lanes  {
    container docker_image_PicardTools
-   containerOptions "--volume ${params.java_temp_dir}:/java_temp_dir"
+   containerOptions "--volume ${params.temp_dir}:/temp_dir"
    
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
-   label "resource_allocation_for_PicardTools"
+   memory total_memory
+   cpus number_of_cpus
 
    input:
       tuple(val(library),
@@ -226,7 +228,7 @@ process PicardTools_MergeSamFiles_across_lanes  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
 
-   java -Xmx100g -Djava.io.tmpdir=/java_temp_dir \
+   java -Xmx24g -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       MergeSamFiles \
       --USE_THREADING true \
@@ -243,11 +245,12 @@ output_ch_PicardTools_MergeSamFiles_across_lanes
 // mark duplicates with picard
 process PicardTools_MarkDuplicates  {
    container docker_image_PicardTools
-   containerOptions "--volume ${params.java_temp_dir}:/java_temp_dir"
+   containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
-   label "resource_allocation_for_PicardTools"
+   memory total_memory
+   cpus number_of_cpus
 
    input:
       tuple(val(library), 
@@ -264,7 +267,7 @@ process PicardTools_MarkDuplicates  {
    """
    set -euo pipefail
 
-   java -Xmx100g -Djava.io.tmpdir=/java_temp_dir/ \
+   java -Xmx24g -Djava.io.tmpdir=/temp_dir/ \
       -jar /picard-tools/picard.jar \
       MarkDuplicates \
       --VALIDATION_STRINGENCY LENIENT \
@@ -297,11 +300,12 @@ output_ch_2_PicardTools_MarkDuplicates
 // merge bams from the same library with picard
 process PicardTools_MergeSamFiles_across_libraries  {
    container docker_image_PicardTools
-   containerOptions "--volume ${params.java_temp_dir}:/java_temp_dir"
+   containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
-   label "resource_allocation_for_PicardTools"
+   memory total_memory
+   cpus number_of_cpus
 
    input:
       file(input_bams) from output_ch_3_PicardTools_MarkDuplicates.input_ch_PicardTools_MergeSamFiles_across_libraries.collect()
@@ -316,7 +320,7 @@ process PicardTools_MergeSamFiles_across_libraries  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
 
-   java -Xmx100g -Djava.io.tmpdir=/java_temp_dir \
+   java -Xmx24g -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       MergeSamFiles \
       --USE_THREADING true \
@@ -333,7 +337,8 @@ process PicardTools_BuildBamIndex  {
 
    publishDir path: params.output_dir, mode: 'copy'
 
-   label "resource_allocation_for_PicardTools"
+   memory total_memory
+   cpus number_of_cpus
    
    input:
       file(input_bam) from output_ch_3_PicardTools_MarkDuplicates.input_ch_PicardTools_BuildBamIndex
@@ -342,13 +347,13 @@ process PicardTools_BuildBamIndex  {
    // no need for an output channel becuase this is the final stepp
    output:
       tuple(file("${params.sample_name}.bam"),
-         file("${params.sample_name}.bam.bai"))
+         file("${params.sample_name}.bam.bai")) into output_ch_PicardTools_BuildBamIndex
 
    script:
    """
    set -euo pipefail
 
-   java -Xmx100g -Djava.io.tmpdir=/java_temp_dir \
+   java -Xmx24g -Djava.io.tmpdir=/java_temp_dir \
       -jar /picard-tools/picard.jar \
       BuildBamIndex \
       --VALIDATION_STRINGENCY LENIENT \
@@ -358,4 +363,30 @@ process PicardTools_BuildBamIndex  {
    # rename final output bam
    mv ${input_bam} ${params.sample_name}.bam 
    """
+}
+
+// produce checksum for the bam and bam index
+process generate_sha512sum {    
+   container docker_image_sha512sum
+
+   publishDir path: params.output_dir, mode: 'copy'
+   
+   memory total_memory
+   cpus number_of_cpus
+
+   input:
+      tuple(file(input_bam),
+        file(input_bam_bai)) from output_ch_PicardTools_BuildBamIndex
+
+   output:
+      tuple(file("${params.sample_name}.bam.sha512sum"),
+        file("${params.sample_name}.bam.bai.sha512sum")) 
+
+   shell:
+   '''
+   set -euo pipefail
+
+   sha512sum !{input_bam} | awk '{print $1}' > !{params.sample_name}.bam.sha512sum
+   sha512sum !{input_bam_bai} | awk '{print $1}' > !{params.sample_name}.bam.bai.sha512sum
+   '''
 }
