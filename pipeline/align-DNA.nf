@@ -174,7 +174,7 @@ process PicardTools_SortSam  {
    """
    set -euo pipefail
 
-   java -Xmx24g -Djava.io.tmpdir=/temp_dir \
+   java -Xmx48g -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       SortSam \
       --VALIDATION_STRINGENCY LENIENT \
@@ -228,7 +228,7 @@ process PicardTools_MergeSamFiles_across_lanes  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
 
-   java -Xmx24g -Djava.io.tmpdir=/temp_dir \
+   java -Xmx48g -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       MergeSamFiles \
       --USE_THREADING true \
@@ -267,7 +267,7 @@ process PicardTools_MarkDuplicates  {
    """
    set -euo pipefail
 
-   java -Xmx24g -Djava.io.tmpdir=/temp_dir/ \
+   java -Xmx48g -Djava.io.tmpdir=/temp_dir/ \
       -jar /picard-tools/picard.jar \
       MarkDuplicates \
       --VALIDATION_STRINGENCY LENIENT \
@@ -320,7 +320,7 @@ process PicardTools_MergeSamFiles_across_libraries  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
 
-   java -Xmx24g -Djava.io.tmpdir=/temp_dir \
+   java -Xmx48g -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       MergeSamFiles \
       --USE_THREADING true \
@@ -353,7 +353,7 @@ process PicardTools_BuildBamIndex  {
    """
    set -euo pipefail
 
-   java -Xmx24g -Djava.io.tmpdir=/java_temp_dir \
+   java -Xmx48g -Djava.io.tmpdir=/java_temp_dir \
       -jar /picard-tools/picard.jar \
       BuildBamIndex \
       --VALIDATION_STRINGENCY LENIENT \
