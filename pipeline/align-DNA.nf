@@ -76,23 +76,23 @@ Channel
          row.read2_fastq
       )
    }
-   .set { input_ch_samples }
+   .into { input_ch_samples_valid, input_ch_samples }
 
 // get the reference and required files for aligning
 Channel
    .fromPath(params.reference_fasta)
    .ifEmpty { error "Cannot find reference: ${params.reference_fasta}" }
-   .set { input_ch_reference_fasta }
+   .into { input_ch_reference_fasta_valid, input_ch_reference_fasta }
 
 Channel
    .fromPath(params.reference_fasta_dict)
    .ifEmpty { error "Cannot find reference dictionary: ${params.reference_fasta_dict}" }
-   .set { input_ch_reference_dict }
+   .into { input_ch_reference_dict_valid, input_ch_reference_dict }
 
 Channel
    .fromPath(params.reference_fasta_index_files)
    .ifEmpty { error "Cannot find reference index files: ${params.reference_fasta_index_files}" }
-   .set { input_ch_reference_index_files }
+   .into { input_ch_reference_index_files_valid, input_ch_reference_index_files }
 
 // align with bwa mem and convert with samtools
 process BWA_mem_SAMTools_Convert_Sam_to_Bam {
@@ -114,6 +114,9 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
       each file(ref_fasta) from input_ch_reference_fasta
       each file(ref_dict) from input_ch_reference_dict
       file(ref_idx_files) from input_ch_reference_index_files.collect()
+
+   when:
+      number_of_invalid_inputs == 0
 
    // output the lane information in the file name to differentiate bewteen aligments of the same
    // sample but different lanes
@@ -389,4 +392,59 @@ process generate_sha512sum {
    sha512sum !{input_bam} | awk '{print $1}' > !{params.sample_name}.bam.sha512sum
    sha512sum !{input_bam_bai} | awk '{print $1}' > !{params.sample_name}.bam.bai.sha512sum
    '''
+}
+
+// input validation
+input_ch_samples_valid
+   .flatMap { library, lane, read_group_name, read1_fastq, read2_fastq ->
+      [read1_fastq, read2_fastq]
+   }
+   .set { input_ch_samples_valid_flat }
+
+process validate_inputs {
+   container validate
+
+   input:
+   path(file_to_validate) from input_ch_samples_valid_flat.mix(
+      input_ch_reference_fasta_valid, input_ch_reference_dict_valid, input_ch_reference_index_files_valid
+   )
+
+   output:
+   true into output_ch_validate_inputs
+
+   script:
+   """
+   set -euo pipefail
+
+   python -m validate -t ${file_to_validate}
+   """
+}
+
+int number_of_invalid_inputs = output_ch_validate_inputs // gets number of invalid inputs
+   .collect()
+   .filter { valid_result ->
+      valid_result == false
+   }
+   .count()
+   .get()
+
+// output validation
+output_ch_PicardTools_BuildBamIndex
+   .flatMap { picardtools_bam, picardtools_bai ->
+      [picardtools_bam, picardtools_bai]
+   }
+   .set { output_ch_PicardTools_BuildBamIndex_flat }
+
+process validate_outputs {
+   container validate
+
+   input:
+   path(file_to_validate) from output_ch_PicardTools_BuildBamIndex_flat
+
+   script:
+   """
+   set -euo pipefail
+
+   python -m validate -t ${file_to_validate}
+   """
 }
