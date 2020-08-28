@@ -12,6 +12,7 @@
 def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-0.7.17_samtools-1.10"
 def docker_image_PicardTools = "blcdsdockerregistry/align-dna:picardtools-2.23.3"
 def docker_image_sha512sum = "blcdsdockerregistry/align-dna:sha512sum-1.0"
+def docker_image_validate_params = "blcdsdockerregistry/align-dna:sha512sum-1.0"
 
 // resource information
 def number_of_cpus = Runtime.getRuntime().availableProcessors()
@@ -46,7 +47,7 @@ log.info """\
    - BWA and SAMtools: ${docker_image_BWA_and_SAMTools}
    - Picard Tools: ${docker_image_PicardTools}
    - sha512sum: ${docker_image_sha512sum}
-
+   - validate_params: ${docker_image_validate_params}
    ------------------------------------
    Executing workflow...
    ------------------------------------
@@ -76,63 +77,67 @@ Channel
          row.read2_fastq
       )
    }
-   .into { input_ch_samples_valid, input_ch_samples }
+   .into { input_ch_samples_validate; input_ch_samples }
 
 // get the reference and required files for aligning
 Channel
    .fromPath(params.reference_fasta)
    .ifEmpty { error "Cannot find reference: ${params.reference_fasta}" }
-   .into { input_ch_reference_fasta_valid, input_ch_reference_fasta }
+   .into { input_ch_reference_fasta_validate; input_ch_reference_fasta }
 
 Channel
    .fromPath(params.reference_fasta_dict)
    .ifEmpty { error "Cannot find reference dictionary: ${params.reference_fasta_dict}" }
-   .into { input_ch_reference_dict_valid, input_ch_reference_dict }
+   .into { input_ch_reference_dict_validate; input_ch_reference_dict }
 
 Channel
    .fromPath(params.reference_fasta_index_files)
    .ifEmpty { error "Cannot find reference index files: ${params.reference_fasta_index_files}" }
-   .into { input_ch_reference_index_files_valid, input_ch_reference_index_files }
+   .into { input_ch_reference_index_files_validate; input_ch_reference_index_files }
 
-// input validation
-input_ch_samples_valid
+// get relavent inputs from csv that should be validated
+input_ch_samples_validate
    .flatMap { library, lane, read_group_name, read1_fastq, read2_fastq ->
       [read1_fastq, read2_fastq]
    }
-   .set { input_ch_samples_valid_flat }
+   .set { input_ch_2_samples_validate }
 
 process validate_inputs {
-   container validate
+   container docker_image_validate_params
 
    input:
-   path(file_to_validate) from input_ch_samples_valid_flat.mix(
-      input_ch_reference_fasta_valid, input_ch_reference_dict_valid, input_ch_reference_index_files_valid
+   path(file_to_validate) from input_ch_2_samples_validate.mix(
+      input_ch_reference_fasta_validate, 
+      input_ch_reference_dict_validate, 
+      input_ch_reference_index_files_validate
    )
 
    output:
-   true into output_ch_validate_inputs
+      val(true) into output_ch_validate_inputs
 
    script:
    """
    set -euo pipefail
 
-   python -m validate -t ${file_to_validate}
+   #python -m validate -t ${file_to_validate}
    """
 }
 
-int number_of_invalid_inputs = output_ch_validate_inputs // gets number of invalid inputs
-   .collect()
-   .filter { valid_result ->
-      valid_result == false
-   }
-   .count()
-   .get()
+int number_of_invalid_inputs = output_ch_validate_inputs.collect()
+         .filter { valid_result ->
+            valid_result == false
+         }
+         .count()
+         .get()
 
 // align with bwa mem and convert with samtools
 process BWA_mem_SAMTools_Convert_Sam_to_Bam {
    container docker_image_BWA_and_SAMTools
 
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+
+   when:
+      number_of_invalid_inputs == 0
 
    memory total_memory
    cpus number_of_cpus
@@ -148,9 +153,6 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
       each file(ref_fasta) from input_ch_reference_fasta
       each file(ref_dict) from input_ch_reference_dict
       file(ref_idx_files) from input_ch_reference_index_files.collect()
-
-   when:
-      number_of_invalid_inputs == 0
 
    // output the lane information in the file name to differentiate bewteen aligments of the same
    // sample but different lanes
@@ -211,7 +213,7 @@ process PicardTools_SortSam  {
    """
    set -euo pipefail
 
-   java -Xmx48g -Djava.io.tmpdir=/temp_dir \
+   java -Xmx4g -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       SortSam \
       --VALIDATION_STRINGENCY LENIENT \
@@ -265,7 +267,7 @@ process PicardTools_MergeSamFiles_across_lanes  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
 
-   java -Xmx48g -Djava.io.tmpdir=/temp_dir \
+   java -Xmx4g -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       MergeSamFiles \
       --USE_THREADING true \
@@ -304,7 +306,7 @@ process PicardTools_MarkDuplicates  {
    """
    set -euo pipefail
 
-   java -Xmx48g -Djava.io.tmpdir=/temp_dir/ \
+   java -Xmx4g -Djava.io.tmpdir=/temp_dir/ \
       -jar /picard-tools/picard.jar \
       MarkDuplicates \
       --VALIDATION_STRINGENCY LENIENT \
@@ -357,7 +359,7 @@ process PicardTools_MergeSamFiles_across_libraries  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
 
-   java -Xmx48g -Djava.io.tmpdir=/temp_dir \
+   java -Xmx4g -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       MergeSamFiles \
       --USE_THREADING true \
@@ -367,40 +369,43 @@ process PicardTools_MergeSamFiles_across_libraries  {
    '''
 }
 
+output_ch_3_PicardTools_MarkDuplicates.input_ch_PicardTools_BuildBamIndex
+   .mix(output_ch_PicardTools_MergeSamFiles_across_libraries)
+   .into { input_ch_2_PicardTools_BuildBamIndex; input_ch_generate_sha512sum;  }
+
 // index bams with picard
 process PicardTools_BuildBamIndex  {
    container docker_image_PicardTools
    containerOptions "--volume ${params.java_temp_dir}:/java_temp_dir"
 
-   publishDir path: params.output_dir, mode: 'copy'
+   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
    memory total_memory
    cpus number_of_cpus
    
    input:
-      file(input_bam) from output_ch_3_PicardTools_MarkDuplicates.input_ch_PicardTools_BuildBamIndex
-         .mix(output_ch_PicardTools_MergeSamFiles_across_libraries)
+      file(input_bam) from input_ch_2_PicardTools_BuildBamIndex
 
    // no need for an output channel becuase this is the final stepp
    output:
-      tuple(file("${params.sample_name}.bam"),
-         file("${params.sample_name}.bam.bai")) into output_ch_PicardTools_BuildBamIndex
+      file("${input_bam.getName()}.bai") into output_ch_PicardTools_BuildBamIndex
 
    script:
    """
    set -euo pipefail
 
-   java -Xmx48g -Djava.io.tmpdir=/java_temp_dir \
+   java -Xmx4g -Djava.io.tmpdir=/java_temp_dir \
       -jar /picard-tools/picard.jar \
       BuildBamIndex \
       --VALIDATION_STRINGENCY LENIENT \
       --INPUT ${input_bam} \
-      --OUTPUT ${params.sample_name}.bam.bai
-
-   # rename final output bam
-   mv ${input_bam} ${params.sample_name}.bam 
+      --OUTPUT ${input_bam.getName()}.bai
    """
 }
+
+output_ch_PicardTools_BuildBamIndex
+   .mix(input_ch_generate_sha512sum)
+   .into{ input_ch_2_generate_sha512sum; input_ch_validate_outputs }
 
 // produce checksum for the bam and bam index
 process generate_sha512sum {    
@@ -412,38 +417,36 @@ process generate_sha512sum {
    cpus number_of_cpus
 
    input:
-      tuple(file(input_bam),
-        file(input_bam_bai)) from output_ch_PicardTools_BuildBamIndex
+      file(input_file) from input_ch_2_generate_sha512sum
 
    output:
-      tuple(file("${params.sample_name}.bam.sha512sum"),
-        file("${params.sample_name}.bam.bai.sha512sum")) into output_ch_generate_sha512sum
+      tuple(file("${input_file}"),
+        file("${input_file.getName()}.sha512sum")) into output_ch_generate_sha512sum
 
    shell:
-   '''
+   """
    set -euo pipefail
 
-   sha512sum !{input_bam} > !{params.sample_name}.bam.sha512sum
-   sha512sum !{input_bam_bai} > !{params.sample_name}.bam.bai.sha512sum
-   '''
+   sha512sum ${input_file} > ${input_file.getName()}.sha512sum
+   """
 }
 
 // output validation
-output_ch_PicardTools_BuildBamIndex
-   .mix(output_ch_generate_sha512sum)
+output_ch_generate_sha512sum
    .flatten()
-   .set { input_ch_validate_outputs }
+   .mix(input_ch_validate_outputs)
+   .set { input_ch_2_validate_outputs }
 
 process validate_outputs {
-   container validate
+   container docker_image_validate_params
 
    input:
-   path(file_to_validate) from input_ch_validate_outputs
+      path(file_to_validate) from input_ch_2_validate_outputs
 
    script:
    """
    set -euo pipefail
 
-   python -m validate -t ${file_to_validate}
+   #python -m validate -t ${file_to_validate}
    """
 }
