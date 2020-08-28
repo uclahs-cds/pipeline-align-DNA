@@ -213,7 +213,7 @@ process PicardTools_SortSam  {
    """
    set -euo pipefail
 
-   java -Xmx4g -Djava.io.tmpdir=/temp_dir \
+   java -Xmx100g -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       SortSam \
       --VALIDATION_STRINGENCY LENIENT \
@@ -267,7 +267,7 @@ process PicardTools_MergeSamFiles_across_lanes  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
 
-   java -Xmx4g -Djava.io.tmpdir=/temp_dir \
+   java -Xmx100g -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       MergeSamFiles \
       --USE_THREADING true \
@@ -306,7 +306,7 @@ process PicardTools_MarkDuplicates  {
    """
    set -euo pipefail
 
-   java -Xmx4g -Djava.io.tmpdir=/temp_dir/ \
+   java -Xmx100g -Djava.io.tmpdir=/temp_dir/ \
       -jar /picard-tools/picard.jar \
       MarkDuplicates \
       --VALIDATION_STRINGENCY LENIENT \
@@ -359,7 +359,7 @@ process PicardTools_MergeSamFiles_across_libraries  {
    # add picard option prefix, 'INPUT=' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
 
-   java -Xmx4g -Djava.io.tmpdir=/temp_dir \
+   java -Xmx100g -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       MergeSamFiles \
       --USE_THREADING true \
@@ -394,7 +394,7 @@ process PicardTools_BuildBamIndex  {
    """
    set -euo pipefail
 
-   java -Xmx4g -Djava.io.tmpdir=/java_temp_dir \
+   java -Xmx100g -Djava.io.tmpdir=/java_temp_dir \
       -jar /picard-tools/picard.jar \
       BuildBamIndex \
       --VALIDATION_STRINGENCY LENIENT \
@@ -405,7 +405,7 @@ process PicardTools_BuildBamIndex  {
 
 output_ch_PicardTools_BuildBamIndex
    .mix(input_ch_generate_sha512sum)
-   .into{ input_ch_2_generate_sha512sum; input_ch_validate_outputs }
+   .into { input_ch_2_generate_sha512sum; input_ch_validate_outputs }
 
 // produce checksum for the bam and bam index
 process generate_sha512sum {    
@@ -420,8 +420,7 @@ process generate_sha512sum {
       file(input_file) from input_ch_2_generate_sha512sum
 
    output:
-      tuple(file("${input_file}"),
-        file("${input_file.getName()}.sha512sum")) into output_ch_generate_sha512sum
+      file("${input_file.getName()}.sha512sum") into output_ch_generate_sha512sum
 
    shell:
    """
@@ -431,17 +430,12 @@ process generate_sha512sum {
    """
 }
 
-// output validation
-output_ch_generate_sha512sum
-   .flatten()
-   .mix(input_ch_validate_outputs)
-   .set { input_ch_2_validate_outputs }
-
 process validate_outputs {
    container docker_image_validate_params
 
    input:
-      path(file_to_validate) from input_ch_2_validate_outputs
+      path(file_to_validate) from input_ch_validate_outputs
+         .mix(output_ch_generate_sha512sum, Channel.from(params.temp_dir, params.output_dir))
 
    script:
    """
