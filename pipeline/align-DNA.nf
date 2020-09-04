@@ -2,11 +2,8 @@
 
 /* 
    TODO:
+      - UPDATE DOCKER IMAGE AND COMMAND CALL FOR VALIDATING INPUTS AND OUTPUTS
       - NEEDS LOGGING UPDATE FOR OUTPUS, LOGS AND REPORTS
-      - NEEDS A VALIDATION PROCESS/STEP
-      - AFTER SEP 2015 PICARD TOOLS MARK DUPS IS LIBRARY AWARE
-      AS A RESULT, WE CAN COMBINE MERGE AND MARK DUPS STEPS INTO 
-      1 PROCESS
 */
 
 def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-0.7.17_samtools-1.10"
@@ -15,9 +12,17 @@ def docker_image_sha512sum = "blcdsdockerregistry/align-dna:sha512sum-1.0"
 def docker_image_validate_params = "blcdsdockerregistry/align-dna:sha512sum-1.0"
 
 // resource information
-def number_of_cpus = Runtime.getRuntime().availableProcessors()
-def total_memory = ((int) ((java.lang.management.ManagementFactory.getOperatingSystemMXBean()
-   .getTotalPhysicalMemorySize() / (1024.0 * 1024.0 * 1024.0)) * 0.9)).toString() + " GB"
+def number_of_cpus = (int) (Runtime.getRuntime().availableProcessors() / params.max_number_of_parallel_jobs)
+if (number_of_cpus < 1) {
+   number_of_cpus = 1
+}
+def amount_of_memory = ((int) (((java.lang.management.ManagementFactory.getOperatingSystemMXBean()
+   .getTotalPhysicalMemorySize() / (1024.0 * 1024.0 * 1024.0)) * 0.9) / params.max_number_of_parallel_jobs ))
+if (amount_of_memory < 1) {
+   amount_of_memory = 1
+}
+amount_of_memory = amount_of_memory.toString() + " GB"
+
 
 // output details of the pipeline run to stdout
 log.info """\
@@ -48,8 +53,9 @@ log.info """\
    - Picard Tools: ${docker_image_PicardTools}
    - sha512sum: ${docker_image_sha512sum}
    - validate_params: ${docker_image_validate_params}
+
    ------------------------------------
-   Executing workflow...
+   Starting workflow...
    ------------------------------------
    """
    .stripIndent()
@@ -139,7 +145,7 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
    when:
       number_of_invalid_inputs == 0
 
-   memory total_memory
+   memory amount_of_memory
    cpus number_of_cpus
 
    // use "each" so the the reference files are passed through for each fastq pair alignment 
@@ -190,7 +196,7 @@ process PicardTools_SortSam  {
    
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
 
-   memory total_memory
+   memory amount_of_memory
    cpus number_of_cpus
 
    input:
@@ -205,9 +211,7 @@ process PicardTools_SortSam  {
    // the next steps of the pipeline are merging so using a lane to differentiate between files is no londer needed
    // (files of same lane are merged together) so the lane information is dropped
    output:
-      tuple(val(library), 
-         file("${library}-${lane}.sorted.bam")
-      ) into output_ch_PicardTools_SortSam
+      file("${library}-${lane}.sorted.bam") into output_ch_PicardTools_SortSam
 
    script:
    """
@@ -223,168 +227,58 @@ process PicardTools_SortSam  {
    """
 }
 
-// group the aligned and filtered bams by the same library
-// and send those outputs to be merged if there is more than one bam per group (this means there are multiple lanes)
-output_ch_PicardTools_SortSam
-	.groupTuple()
-   .branch { library, output_SortSam_bams ->
-		input_ch_PicardTools_MergeSamFiles_across_lanes: output_SortSam_bams.size() > 1
-
-      // when grouping in values besides the first value passed, the key become wrapped in an additional tuple
-      // and b/c we know that the library and bams are a tuple  of size 1 and the downstream input requires a file and library
-      // that are not wrapped in a tuple, we just get the 1st element of the tuple, the files themselves
-
-      // samples that are only aligned to one lane 
-		input_ch_PicardTools_MergeSamFiles_across_libraries_PicardTools_MarkDuplicates: output_SortSam_bams.size() <= 1
-         return tuple(library, output_SortSam_bams.get(0))
-	}
-	.set { output_ch_2_PicardTools_SortSam }
-
-// merge bams from across lanes from the same library with picard
-process PicardTools_MergeSamFiles_across_lanes  {
-   container docker_image_PicardTools
-   containerOptions "--volume ${params.temp_dir}:/temp_dir"
-   
-   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
-
-   memory total_memory
-   cpus number_of_cpus
-
-   input:
-      tuple(val(library),
-         file(input_bams)
-      ) from output_ch_2_PicardTools_SortSam.input_ch_PicardTools_MergeSamFiles_across_lanes
-
-   output:
-      tuple(val(library),
-         file("${library}.merged-lanes.bam")
-      ) into output_ch_PicardTools_MergeSamFiles_across_lanes
-
-   shell:
-   '''
-   set -euo pipefail
-
-   # add picard option prefix, 'INPUT=' to each input bam
-   declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
-
-   java -Xmx100g -Djava.io.tmpdir=/temp_dir \
-      -jar /picard-tools/picard.jar \
-      MergeSamFiles \
-      --USE_THREADING true \
-      --VALIDATION_STRINGENCY LENIENT \
-      $INPUT \
-      --OUTPUT !{library}.merged-lanes.bam
-   '''
-}
-
-output_ch_PicardTools_MergeSamFiles_across_lanes
-   .mix(output_ch_2_PicardTools_SortSam.input_ch_PicardTools_MergeSamFiles_across_libraries_PicardTools_MarkDuplicates)
-   .set { input_ch_PicardTools_MarkDuplicates }
-
 // mark duplicates with picard
 process PicardTools_MarkDuplicates  {
    container docker_image_PicardTools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
-   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+   publishDir path: params.output_dir, mode: 'copy'
 
-   memory total_memory
+   memory amount_of_memory
    cpus number_of_cpus
 
    input:
-      tuple(val(library), 
-         file(input_bam)
-      ) from input_ch_PicardTools_MarkDuplicates
+      file(input_bams) from output_ch_PicardTools_SortSam.collect()
 
    // after marking duplicates, bams will be merged by library so the library name is not needed
    // just the sample name (global variable), do not pass it as a val
    output:
-      file("${library}.mark_dup.bam") into output_ch_PicardTools_MarkDuplicates
-      file("${library}.mark_dup.metrics")
+      file("${params.sample_name}.bam") into output_ch_PicardTools_MarkDuplicates
 
    shell:
-   """
+   ''' 
    set -euo pipefail
+
+   # add picard option prefix, '--INPUT' to each input bam
+   declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
 
    java -Xmx100g -Djava.io.tmpdir=/temp_dir/ \
       -jar /picard-tools/picard.jar \
       MarkDuplicates \
       --VALIDATION_STRINGENCY LENIENT \
-      --INPUT ${input_bam} \
-      --OUTPUT ${library}.mark_dup.bam \
-      --METRICS_FILE ${library}.mark_dup.metrics \
-      --PROGRAM_RECORD_ID MarkDuplicates
-   """
-}
-
-// copy into 2 channels and use one to get the size of the channel
-output_ch_PicardTools_MarkDuplicates
-   .into { output_ch_PicardTools_MarkDuplicates_count; output_ch_2_PicardTools_MarkDuplicates }
-
-//  the number of mark duplicate bams == the number of libraries 
-int num_of_libraries = output_ch_PicardTools_MarkDuplicates_count
-	.count()
-	.get()
-
-// send to merge across lanes if more than one library
-output_ch_2_PicardTools_MarkDuplicates
-   .branch { bams ->
-		input_ch_PicardTools_MergeSamFiles_across_libraries: num_of_libraries > 1
-      
-      // if only one library
-		input_ch_PicardTools_BuildBamIndex: true
-	}
-	.set { output_ch_3_PicardTools_MarkDuplicates }
-
-// merge bams from the same library with picard
-process PicardTools_MergeSamFiles_across_libraries  {
-   container docker_image_PicardTools
-   containerOptions "--volume ${params.temp_dir}:/temp_dir"
-
-   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
-
-   memory total_memory
-   cpus number_of_cpus
-
-   input:
-      file(input_bams) from output_ch_3_PicardTools_MarkDuplicates.input_ch_PicardTools_MergeSamFiles_across_libraries.collect()
-
-   output:
-      file("${params.sample_name}.merged-libraries.bam") into output_ch_PicardTools_MergeSamFiles_across_libraries
-
-   shell:
-   '''
-   set -euo pipefail
-
-   # add picard option prefix, 'INPUT=' to each input bam
-   declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
-
-   java -Xmx100g -Djava.io.tmpdir=/temp_dir \
-      -jar /picard-tools/picard.jar \
-      MergeSamFiles \
-      --USE_THREADING true \
-      --VALIDATION_STRINGENCY LENIENT \
       $INPUT \
-      --OUTPUT !{params.sample_name}.merged-libraries.bam
+      --OUTPUT !{params.sample_name}.bam \
+      --METRICS_FILE !{params.sample_name}.mark_dup.metrics \
+      --ASSUME_SORT_ORDER coordinate \
+      --PROGRAM_RECORD_ID MarkDuplicates
    '''
 }
 
-output_ch_3_PicardTools_MarkDuplicates.input_ch_PicardTools_BuildBamIndex
-   .mix(output_ch_PicardTools_MergeSamFiles_across_libraries)
-   .into { input_ch_2_PicardTools_BuildBamIndex; input_ch_generate_sha512sum;  }
+output_ch_PicardTools_MarkDuplicates
+   .into { input_ch_PicardTools_BuildBamIndex; input_ch_generate_sha512sum; input_ch_validate_outputs }
 
 // index bams with picard
 process PicardTools_BuildBamIndex  {
    container docker_image_PicardTools
    containerOptions "--volume ${params.java_temp_dir}:/java_temp_dir"
 
-   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+   publishDir path: params.output_dir, mode: 'copy'
 
-   memory total_memory
+   memory amount_of_memory
    cpus number_of_cpus
    
    input:
-      file(input_bam) from input_ch_2_PicardTools_BuildBamIndex
+      file(input_bam) from input_ch_PicardTools_BuildBamIndex
 
    // no need for an output channel becuase this is the final stepp
    output:
@@ -404,8 +298,7 @@ process PicardTools_BuildBamIndex  {
 }
 
 output_ch_PicardTools_BuildBamIndex
-   .mix(input_ch_generate_sha512sum)
-   .into { input_ch_2_generate_sha512sum; input_ch_validate_outputs }
+   .into{ input_ch_2_generate_sha512sum; input_ch_2_validate_outputs }
 
 // produce checksum for the bam and bam index
 process generate_sha512sum {    
@@ -413,16 +306,16 @@ process generate_sha512sum {
 
    publishDir path: params.output_dir, mode: 'copy'
    
-   memory total_memory
+   memory amount_of_memory
    cpus number_of_cpus
 
    input:
-      file(input_file) from input_ch_2_generate_sha512sum
+      file(input_file) from input_ch_generate_sha512sum.mix(input_ch_2_generate_sha512sum)
 
    output:
       file("${input_file.getName()}.sha512sum") into output_ch_generate_sha512sum
 
-   shell:
+   script:
    """
    set -euo pipefail
 
@@ -435,7 +328,10 @@ process validate_outputs {
 
    input:
       path(file_to_validate) from input_ch_validate_outputs
-         .mix(output_ch_generate_sha512sum, Channel.from(params.temp_dir, params.output_dir))
+         .mix(output_ch_generate_sha512sum, 
+              input_ch_2_validate_outputs,
+              Channel.from(params.temp_dir, 
+                           params.output_dir))
 
    script:
    """
