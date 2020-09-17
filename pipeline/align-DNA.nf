@@ -6,7 +6,7 @@
       - NEEDS LOGGING UPDATE FOR OUTPUS, LOGS AND REPORTS
 */
 
-def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-0.7.17_samtools-1.10"
+def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-mem2-2.0_samtools-1.10"
 def docker_image_PicardTools = "blcdsdockerregistry/align-dna:picardtools-2.23.3"
 def docker_image_sha512sum = "blcdsdockerregistry/align-dna:sha512sum-1.0"
 def docker_image_validate_params = "blcdsdockerregistry/align-dna:sha512sum-1.0"
@@ -53,7 +53,7 @@ log.info """\
       max_number_of_parallel_jobs = ${params.max_number_of_parallel_jobs}
 
    Tools Used:
-   - BWA and SAMtools: ${docker_image_BWA_and_SAMTools}
+   - BWA-MEM2 and SAMtools: ${docker_image_BWA_and_SAMTools}
    - Picard Tools: ${docker_image_PicardTools}
    - sha512sum: ${docker_image_sha512sum}
    - validate_params: ${docker_image_validate_params}
@@ -176,7 +176,7 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
    """
    set -euo pipefail
 
-   bwa \
+   bwa-mem2 \
       mem \
       -t ${number_of_cpus} \
       -M \
