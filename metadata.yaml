@@ -1,6 +1,8 @@
 ---
 Category: "pipeline"
-Description: "DNA Alignment pipeline for aligning, sorting, marking duplicates and indexing paired fastqs"
+Description: >
+ "DNA Alignment pipeline for aligning, 
+sorting, marking duplicates and indexing paired fastqs"
 Maintainers: "Boutros Lab Infrastructure"
 Contributors: ["Benjamin Carlin"]
 Languages: ["Nextflow", "Docker"]
