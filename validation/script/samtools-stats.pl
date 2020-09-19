@@ -3,7 +3,7 @@
 ### satmtools-stats.pl
 ##################################################################################
 #  Simple/crude perl script to find BAMs and execute samtools stat for BAMs using either sbatch or qsub
-#  Modify and update this script for more general useage or pipeline integration
+#  Modify and update this script for more general usage or pipeline integration
 #
 ### HISTORY
 #######################################################################################
