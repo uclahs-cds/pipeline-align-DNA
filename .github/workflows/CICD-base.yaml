@@ -1,4 +1,5 @@
-name: cicd-base
+---
+name: CICD-base
 
 on:
   push:
@@ -9,7 +10,7 @@ on:
       - master
 
 jobs:
-  cicd-base:
+  CICD-base:
     runs-on: ubuntu-latest
 
     timeout-minutes: 15
@@ -18,7 +19,7 @@ jobs:
       # Checkout codebase
       - name: Checkout
         uses: actions/checkout@v2
-      
-      # Run cicd-base
-      - name: cicd-base
+
+      # Run CICD-base
+      - name: CICD-base
         uses: docker://blcdsdockerregistry/cicd-base:latest
