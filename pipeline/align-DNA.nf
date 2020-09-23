@@ -24,9 +24,9 @@ if (amount_of_memory < 1) {
 amount_of_memory = amount_of_memory.toString() + " GB"
 
 // Default memory configuration for Picard's Java commands
-params.mem_command_sort_sam = 4
-params.mem_command_mark_duplicates = 4
-params.mem_command_build_bam_index = 4
+params.mem_command_sort_sam = "4g"
+params.mem_command_mark_duplicates = "4g"
+params.mem_command_build_bam_index = "4g"
 
 // output details of the pipeline run to stdout
 log.info """\
@@ -221,7 +221,7 @@ process PicardTools_SortSam  {
    """
    set -euo pipefail
 
-   java -Xmx${params.mem_command_sort_sam}g -Djava.io.tmpdir=/temp_dir \
+   java -Xmx${params.mem_command_sort_sam} -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       SortSam \
       --VALIDATION_STRINGENCY LENIENT \
@@ -256,7 +256,7 @@ process PicardTools_MarkDuplicates  {
    # add picard option prefix, '--INPUT' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
 
-   java -Xmx!{params.mem_command_mark_duplicates}g -Djava.io.tmpdir=/temp_dir \
+   java -Xmx!{params.mem_command_mark_duplicates} -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       MarkDuplicates \
       --VALIDATION_STRINGENCY LENIENT \
@@ -292,7 +292,7 @@ process PicardTools_BuildBamIndex  {
    """
    set -euo pipefail
 
-   java -Xmx${params.mem_command_build_bam_index}g -Djava.io.tmpdir=/temp_dir \
+   java -Xmx${params.mem_command_build_bam_index} -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       BuildBamIndex \
       --VALIDATION_STRINGENCY LENIENT \
