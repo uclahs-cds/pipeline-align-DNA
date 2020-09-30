@@ -9,7 +9,7 @@
 def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-0.7.17_samtools-1.10"
 def docker_image_PicardTools = "blcdsdockerregistry/align-dna:picardtools-2.23.3"
 def docker_image_sha512sum = "blcdsdockerregistry/align-dna:sha512sum-1.0"
-def docker_image_validate_params = "blcdsdockerregistry/align-dna:sha512sum-1.0"
+def docker_image_validate_params = "blcdsdockerregistry/validate:1.0.0"
 
 // resource information
 def number_of_cpus = (int) (Runtime.getRuntime().availableProcessors() / params.max_number_of_parallel_jobs)
@@ -129,7 +129,7 @@ process validate_inputs {
    """
    set -euo pipefail
 
-   #python -m validate -t ${file_to_validate}
+   python -m validate -t file-input ${file_to_validate}
    """
 }
 
@@ -341,6 +341,6 @@ process validate_outputs {
    """
    set -euo pipefail
 
-   #python -m validate -t ${file_to_validate}
+   python -m validate -t file-input ${file_to_validate}
    """
 }
