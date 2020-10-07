@@ -21,12 +21,27 @@ def amount_of_memory = ((int) (((java.lang.management.ManagementFactory.getOpera
 if (amount_of_memory < 1) {
    amount_of_memory = 1
 }
+
 amount_of_memory = amount_of_memory.toString() + " GB"
 
 // Default memory configuration for Picard's Java commands
 params.mem_command_sort_sam = "4g"
 params.mem_command_mark_duplicates = "4g"
 params.mem_command_build_bam_index = "4g"
+
+// cpus for bwa-mem2
+// The memory requied by bwa-mem2 increases along with the threads. Here we ensure that each cpu has
+// at least 2.5 GB of memory, to avoid out-of-memory failure, unless the number of cpu is defined in
+// config.
+if (params.containsKey("bwa_mem_number_of_cpus")) {
+   bwa_mem_number_of_cpus = params.bwa_mem_number_of_cpus
+} else {
+   amount_of_memory_int = amount_of_memory.replace(" GB", "") as Integer
+   bwa_mem_number_of_cpus = (int) Math.min(number_of_cpus, Math.floor(amount_of_memory_int / 2.5))
+   if (bwa_mem_number_of_cpus < 1) {
+      bwa_mem_number_of_cpus  = 1
+   }
+}
 
 // output details of the pipeline run to stdout
 log.info """\
@@ -133,7 +148,7 @@ process validate_inputs {
    """
 }
 
-int number_of_invalid_inputs = output_ch_validate_inputs.collect()
+int number_of_invalid_inputs = output_ch_validate_inputs
          .filter { valid_result ->
             valid_result == false
          }
@@ -143,14 +158,13 @@ int number_of_invalid_inputs = output_ch_validate_inputs.collect()
 // align with bwa mem and convert with samtools
 process BWA_mem_SAMTools_Convert_Sam_to_Bam {
    container docker_image_BWA_and_SAMTools
-
    publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+
+   memory amount_of_memory
+   cpus bwa_mem_number_of_cpus
 
    when:
       number_of_invalid_inputs == 0
-
-   memory amount_of_memory
-   cpus number_of_cpus
 
    // use "each" so the the reference files are passed through for each fastq pair alignment 
    input: 
@@ -175,10 +189,9 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
    script:
    """
    set -euo pipefail
-
    bwa-mem2 \
       mem \
-      -t ${number_of_cpus} \
+      -t ${task.cpus} \
       -M \
       -R "${read_group_name}" \
       ${ref_fasta} \
@@ -186,7 +199,7 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
       ${read2_fastq} | \
    samtools \
       view \
-      -@ ${number_of_cpus} \
+      -@ ${task.cpus} \
       -S \
       -b > \
       ${library}-${lane}.aligned.bam
