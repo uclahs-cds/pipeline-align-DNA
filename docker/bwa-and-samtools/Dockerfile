@@ -5,10 +5,10 @@ LABEL maintainer="Ben Carlin <bcarlin@mednet.ucla.edu>"
 # add channels in correct order to avoid missing libcrypto dependency
 # https://github.com/bioconda/bioconda-recipes/issues/12100
 RUN conda update -n base -c defaults conda && \
-    conda install -q -y -c bioconda bwa=0.7.17 && \
+    conda install -q -y -c bioconda bwa-mem2=2.0 && \
     conda clean --all -y 
 
-CMD ["bwa"]
+CMD ["bwa-mem2"]
 
 # https://github.com/bioconda/bioconda-recipes/issues/12100
 RUN conda update -n base -c defaults conda &&\

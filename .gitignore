@@ -3,3 +3,4 @@ work/
 *.nextflow.log*
 logs/
 .DS_Store
+.vscode
