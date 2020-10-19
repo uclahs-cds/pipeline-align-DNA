@@ -6,7 +6,7 @@
       - NEEDS LOGGING UPDATE FOR OUTPUS, LOGS AND REPORTS
 */
 
-def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:bwa-mem2-2.0_samtools-1.10"
+def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:${params.bwa_version}_samtools-1.10"
 def docker_image_PicardTools = "blcdsdockerregistry/align-dna:picardtools-2.23.3"
 def docker_image_sha512sum = "blcdsdockerregistry/align-dna:sha512sum-1.0"
 def docker_image_validate_params = "blcdsdockerregistry/align-dna:sha512sum-1.0"
@@ -148,44 +148,6 @@ process validate_inputs {
    """
 }
 
-// get ouput path for bam files
-bam_output_dir = params.output_dir
-bam_output_filename = "${params.sample_name}.bam"
-
-if (params.blcds_registered_dataset) {
-   (bam_output_dir, bam_output_filename) = input_ch_samples_output
-   .map { it ->
-      def path_matcher = it[3] =~ /^(?<baseDir>(?<mntDir>\/\w+)\/data\/(?<diseaseId>\w+)\/(?<datasetId>\w+)\/(?<patientId>\w+)\/(?<sampleId>[A-Za-z0-9-]+)\/.+)\/raw\/FASTQ\/.+$/
-      if (!path_matcher.matches()) {
-         throw new Exception("The input path ${it[2]} isn't a valid blcds-registered path.")
-      }
-      def base_dir = path_matcher.group("baseDir")
-      def dataset_id = path_matcher.group("datasetId")
-      def sample_id = path_matcher.group("sampleId")
-
-      // blcdsdockerregistry/align-dna:bwa-mem2-2.0_samtools-1.10
-      def aligner_matcher = docker_image_BWA_and_SAMTools =~ /^.+\/align-dna:(?<alignerTool>[A-Za-z0-9-]+)-(?<alignerVersion>[0-9.]+)_.+$/
-      aligner_matcher.matches()
-      def aligner_tool = aligner_matcher.group("alignerTool").toUpperCase()
-      def aligner_version = aligner_matcher.group("alignerVersion")
-      
-      // TODO: need to validate genome version
-      return tuple(
-         "${base_dir}/aligned/${params.reference_genome_version}/BAM",
-         "${aligner_tool}-${aligner_version}_${dataset_id}-${sample_id}.bam"
-      )
-   }
-   .unique()
-   .collect()
-   .map { it -> 
-      if (it.size() > 2) {
-         throw new Exception("Not all input fastq files are from the same blcds-registered sample. Please verify.")
-      }
-      return it
-   }
-   .get()
-}
-
 int number_of_invalid_inputs = output_ch_validate_inputs
          .filter { valid_result ->
             valid_result == false
@@ -196,7 +158,17 @@ int number_of_invalid_inputs = output_ch_validate_inputs
 // align with bwa mem and convert with samtools
 process BWA_mem_SAMTools_Convert_Sam_to_Bam {
    container docker_image_BWA_and_SAMTools
-   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+
+   publishDir params.bam_output_dir,
+      enabled: params.save_intermediate_files,
+      pattern: "*.bam",
+      mode: 'copy'
+
+   publishDir params.log_output_dir,
+      enabled: params.blcds_registered_dataset,
+      pattern: "*.command.*",
+      mode: "copy",
+      saveAs: { "BWA_mem_SAMTools_Convert_Sam_to_Bam/${file(read1_fastq).getName()}/log${file(it).getName()}" }
 
    memory amount_of_memory
    cpus bwa_mem_number_of_cpus
@@ -249,7 +221,16 @@ process PicardTools_SortSam  {
    container docker_image_PicardTools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
    
-   publishDir path: params.output_dir, enabled: params.save_intermediate_files, mode: 'copy'
+   publishDir params.output_dir,
+      enabled: params.save_intermediate_files,
+      pattern: "*.sorted.bam",
+      mode: 'copy'
+
+   publishDir params.log_output_dir,
+      enabled: params.blcds_registered_dataset,
+      pattern: "*.command.*",
+      mode: "copy",
+      saveAs: { "PicardTools_SortSam/log${file(it).getName()}" }
 
    memory amount_of_memory
    cpus number_of_cpus
@@ -287,7 +268,15 @@ process PicardTools_MarkDuplicates  {
    container docker_image_PicardTools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
-   publishDir path: bam_output_dir, mode: 'copy'
+   publishDir params.bam_output_dir,
+      pattern: "*.bam",
+      mode: 'copy'
+
+   publishDir params.log_output_dir,
+      enabled: params.blcds_registered_dataset,
+      pattern: "*.command.*",
+      mode: "copy",
+      saveAs: { "PicardTools_MarkDuplicates/log${file(it).getName()}" }
 
    memory amount_of_memory
    cpus number_of_cpus
@@ -301,7 +290,7 @@ process PicardTools_MarkDuplicates  {
       file(bam_output_filename) into output_ch_PicardTools_MarkDuplicates
 
    shell:
-   bam_output_filename = bam_output_filename
+   bam_output_filename = params.bam_output_filename
    ''' 
    set -euo pipefail
 
@@ -328,7 +317,15 @@ process PicardTools_BuildBamIndex  {
    container docker_image_PicardTools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
-   publishDir path: bam_output_dir, mode: 'copy'
+   publishDir params.bam_output_dir,
+      pattern: "*.bam.bai",
+      mode: 'copy'
+
+   publishDir params.log_output_dir,
+      enabled: params.blcds_registered_dataset,
+      pattern: "*.command.*",
+      mode: "copy",
+      saveAs: { "PicardTools_BuildBamIndex/log${file(it).getName()}" }
 
    memory amount_of_memory
    cpus number_of_cpus
@@ -360,7 +357,7 @@ output_ch_PicardTools_BuildBamIndex
 process generate_sha512sum {    
    container docker_image_sha512sum
 
-   publishDir path: bam_output_dir, mode: 'copy'
+   publishDir params.bam_output_dir, mode: 'copy'
    
    memory amount_of_memory
    cpus number_of_cpus
