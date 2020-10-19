@@ -166,7 +166,7 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
 
    publishDir params.log_output_dir,
       enabled: params.blcds_registered_dataset,
-      pattern: "*.command.*",
+      pattern: ".command.*",
       mode: "copy",
       saveAs: { "BWA_mem_SAMTools_Convert_Sam_to_Bam/${file(read1_fastq).getName()}/log${file(it).getName()}" }
 
@@ -195,6 +195,7 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
          val(lane),
          file("${library}-${lane}.aligned.bam")
       ) into output_ch_BWA_mem_SAMTools_Convert_Sam_to_Bam
+      file ".command.*" into output_dot_command_SAMTools_Convert_Sam_to_Bam
 
    script:
    """
@@ -248,6 +249,7 @@ process PicardTools_SortSam  {
    // (files of same lane are merged together) so the lane information is dropped
    output:
       file("${library}-${lane}.sorted.bam") into output_ch_PicardTools_SortSam
+      file ".command.*" into output_dot_command_PicardTools_SortSam
 
    script:
    """
@@ -288,6 +290,7 @@ process PicardTools_MarkDuplicates  {
    // just the sample name (global variable), do not pass it as a val
    output:
       file(bam_output_filename) into output_ch_PicardTools_MarkDuplicates
+      file ".command.*" into output_dot_command_PicardTools_MarkDuplicates
 
    shell:
    bam_output_filename = params.bam_output_filename
@@ -336,6 +339,7 @@ process PicardTools_BuildBamIndex  {
    // no need for an output channel becuase this is the final stepp
    output:
       file("${input_bam.getName()}.bai") into output_ch_PicardTools_BuildBamIndex
+      file ".command.*" into output_dot_command_PicardTools_BuildBamIndex
 
    script:
    """
