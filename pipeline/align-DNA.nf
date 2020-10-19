@@ -61,11 +61,17 @@ log.info """\
    - output: 
       temp_dir: ${params.temp_dir}
       output_dir: ${params.output_dir}
+      bam_output_dir: ${params.bam_output_dir}
+      bam_output_filename: ${params.bam_output_filename}
+      log_output_dir: ${params.log_output_dir}
       
    - options:
       save_intermediate_files = ${params.save_intermediate_files}
       cache_intermediate_pipeline_steps = ${params.cache_intermediate_pipeline_steps}
       max_number_of_parallel_jobs = ${params.max_number_of_parallel_jobs}
+      bwa_mem_number_of_cpus = ${bwa_mem_number_of_cpus}
+      blcds_registered_dataset_input = ${params.blcds_registered_dataset_input}
+      blcds_registered_dataset_output = ${params.blcds_registered_dataset_output}
 
    Tools Used:
    - BWA-MEM2 and SAMtools: ${docker_image_BWA_and_SAMTools}
@@ -165,7 +171,6 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
       mode: 'copy'
 
    publishDir params.log_output_dir,
-      enabled: params.blcds_registered_dataset,
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "BWA_mem_SAMTools_Convert_Sam_to_Bam/${file(read1_fastq).getName()}/log${file(it).getName()}" }
@@ -228,7 +233,6 @@ process PicardTools_SortSam  {
       mode: 'copy'
 
    publishDir params.log_output_dir,
-      enabled: params.blcds_registered_dataset,
       pattern: "*.command.*",
       mode: "copy",
       saveAs: { "PicardTools_SortSam/log${file(it).getName()}" }
@@ -275,7 +279,6 @@ process PicardTools_MarkDuplicates  {
       mode: 'copy'
 
    publishDir params.log_output_dir,
-      enabled: params.blcds_registered_dataset,
       pattern: "*.command.*",
       mode: "copy",
       saveAs: { "PicardTools_MarkDuplicates/log${file(it).getName()}" }
@@ -325,7 +328,6 @@ process PicardTools_BuildBamIndex  {
       mode: 'copy'
 
    publishDir params.log_output_dir,
-      enabled: params.blcds_registered_dataset,
       pattern: "*.command.*",
       mode: "copy",
       saveAs: { "PicardTools_BuildBamIndex/log${file(it).getName()}" }
