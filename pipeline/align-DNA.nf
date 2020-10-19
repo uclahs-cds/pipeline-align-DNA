@@ -102,7 +102,7 @@ Channel
          row.read2_fastq
       )
    }
-   .into { input_ch_samples_validate; input_ch_samples }
+   .into { input_ch_samples_validate; input_ch_samples; input_ch_samples_output }
 
 // get the reference and required files for aligning
 Channel
@@ -146,6 +146,44 @@ process validate_inputs {
 
    #python -m validate -t ${file_to_validate}
    """
+}
+
+// get ouput path for bam files
+bam_output_dir = params.output_dir
+bam_output_filename = "${params.sample_name}.bam"
+
+if (params.blcds_registered_dataset) {
+   (bam_output_dir, bam_output_filename) = input_ch_samples_output
+   .map { it ->
+      def path_matcher = it[3] =~ /^(?<baseDir>(?<mntDir>\/\w+)\/data\/(?<diseaseId>\w+)\/(?<datasetId>\w+)\/(?<patientId>\w+)\/(?<sampleId>[A-Za-z0-9-]+)\/.+)\/raw\/FASTQ\/.+$/
+      if (!path_matcher.matches()) {
+         throw new Exception("The input path ${it[2]} isn't a valid blcds-registered path.")
+      }
+      def base_dir = path_matcher.group("baseDir")
+      def dataset_id = path_matcher.group("datasetId")
+      def sample_id = path_matcher.group("sampleId")
+
+      // blcdsdockerregistry/align-dna:bwa-mem2-2.0_samtools-1.10
+      def aligner_matcher = docker_image_BWA_and_SAMTools =~ /^.+\/align-dna:(?<alignerTool>[A-Za-z0-9-]+)-(?<alignerVersion>[0-9.]+)_.+$/
+      aligner_matcher.matches()
+      def aligner_tool = aligner_matcher.group("alignerTool").toUpperCase()
+      def aligner_version = aligner_matcher.group("alignerVersion")
+      
+      // TODO: need to validate genome version
+      return tuple(
+         "${base_dir}/aligned/${params.reference_genome_version}/BAM",
+         "${aligner_tool}-${aligner_version}_${dataset_id}-${sample_id}.bam"
+      )
+   }
+   .unique()
+   .collect()
+   .map { it -> 
+      if (it.size() > 2) {
+         throw new Exception("Not all input fastq files are from the same blcds-registered sample. Please verify.")
+      }
+      return it
+   }
+   .get()
 }
 
 int number_of_invalid_inputs = output_ch_validate_inputs
@@ -249,7 +287,7 @@ process PicardTools_MarkDuplicates  {
    container docker_image_PicardTools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
-   publishDir path: params.output_dir, mode: 'copy'
+   publishDir path: bam_output_dir, mode: 'copy'
 
    memory amount_of_memory
    cpus number_of_cpus
@@ -260,9 +298,10 @@ process PicardTools_MarkDuplicates  {
    // after marking duplicates, bams will be merged by library so the library name is not needed
    // just the sample name (global variable), do not pass it as a val
    output:
-      file("${params.sample_name}.bam") into output_ch_PicardTools_MarkDuplicates
+      file(bam_output_filename) into output_ch_PicardTools_MarkDuplicates
 
    shell:
+   bam_output_filename = bam_output_filename
    ''' 
    set -euo pipefail
 
@@ -274,7 +313,7 @@ process PicardTools_MarkDuplicates  {
       MarkDuplicates \
       --VALIDATION_STRINGENCY LENIENT \
       $INPUT \
-      --OUTPUT !{params.sample_name}.bam \
+      --OUTPUT !{bam_output_filename} \
       --METRICS_FILE !{params.sample_name}.mark_dup.metrics \
       --ASSUME_SORT_ORDER coordinate \
       --PROGRAM_RECORD_ID MarkDuplicates
@@ -282,14 +321,14 @@ process PicardTools_MarkDuplicates  {
 }
 
 output_ch_PicardTools_MarkDuplicates
-   .into { input_ch_PicardTools_BuildBamIndex; input_ch_generate_sha512sum; input_ch_validate_outputs }
+   .into { input_ch_PicardTools_BuildBamIndex; input_ch_generate_sha512; input_ch_validate_outputs }
 
 // index bams with picard
 process PicardTools_BuildBamIndex  {
    container docker_image_PicardTools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
-   publishDir path: params.output_dir, mode: 'copy'
+   publishDir path: bam_output_dir, mode: 'copy'
 
    memory amount_of_memory
    cpus number_of_cpus
@@ -315,28 +354,28 @@ process PicardTools_BuildBamIndex  {
 }
 
 output_ch_PicardTools_BuildBamIndex
-   .into{ input_ch_2_generate_sha512sum; input_ch_2_validate_outputs }
+   .into{ input_ch_2_generate_sha512; input_ch_2_validate_outputs }
 
 // produce checksum for the bam and bam index
 process generate_sha512sum {    
    container docker_image_sha512sum
 
-   publishDir path: params.output_dir, mode: 'copy'
+   publishDir path: bam_output_dir, mode: 'copy'
    
    memory amount_of_memory
    cpus number_of_cpus
 
    input:
-      file(input_file) from input_ch_generate_sha512sum.mix(input_ch_2_generate_sha512sum)
+      file(input_file) from input_ch_generate_sha512.mix(input_ch_2_generate_sha512)
 
    output:
-      file("${input_file.getName()}.sha512sum") into output_ch_generate_sha512sum
+      file("${input_file.getName()}.sha512") into output_ch_generate_sha512
 
    script:
    """
    set -euo pipefail
 
-   sha512sum ${input_file} > ${input_file.getName()}.sha512sum
+   sha512sum ${input_file} > ${input_file.getName()}.sha512
    """
 }
 
@@ -345,7 +384,7 @@ process validate_outputs {
 
    input:
       path(file_to_validate) from input_ch_validate_outputs
-         .mix(output_ch_generate_sha512sum, 
+         .mix(output_ch_generate_sha512, 
               input_ch_2_validate_outputs,
               Channel.from(params.temp_dir, 
                            params.output_dir))
