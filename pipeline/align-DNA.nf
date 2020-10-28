@@ -233,7 +233,7 @@ process PicardTools_SortSam  {
       mode: 'copy'
 
    publishDir params.log_output_dir,
-      pattern: "*.command.*",
+      pattern: ".command.*",
       mode: "copy",
       saveAs: { "PicardTools_SortSam/log${file(it).getName()}" }
 
@@ -279,7 +279,7 @@ process PicardTools_MarkDuplicates  {
       mode: 'copy'
 
    publishDir params.log_output_dir,
-      pattern: "*.command.*",
+      pattern: ".command.*",
       mode: "copy",
       saveAs: { "PicardTools_MarkDuplicates/log${file(it).getName()}" }
 
@@ -328,7 +328,7 @@ process PicardTools_BuildBamIndex  {
       mode: 'copy'
 
    publishDir params.log_output_dir,
-      pattern: "*.command.*",
+      pattern: ".command.*",
       mode: "copy",
       saveAs: { "PicardTools_BuildBamIndex/log${file(it).getName()}" }
 
