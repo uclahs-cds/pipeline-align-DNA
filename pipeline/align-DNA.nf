@@ -33,13 +33,11 @@ params.mem_command_build_bam_index = "4g"
 // The memory requied by bwa-mem2 increases along with the threads. Here we ensure that each cpu has
 // at least 2.5 GB of memory, to avoid out-of-memory failure, unless the number of cpu is defined in
 // config.
-if (params.containsKey("bwa_mem_number_of_cpus")) {
-   bwa_mem_number_of_cpus = params.bwa_mem_number_of_cpus
-} else {
+if (!params.containsKey("bwa_mem_number_of_cpus")) {
    amount_of_memory_int = amount_of_memory.replace(" GB", "") as Integer
-   bwa_mem_number_of_cpus = (int) Math.min(number_of_cpus, Math.floor(amount_of_memory_int / 2.5))
-   if (bwa_mem_number_of_cpus < 1) {
-      bwa_mem_number_of_cpus  = 1
+   params.bwa_mem_number_of_cpus = (int) Math.min(number_of_cpus, Math.floor(amount_of_memory_int / 2.5))
+   if (params.bwa_mem_number_of_cpus < 1) {
+      params.bwa_mem_number_of_cpus  = 1
    }
 }
 
@@ -69,7 +67,7 @@ log.info """\
       save_intermediate_files = ${params.save_intermediate_files}
       cache_intermediate_pipeline_steps = ${params.cache_intermediate_pipeline_steps}
       max_number_of_parallel_jobs = ${params.max_number_of_parallel_jobs}
-      bwa_mem_number_of_cpus = ${bwa_mem_number_of_cpus}
+      bwa_mem_number_of_cpus = ${params.bwa_mem_number_of_cpus}
       blcds_registered_dataset_input = ${params.blcds_registered_dataset_input}
       blcds_registered_dataset_output = ${params.blcds_registered_dataset_output}
 
@@ -176,7 +174,7 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
       saveAs: { "BWA_mem_SAMTools_Convert_Sam_to_Bam/${file(read1_fastq).getName()}/log${file(it).getName()}" }
 
    memory amount_of_memory
-   cpus bwa_mem_number_of_cpus
+   cpus params.bwa_mem_number_of_cpus
 
    when:
       number_of_invalid_inputs == 0
