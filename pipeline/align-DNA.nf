@@ -163,12 +163,12 @@ int number_of_invalid_inputs = output_ch_validate_inputs
 process BWA_mem_SAMTools_Convert_Sam_to_Bam {
    container docker_image_BWA_and_SAMTools
 
-   publishDir params.bam_output_dir,
+   publishDir path: params.bam_output_dir,
       enabled: params.save_intermediate_files,
       pattern: "*.bam",
       mode: 'copy'
 
-   publishDir params.log_output_dir,
+   publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "BWA_mem_SAMTools_Convert_Sam_to_Bam/${file(read1_fastq).getName()}/log${file(it).getName()}" }
@@ -225,12 +225,12 @@ process PicardTools_SortSam  {
    container docker_image_PicardTools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
    
-   publishDir params.output_dir,
+   publishDir path: params.output_dir,
       enabled: params.save_intermediate_files,
       pattern: "*.sorted.bam",
       mode: 'copy'
 
-   publishDir params.log_output_dir,
+   publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "PicardTools_SortSam/log${file(it).getName()}" }
@@ -272,11 +272,11 @@ process PicardTools_MarkDuplicates  {
    container docker_image_PicardTools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
-   publishDir params.bam_output_dir,
+   publishDir path: params.bam_output_dir,
       pattern: "*.bam",
       mode: 'copy'
 
-   publishDir params.log_output_dir,
+   publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "PicardTools_MarkDuplicates/log${file(it).getName()}" }
@@ -321,11 +321,11 @@ process PicardTools_BuildBamIndex  {
    container docker_image_PicardTools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
-   publishDir params.bam_output_dir,
+   publishDir path: params.bam_output_dir,
       pattern: "*.bam.bai",
       mode: 'copy'
 
-   publishDir params.log_output_dir,
+   publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "PicardTools_BuildBamIndex/log${file(it).getName()}" }
@@ -361,7 +361,7 @@ output_ch_PicardTools_BuildBamIndex
 process generate_sha512sum {    
    container docker_image_sha512sum
 
-   publishDir params.bam_output_dir, mode: 'copy'
+   publishDir path: params.bam_output_dir, mode: 'copy'
    
    memory amount_of_memory
    cpus number_of_cpus
