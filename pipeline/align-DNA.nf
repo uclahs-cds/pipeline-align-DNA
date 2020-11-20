@@ -6,10 +6,10 @@
       - NEEDS LOGGING UPDATE FOR OUTPUS, LOGS AND REPORTS
 */
 
-def docker_image_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:${params.bwa_version}_samtools-1.10"
-def docker_image_PicardTools = "blcdsdockerregistry/align-dna:picardtools-2.23.3"
-def docker_image_sha512sum = "blcdsdockerregistry/align-dna:sha512sum-1.0"
-def docker_image_validate_params = "blcdsdockerregistry/align-dna:sha512sum-1.0"
+def dockeri_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:${params.bwa_version}_samtools-1.10"
+def dockeri_PicardTools = "blcdsdockerregistry/align-dna:picardtools-2.23.3"
+def dockeri_sha512sum = "blcdsdockerregistry/align-dna:sha512sum-1.0"
+def dockeri_validate_params = "blcdsdockerregistry/align-dna:sha512sum-1.0"
 
 // resource information
 def number_of_cpus = (int) (Runtime.getRuntime().availableProcessors() / params.max_number_of_parallel_jobs)
@@ -72,10 +72,10 @@ log.info """\
       blcds_registered_dataset_output = ${params.blcds_registered_dataset_output}
 
    Tools Used:
-   - BWA-MEM2 and SAMtools: ${docker_image_BWA_and_SAMTools}
-   - Picard Tools: ${docker_image_PicardTools}
-   - sha512sum: ${docker_image_sha512sum}
-   - validate_params: ${docker_image_validate_params}
+   - BWA-MEM2 and SAMtools: ${dockeri_BWA_and_SAMTools}
+   - Picard Tools: ${dockeri_PicardTools}
+   - sha512sum: ${dockeri_sha512sum}
+   - validate_params: ${dockeri_validate_params}
 
    ------------------------------------
    Starting workflow...
@@ -106,43 +106,43 @@ Channel
          row.read2_fastq
       )
    }
-   .into { input_ch_samples_validate; input_ch_samples; input_ch_samples_output }
+   .into { ich_samples_validate; ich_samples; ich_samples_output }
 
 // get the reference and required files for aligning
 Channel
    .fromPath(params.reference_fasta)
    .ifEmpty { error "Cannot find reference: ${params.reference_fasta}" }
-   .into { input_ch_reference_fasta_validate; input_ch_reference_fasta }
+   .into { ich_reference_fasta_validate; ich_reference_fasta }
 
 Channel
    .fromPath(params.reference_fasta_dict)
    .ifEmpty { error "Cannot find reference dictionary: ${params.reference_fasta_dict}" }
-   .into { input_ch_reference_dict_validate; input_ch_reference_dict }
+   .into { ich_reference_dict_validate; ich_reference_dict }
 
 Channel
    .fromPath(params.reference_fasta_index_files)
    .ifEmpty { error "Cannot find reference index files: ${params.reference_fasta_index_files}" }
-   .into { input_ch_reference_index_files_validate; input_ch_reference_index_files }
+   .into { ich_reference_index_files_validate; ich_reference_index_files }
 
 // get relavent inputs from csv that should be validated
-input_ch_samples_validate
+ich_samples_validate
    .flatMap { library, lane, read_group_name, read1_fastq, read2_fastq ->
       [read1_fastq, read2_fastq]
    }
-   .set { input_ch_2_samples_validate }
+   .set { ich_2_samples_validate }
 
 process validate_inputs {
-   container docker_image_validate_params
+   container dockeri_validate_params
 
    input:
-   path(file_to_validate) from input_ch_2_samples_validate.mix(
-      input_ch_reference_fasta_validate, 
-      input_ch_reference_dict_validate, 
-      input_ch_reference_index_files_validate
+   path(file_to_validate) from ich_2_samples_validate.mix(
+      ich_reference_fasta_validate, 
+      ich_reference_dict_validate, 
+      ich_reference_index_files_validate
    )
 
    output:
-      val(true) into output_ch_validate_inputs
+      val(true) into och_validate_inputs
 
    script:
    """
@@ -152,7 +152,7 @@ process validate_inputs {
    """
 }
 
-int number_of_invalid_inputs = output_ch_validate_inputs
+int number_of_invalid_inputs = och_validate_inputs
          .filter { valid_result ->
             valid_result == false
          }
@@ -160,8 +160,8 @@ int number_of_invalid_inputs = output_ch_validate_inputs
          .get()
 
 // align with bwa mem and convert with samtools
-process BWA_mem_SAMTools_Convert_Sam_to_Bam {
-   container docker_image_BWA_and_SAMTools
+process dockeriBWA_mem_SAMtools_Convert_Sam_to_Bam {
+   container dockeri_BWA_and_SAMTools
 
    publishDir path: params.bam_output_dir,
       enabled: params.save_intermediate_files,
@@ -171,7 +171,7 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "BWA_mem_SAMTools_Convert_Sam_to_Bam/${file(read1_fastq).getName()}/log${file(it).getName()}" }
+      saveAs: { "dockeriBWA_mem_SAMtools_Convert_Sam_to_Bam/${file(read1_fastq).getName()}/log${file(it).getName()}" }
 
    memory amount_of_memory
    cpus params.bwa_mem_number_of_cpus
@@ -186,10 +186,10 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
          val(read_group_name), 
          path(read1_fastq),
          path(read2_fastq) 
-      ) from input_ch_samples
-      each file(ref_fasta) from input_ch_reference_fasta
-      each file(ref_dict) from input_ch_reference_dict
-      file(ref_idx_files) from input_ch_reference_index_files.collect()
+      ) from ich_samples
+      each file(ref_fasta) from ich_reference_fasta
+      each file(ref_dict) from ich_reference_dict
+      file(ref_idx_files) from ich_reference_index_files.collect()
 
    // output the lane information in the file name to differentiate bewteen aligments of the same
    // sample but different lanes
@@ -197,7 +197,7 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
       tuple(val(library), 
          val(lane),
          file("${library}-${lane}.aligned.bam")
-      ) into output_ch_BWA_mem_SAMTools_Convert_Sam_to_Bam
+      ) into och_dockeriBWA_mem_SAMtools_Convert_Sam_to_Bam
       file ".command.*"
 
    script:
@@ -222,7 +222,7 @@ process BWA_mem_SAMTools_Convert_Sam_to_Bam {
 
 // sort coordinate order with picard
 process PicardTools_SortSam  {
-   container docker_image_PicardTools
+   container dockeri_PicardTools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
    
    publishDir path: params.output_dir,
@@ -242,7 +242,7 @@ process PicardTools_SortSam  {
       tuple(val(library), 
          val(lane),
          file(input_bam)
-      ) from output_ch_BWA_mem_SAMTools_Convert_Sam_to_Bam
+      ) from och_dockeriBWA_mem_SAMtools_Convert_Sam_to_Bam
    
    // the first value of the tuple will be used as a key to group aligned and filtered bams
    // from the same sample and library but different lane together
@@ -250,7 +250,7 @@ process PicardTools_SortSam  {
    // the next steps of the pipeline are merging so using a lane to differentiate between files is no londer needed
    // (files of same lane are merged together) so the lane information is dropped
    output:
-      file("${library}-${lane}.sorted.bam") into output_ch_PicardTools_SortSam
+      file("${library}-${lane}.sorted.bam") into och_PicardTools_SortSam
       file ".command.*"
 
    script:
@@ -269,7 +269,7 @@ process PicardTools_SortSam  {
 
 // mark duplicates with picard
 process PicardTools_MarkDuplicates  {
-   container docker_image_PicardTools
+   container dockeri_PicardTools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
    publishDir path: params.bam_output_dir,
@@ -285,12 +285,12 @@ process PicardTools_MarkDuplicates  {
    cpus number_of_cpus
 
    input:
-      file(input_bams) from output_ch_PicardTools_SortSam.collect()
+      file(input_bams) from och_PicardTools_SortSam.collect()
 
    // after marking duplicates, bams will be merged by library so the library name is not needed
    // just the sample name (global variable), do not pass it as a val
    output:
-      file(bam_output_filename) into output_ch_PicardTools_MarkDuplicates
+      file(bam_output_filename) into och_PicardTools_MarkDuplicates
       file ".command.*"
 
    shell:
@@ -313,12 +313,12 @@ process PicardTools_MarkDuplicates  {
    '''
 }
 
-output_ch_PicardTools_MarkDuplicates
-   .into { input_ch_PicardTools_BuildBamIndex; input_ch_generate_sha512; input_ch_validate_outputs }
+och_PicardTools_MarkDuplicates
+   .into { ich_PicardTools_BuildBamIndex; ich_generate_sha512; ich_validate_outputs }
 
 // index bams with picard
 process PicardTools_BuildBamIndex  {
-   container docker_image_PicardTools
+   container dockeri_PicardTools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
    publishDir path: params.bam_output_dir,
@@ -334,11 +334,11 @@ process PicardTools_BuildBamIndex  {
    cpus number_of_cpus
    
    input:
-      file(input_bam) from input_ch_PicardTools_BuildBamIndex
+      file(input_bam) from ich_PicardTools_BuildBamIndex
 
    // no need for an output channel becuase this is the final stepp
    output:
-      file("${input_bam.getName()}.bai") into output_ch_PicardTools_BuildBamIndex
+      file("${input_bam.getName()}.bai") into och_PicardTools_BuildBamIndex
       file ".command.*"
 
    script:
@@ -354,12 +354,12 @@ process PicardTools_BuildBamIndex  {
    """
 }
 
-output_ch_PicardTools_BuildBamIndex
-   .into{ input_ch_2_generate_sha512; input_ch_2_validate_outputs }
+och_PicardTools_BuildBamIndex
+   .into{ ich_2_generate_sha512; ich_2_validate_outputs }
 
 // produce checksum for the bam and bam index
 process generate_sha512sum {    
-   container docker_image_sha512sum
+   container dockeri_sha512sum
 
    publishDir path: params.bam_output_dir, mode: 'copy'
    
@@ -367,10 +367,10 @@ process generate_sha512sum {
    cpus number_of_cpus
 
    input:
-      file(input_file) from input_ch_generate_sha512.mix(input_ch_2_generate_sha512)
+      file(input_file) from ich_generate_sha512.mix(ich_2_generate_sha512)
 
    output:
-      file("${input_file.getName()}.sha512") into output_ch_generate_sha512
+      file("${input_file.getName()}.sha512") into och_generate_sha512
 
    script:
    """
@@ -381,12 +381,12 @@ process generate_sha512sum {
 }
 
 process validate_outputs {
-   container docker_image_validate_params
+   container dockeri_validate_params
 
    input:
-      path(file_to_validate) from input_ch_validate_outputs
-         .mix(output_ch_generate_sha512, 
-              input_ch_2_validate_outputs,
+      path(file_to_validate) from ich_validate_outputs
+         .mix(och_generate_sha512, 
+              ich_2_validate_outputs,
               Channel.from(params.temp_dir, 
                            params.output_dir))
 
