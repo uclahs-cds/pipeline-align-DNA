@@ -6,7 +6,7 @@
       - NEEDS LOGGING UPDATE FOR OUTPUS, LOGS AND REPORTS
 */
 
-def dockeri_BWA_and_SAMTools = "blcdsdockerregistry/align-dna:${params.bwa_version}_samtools-1.10"
+def dockeri_BWA_and_SAMtools = "blcdsdockerregistry/align-dna:${params.bwa_version}_samtools-1.10"
 def dockeri_PicardTools = "blcdsdockerregistry/align-dna:picardtools-2.23.3"
 def dockeri_sha512sum = "blcdsdockerregistry/align-dna:sha512sum-1.0"
 def dockeri_validate_params = "blcdsdockerregistry/align-dna:sha512sum-1.0"
@@ -72,7 +72,7 @@ log.info """\
       blcds_registered_dataset_output = ${params.blcds_registered_dataset_output}
 
    Tools Used:
-   - BWA-MEM2 and SAMtools: ${dockeri_BWA_and_SAMTools}
+   - BWA-MEM2 and SAMtools: ${dockeri_BWA_and_SAMtools}
    - Picard Tools: ${dockeri_PicardTools}
    - sha512sum: ${dockeri_sha512sum}
    - validate_params: ${dockeri_validate_params}
@@ -160,8 +160,8 @@ int number_of_invalid_inputs = och_validate_inputs
          .get()
 
 // align with bwa mem and convert with samtools
-process dockeriBWA_mem_SAMtools_Convert_Sam_to_Bam {
-   container dockeri_BWA_and_SAMTools
+process BWA_mem_SAMtools_Convert_Sam_to_Bam {
+   container dockeri_BWA_and_SAMtools
 
    publishDir path: params.bam_output_dir,
       enabled: params.save_intermediate_files,
@@ -171,7 +171,7 @@ process dockeriBWA_mem_SAMtools_Convert_Sam_to_Bam {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "dockeriBWA_mem_SAMtools_Convert_Sam_to_Bam/${file(read1_fastq).getName()}/log${file(it).getName()}" }
+      saveAs: { "BWA_mem_SAMtools_Convert_Sam_to_Bam/${file(read1_fastq).getName()}/log${file(it).getName()}" }
 
    memory amount_of_memory
    cpus params.bwa_mem_number_of_cpus
@@ -197,7 +197,7 @@ process dockeriBWA_mem_SAMtools_Convert_Sam_to_Bam {
       tuple(val(library), 
          val(lane),
          file("${library}-${lane}.aligned.bam")
-      ) into och_dockeriBWA_mem_SAMtools_Convert_Sam_to_Bam
+      ) into och_BWA_mem_SAMtools_Convert_Sam_to_Bam
       file ".command.*"
 
    script:
@@ -242,7 +242,7 @@ process PicardTools_SortSam  {
       tuple(val(library), 
          val(lane),
          file(input_bam)
-      ) from och_dockeriBWA_mem_SAMtools_Convert_Sam_to_Bam
+      ) from och_BWA_mem_SAMtools_Convert_Sam_to_Bam
    
    // the first value of the tuple will be used as a key to group aligned and filtered bams
    // from the same sample and library but different lane together
