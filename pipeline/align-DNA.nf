@@ -9,7 +9,7 @@
 def dockeri_BWA_and_SAMtools = "blcdsdockerregistry/align-dna:${params.bwa_version}_samtools-1.10"
 def dockeri_PicardTools = "blcdsdockerregistry/align-dna:picardtools-2.23.3"
 def dockeri_sha512sum = "blcdsdockerregistry/align-dna:sha512sum-1.0"
-def dockeri_validate_params = "blcdsdockerregistry/align-dna:sha512sum-1.0"
+def dockeri_validate_params = "blcdsdockerregistry/validate:1.0.0"
 
 // resource information
 def number_of_cpus = (int) (Runtime.getRuntime().availableProcessors() / params.max_number_of_parallel_jobs)
@@ -141,23 +141,13 @@ process validate_inputs {
       ich_reference_index_files_validate
    )
 
-   output:
-      val(true) into och_validate_inputs
-
    script:
    """
    set -euo pipefail
 
-   #python -m validate -t ${file_to_validate}
+   python -m validate -t file-input ${file_to_validate}
    """
 }
-
-int number_of_invalid_inputs = och_validate_inputs
-         .filter { valid_result ->
-            valid_result == false
-         }
-         .count()
-         .get()
 
 // align with bwa mem and convert with samtools
 process BWA_mem_SAMtools_Convert_Sam_to_Bam {
@@ -175,9 +165,6 @@ process BWA_mem_SAMtools_Convert_Sam_to_Bam {
 
    memory amount_of_memory
    cpus params.bwa_mem_number_of_cpus
-
-   when:
-      number_of_invalid_inputs == 0
 
    // use "each" so the the reference files are passed through for each fastq pair alignment 
    input: 
@@ -394,6 +381,6 @@ process validate_outputs {
    """
    set -euo pipefail
 
-   #python -m validate -t ${file_to_validate}
+   python -m validate -t file-input ${file_to_validate}
    """
 }
