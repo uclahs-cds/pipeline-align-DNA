@@ -53,7 +53,6 @@ log.info """\
       sample_name: ${params.sample_name}
       input_csv: ${params.input_csv}
       reference_fasta: ${params.reference_fasta}
-      reference_fasta_dict: ${params.reference_fasta_dict}
       reference_fasta_index_files: ${params.reference_fasta_index_files}
 
    - output: 
@@ -115,11 +114,6 @@ Channel
    .into { ich_reference_fasta_validate; ich_reference_fasta }
 
 Channel
-   .fromPath(params.reference_fasta_dict)
-   .ifEmpty { error "Cannot find reference dictionary: ${params.reference_fasta_dict}" }
-   .into { ich_reference_dict_validate; ich_reference_dict }
-
-Channel
    .fromPath(params.reference_fasta_index_files)
    .ifEmpty { error "Cannot find reference index files: ${params.reference_fasta_index_files}" }
    .into { ich_reference_index_files_validate; ich_reference_index_files }
@@ -137,7 +131,6 @@ process validate_inputs {
    input:
    path(file_to_validate) from ich_2_samples_validate.mix(
       ich_reference_fasta_validate, 
-      ich_reference_dict_validate, 
       ich_reference_index_files_validate
    )
 
@@ -175,7 +168,6 @@ process BWA_mem_SAMtools_Convert_Sam_to_Bam {
          path(read2_fastq) 
       ) from ich_samples
       each file(ref_fasta) from ich_reference_fasta
-      each file(ref_dict) from ich_reference_dict
       file(ref_idx_files) from ich_reference_index_files.collect()
 
    // output the lane information in the file name to differentiate bewteen aligments of the same
