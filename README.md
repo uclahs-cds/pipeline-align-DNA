@@ -15,6 +15,14 @@ The align-DNA nextflow pipeline, aligns paired-end data utilizing [BWA-MEM2](htt
 
 The pipeline should be run **WITH A SINGLE SAMPLE AT A TIME**. Otherwise resource allocation and Nextflow errors could cause the pipeline to fail.
 
+<b><i>Developer's Notes:</i></b>
+
+> For some reads with low mapping qualities, BWA-MEM2 assigns them to different genomic positions when using different CPU-numbers. If you want to 100% reproduce a run, the same CPU-number (`bwa_mem_number_of_cpus`) needs to be set.
+
+> BWA-MEM2 now only supports five CPU instruction set, AVX, AVX2, AVX512, SSE4.1 and SSE4.2. However we only tested the pipeline on AVX2 and AVX512 CPUs.
+
+> We performed a benchmarking on our SLURM cluster. Using 56 CPUs for alignment (`bwa_mem_number_of_cpus`) gives it the best performance. See [Testing and Validation](#Testing-and-Validation).
+
 ---
 
 ## How To Run
