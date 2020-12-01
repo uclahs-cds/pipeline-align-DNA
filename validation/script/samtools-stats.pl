@@ -54,14 +54,14 @@ sub main {
 		"path_hpci=s"          => \$opts{'path_hpci'}
 	) or pod2usage(64);
 	
-    if ($opts{'help'}) { pod2usage(1) };
-    if ($opts{'man'}) { pod2usage(-exitstatus => 0, -verbose => 2) };
+	if ($opts{'help'}) { pod2usage(1) };
+	if ($opts{'man'}) { pod2usage(-exitstatus => 0, -verbose => 2) };
 	while(my ($arg, $value) = each(%opts)){
 		if (!($arg=~/\:/) and !defined $value) {
-		print "ERROR: Missing argument $arg\n";
-		pod2usage(2);
+			print "ERROR: Missing argument $arg\n";
+			pod2usage(2);
 		}
-	  }
+	}
 
 	my @bams = split /\n/, `find $opts{path_nf} -name "*bam"`;
 
