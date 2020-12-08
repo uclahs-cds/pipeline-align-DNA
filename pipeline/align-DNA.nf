@@ -143,7 +143,7 @@ process validate_inputs {
 }
 
 // align with bwa mem and convert with samtools
-process BWA_mem_SAMtools_Convert_Sam_to_Bam {
+process align_BWA_mem_convert_SAM_to_BAM_samtools {
    container dockeri_BWA_and_SAMtools
 
    publishDir path: params.bam_output_dir,
@@ -154,7 +154,7 @@ process BWA_mem_SAMtools_Convert_Sam_to_Bam {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "BWA_mem_SAMtools_Convert_Sam_to_Bam/${file(read1_fastq).getName()}/log${file(it).getName()}" }
+      saveAs: { "align_BWA_mem_convert_SAM_to_BAM_samtools/${file(read1_fastq).getSimpleName()}/log${file(it).getName()}" }
 
    memory amount_of_memory
    cpus params.bwa_mem_number_of_cpus
@@ -176,7 +176,7 @@ process BWA_mem_SAMtools_Convert_Sam_to_Bam {
       tuple(val(library), 
          val(lane),
          file("${library}-${lane}.aligned.bam")
-      ) into och_BWA_mem_SAMtools_Convert_Sam_to_Bam
+      ) into och_align_BWA_mem_convert_SAM_to_BAM_samtools
       file ".command.*"
 
    script:
@@ -221,7 +221,7 @@ process PicardTools_SortSam  {
       tuple(val(library), 
          val(lane),
          file(input_bam)
-      ) from och_BWA_mem_SAMtools_Convert_Sam_to_Bam
+      ) from och_align_BWA_mem_convert_SAM_to_BAM_samtools
    
    // the first value of the tuple will be used as a key to group aligned and filtered bams
    // from the same sample and library but different lane together
