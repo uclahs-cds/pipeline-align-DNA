@@ -154,7 +154,7 @@ process align_BWA_mem_convert_SAM_to_BAM_samtools {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "align_BWA_mem_convert_SAM_to_BAM_samtools/${file(read1_fastq).getName()}/log${file(it).getName()}" }
+      saveAs: { "align_BWA_mem_convert_SAM_to_BAM_samtools/${file(read1_fastq).getSimpleName()}/log${file(it).getName()}" }
 
    memory amount_of_memory
    cpus params.bwa_mem_number_of_cpus
