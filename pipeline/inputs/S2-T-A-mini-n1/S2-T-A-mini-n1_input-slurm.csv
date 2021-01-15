@@ -1,0 +1,2 @@
+index,read_group_identifier,sequencing_center,library_identifier,platform_technology,platform_unit,sample,lane,read1_fastq,read2_fastq
+1,S2_v1.1.5.seq1,BS,bamsurgeon,ILLUMINA,,S2_v1.1.5,1,/hot/data/TEST/TEST0000000/TWGSAMIN000001/TWGSAMIN000001-T002-S02-F/DNA/WGS/raw/FASTQ/S2-T-A-mini-n1/S2.T-n1_R1.fq.gz,/hot/data/TEST/TEST0000000/TWGSAMIN000001/TWGSAMIN000001-T002-S02-F/DNA/WGS/raw/FASTQ/S2-T-A-mini-n1/S2.T-n1_R2.fq.gz
