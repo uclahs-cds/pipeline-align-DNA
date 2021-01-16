@@ -54,12 +54,9 @@ process generate_index {
         mode: "copy",
         saveAs: { "log${file(it).getName()}" }
 
-    // use "each" so the the reference files are passed through for each fastq pair alignment 
     input: 
         file(reference_fasta) from ich_reference_fasta
 
-    // output the lane information in the file name to differentiate bewteen aligments of the same
-    // sample but different lanes
     output:
         file "${reference_fasta.getName()}.*" into och_generate_index
         file ".command.*"
