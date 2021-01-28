@@ -79,7 +79,12 @@ log.info """\
    .stripIndent()
 
 include { validate_ichsamples } from './modules/validation-ichsamples.nf'
-include { aligndna } from './modules/aligndna-processes.nf'
+include { aligndna } from './modules/aligndna-processes.nf'// addParams(bam_output_dir: params.bam_output_dir, log_output_dir: params.log_output_dir)
+
+log.info """\
+p1: ${params.bam_output_dir}
+p2: ${params.log_output_dir}
+"""
 
 workflow {
     ch_bwamem_files = validate_ichsamples()

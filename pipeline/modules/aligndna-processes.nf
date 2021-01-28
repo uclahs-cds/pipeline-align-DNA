@@ -6,6 +6,11 @@
       - NEEDS LOGGING UPDATE FOR OUTPUS, LOGS AND REPORTS
 */
 
+log.info """\
+Param1: ${params.bam_output_dir}
+Param2: ${params.log_output_dir}
+"""
+
 // WHAT calls the processes and when?
 workflow aligndna {
    take:
@@ -23,15 +28,15 @@ workflow aligndna {
       PicardTools_MarkDuplicates(PicardTools_SortSam.collect())
       //PicardTools_MarkDuplicates
       //   .into { ich_PicardTools_BuildBamIndex; ich_generate_sha512; ich_validate_outputs }
-      PicardTools_BuildBamIndex(PicardTools_MarkDuplicates)
+      //--PicardTools_BuildBamIndex(PicardTools_SortSam)
       //// och_PicardTools_BuildBamIndex
       ////    .into{ ich_2_generate_sha512; ich_2_validate_outputs }
       //
       // FIXME this won't work because the channel can't be reused
       // will "channel forking" fix this?
-      generate_sha512sum(PicardTools_SortSam, PicardTools_SortSam)
+      //--generate_sha512sum(PicardTools_SortSam.mix(PicardTools_SortSam))
       // FIXME this too
-      validate_outputs(PicardTools_SortSam)
+      //validate_outputs(PicardTools_SortSam) // maybe should be PicardTools_MarkDuplicates
    emit:
       // TODO change this
       align_BWA_mem_convert_SAM_to_BAM_samtools
@@ -40,11 +45,12 @@ workflow aligndna {
 // align with bwa mem and convert with samtools
 process align_BWA_mem_convert_SAM_to_BAM_samtools {
    //container dockeri_BWA_and_SAMtools
-
+params.bam_output_dir.view()
    publishDir path: params.bam_output_dir,
       enabled: params.save_intermediate_files,
       pattern: "*.bam",
       mode: 'copy'
+params.log_output_dir.view()
 
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
@@ -156,8 +162,8 @@ process PicardTools_MarkDuplicates  {
       mode: "copy",
       saveAs: { "PicardTools_MarkDuplicates/log${file(it).getName()}" }
 
-   memory params.amount_of_memory
-   cpus number_of_cpus
+   //memory params.amount_of_memory
+   //cpus number_of_cpus
 
    input:
       file(input_bams)
@@ -204,8 +210,8 @@ process PicardTools_BuildBamIndex  {
       mode: "copy",
       saveAs: { "PicardTools_BuildBamIndex/log${file(it).getName()}" }
 
-   memory params.amount_of_memory
-   cpus number_of_cpus
+   //memory params.amount_of_memory
+   //cpus number_of_cpus
    
    input:
       file(input_bam)
@@ -236,8 +242,8 @@ process generate_sha512sum {
 
    publishDir path: params.bam_output_dir, mode: 'copy'
    
-   memory params.amount_of_memory
-   cpus number_of_cpus
+   //memory params.amount_of_memory
+   //cpus number_of_cpus
 
    input:
       file(input_file)// from ich_generate_sha512.mix(ich_2_generate_sha512)
