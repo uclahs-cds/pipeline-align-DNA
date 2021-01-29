@@ -48,16 +48,11 @@ workflow validate_ichsamples {
          ich_reference_index_files
       ))
 
-      //ich_samples_validate.mix(
-      //   ich_reference_fasta,
-      //   ich_reference_index_files
-      //).view()
-
    emit:
       ich_samples = ich_samples
       // TODO this is to expose library, lane, etc.
       // there's gotta be a better way ...
       //ich_samples_validate = ich_samples_validate
       ich_reference_fasta = ich_reference_fasta
-      ich_reference_index_files = ich_reference_index_files.collect()
+      ich_reference_index_files = ich_reference_index_files//.collect()
 }

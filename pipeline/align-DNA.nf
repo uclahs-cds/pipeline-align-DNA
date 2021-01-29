@@ -8,17 +8,17 @@ def dockeri_sha512sum = "blcdsdockerregistry/align-dna:sha512sum-1.0"
 def dockeri_validate_params = "blcdsdockerregistry/validate:1.0.0"
 
 // resource information
-def number_of_cpus = (int) (Runtime.getRuntime().availableProcessors() / params.max_number_of_parallel_jobs)
-if (number_of_cpus < 1) {
-   number_of_cpus = 1
+params.number_of_cpus = (int) (Runtime.getRuntime().availableProcessors() / params.max_number_of_parallel_jobs)
+if (params.number_of_cpus < 1) {
+   params.number_of_cpus = 1
 }
-def amount_of_memory = ((int) (((java.lang.management.ManagementFactory.getOperatingSystemMXBean()
+params.amount_of_memory = ((int) (((java.lang.management.ManagementFactory.getOperatingSystemMXBean()
    .getTotalPhysicalMemorySize() / (1024.0 * 1024.0 * 1024.0)) * 0.9) / params.max_number_of_parallel_jobs ))
-if (amount_of_memory < 1) {
-   amount_of_memory = 1
+if (params.amount_of_memory < 1) {
+   params.amount_of_memory = 1
 }
 
-params.amount_of_memory = amount_of_memory.toString() + " GB"
+params.amount_of_memory = params.amount_of_memory.toString() + " GB"
 
 // Default memory configuration for Picard's Java commands
 params.mem_command_sort_sam = "4g"
@@ -30,8 +30,8 @@ params.mem_command_build_bam_index = "4g"
 // at least 2.5 GB of memory, to avoid out-of-memory failure, unless the number of cpu is defined in
 // config.
 if (!params.containsKey("bwa_mem_number_of_cpus")) {
-   params.amount_of_memory_int = amount_of_memory.replace(" GB", "") as Integer
-   params.bwa_mem_number_of_cpus = (int) Math.min(number_of_cpus, Math.floor(amount_of_memory_int / 2.5))
+   params.amount_of_memory_int = params.amount_of_memory.replace(" GB", "") as Integer
+   params.bwa_mem_number_of_cpus = (int) Math.min(params.number_of_cpus, Math.floor(params.amount_of_memory_int / 2.5))
    if (params.bwa_mem_number_of_cpus < 1) {
       params.bwa_mem_number_of_cpus  = 1
    }
@@ -78,16 +78,75 @@ log.info """\
    """
    .stripIndent()
 
-include { validate_ichsamples } from './modules/validation-ichsamples.nf'
-include { aligndna } from './modules/aligndna-processes.nf'// addParams(bam_output_dir: params.bam_output_dir, log_output_dir: params.log_output_dir)
-
-log.info """\
-p1: ${params.bam_output_dir}
-p2: ${params.log_output_dir}
-"""
+//include { validate_ichsamples } from './modules/validation-ichsamples.nf'
+include { validate_file } from './modules/validation.nf'
+//include { aligndna } from './modules/aligndna-processes.nf'
+include { align_BWA_mem_convert_SAM_to_BAM_samtools } from './modules/aligndna-processes.nf'
 
 workflow {
-    ch_bwamem_files = validate_ichsamples()
+    //validate_ichsamples()
+    //  .set { ch_bwamem_files }
+    /*ch_bwamem_files.ich_samples.view()
+    ch_bwamem_files.ich_reference_fasta.view()
+    ch_bwamem_files.ich_reference_index_files.view()*/
     //ch_bwamem_files = channel.fromPath([ich_samples, ich_reference_fasta, ich_reference_index_files.collect()])
-    aligndna(ch_bwamem_files)
+    //aligndna(ch_bwamem_files)
+      Channel
+         .fromPath(params.reference_fasta)
+         .ifEmpty { error "Cannot find reference: ${params.reference_fasta}" }
+         .set { ich_reference_fasta }
+
+      Channel
+         .fromPath(params.reference_fasta_index_files)
+         .ifEmpty { error "Cannot find reference index files: ${params.reference_fasta_index_files}" }
+         .set { ich_reference_index_files }
+
+      // get the input fastq pairs
+      Channel
+         .fromPath(params.input_csv)
+         .ifEmpty { error "Cannot find input csv: ${params.input_csv}" }
+         .splitCsv(header:true)
+         .map { row -> 
+            def read_group_name = "@RG" +
+               "\\tID:" + row.read_group_identifier + ".Seq" + row.lane +
+               "\\tCN:" + row.sequencing_center +
+               "\\tLB:" + row.library_identifier +
+               "\\tPL:" + row.platform_technology +
+               "\\tPU:" + row.platform_unit +
+               "\\tSM:" + row.sample
+
+            // the library, sample and lane are used as keys downstream to group into 
+            // sets of the same key for downstream merging
+            return tuple(row.library_identifier,
+               row.lane,
+               read_group_name,
+               row.read1_fastq,
+               row.read2_fastq
+            )
+         }
+         .set{ ich_samples }
+      
+      ich_samples
+         .flatMap { library, lane, read_group_name, read1_fastq, read2_fastq ->
+            [read1_fastq, read2_fastq]
+         }
+         .set { ich_samples_validate }
+
+      x = Channel.of(ich_samples_validate.mix(
+         ich_reference_fasta,
+         ich_reference_index_files
+      ))
+      validate_file(x)
+    //aligndna(ich_samples,
+    //   ich_reference_fasta,
+    //   ich_reference_index_files
+    //)
+      // TODO see if it works without chaining workflows
+      align_BWA_mem_convert_SAM_to_BAM_samtools(
+         x
+      )
+         //ich_samples,
+         ////ich_samples_validate,
+         //ich_reference_fasta,
+         //ich_reference_index_files.collect())
 }
