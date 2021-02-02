@@ -1,12 +1,6 @@
 
 nextflow.enable.dsl=2
 
-// TODO: Remove this later?
-def dockeri_BWA_and_SAMtools = "blcdsdockerregistry/align-dna:${params.bwa_version}_samtools-1.10"
-def dockeri_PicardTools = "blcdsdockerregistry/align-dna:picardtools-2.23.3"
-def dockeri_sha512sum = "blcdsdockerregistry/align-dna:sha512sum-1.0"
-def dockeri_validate_params = "blcdsdockerregistry/validate:1.0.0"
-
 // resource information
 params.number_of_cpus = (int) (Runtime.getRuntime().availableProcessors() / params.max_number_of_parallel_jobs)
 if (params.number_of_cpus < 1) {
@@ -67,10 +61,10 @@ log.info """\
       blcds_registered_dataset_output = ${params.blcds_registered_dataset_output}
 
    Tools Used:
-   - BWA-MEM2 and SAMtools: ${dockeri_BWA_and_SAMtools}
-   - Picard Tools: ${dockeri_PicardTools}
-   - sha512sum: ${dockeri_sha512sum}
-   - validate_params: ${dockeri_validate_params}
+   - BWA-MEM2 and SAMtools: ${params.docker_image_bwa_and_samtools}
+   - Picard Tools: ${params.docker_image_picardtools}
+   - sha512sum: ${params.docker_image_sha512sum}
+   - validate_params: ${params.docker_image_validate_params}
 
    ------------------------------------
    Starting workflow...
@@ -80,8 +74,8 @@ log.info """\
 
 //include { validate_ichsamples } from './modules/validation-ichsamples.nf'
 include { validate_file } from './modules/validation.nf'
-//include { aligndna } from './modules/aligndna-processes.nf'
-include { align_BWA_mem_convert_SAM_to_BAM_samtools } from './modules/aligndna-processes.nf'
+include { aligndna } from './modules/aligndna-processes.nf'
+//include { align_BWA_mem_convert_SAM_to_BAM_samtools } from './modules/aligndna-processes.nf'
 
 workflow {
     //validate_ichsamples()
@@ -125,28 +119,20 @@ workflow {
             )
          }
          .set{ ich_samples }
-      
+     
       ich_samples
          .flatMap { library, lane, read_group_name, read1_fastq, read2_fastq ->
             [read1_fastq, read2_fastq]
          }
          .set { ich_samples_validate }
 
-      x = Channel.of(ich_samples_validate.mix(
-         ich_reference_fasta,
-         ich_reference_index_files
-      ))
-      validate_file(x)
-    //aligndna(ich_samples,
-    //   ich_reference_fasta,
-    //   ich_reference_index_files
-    //)
-      // TODO see if it works without chaining workflows
-      align_BWA_mem_convert_SAM_to_BAM_samtools(
-         x
-      )
-         //ich_samples,
-         ////ich_samples_validate,
-         //ich_reference_fasta,
-         //ich_reference_index_files.collect())
+     validate_file(ich_samples_validate.mix(
+        ich_reference_fasta,
+        ich_reference_index_files
+     ))
+
+    aligndna(ich_samples,
+       ich_reference_fasta,
+       ich_reference_index_files
+    )
 }
