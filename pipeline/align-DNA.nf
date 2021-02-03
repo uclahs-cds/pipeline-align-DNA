@@ -2,17 +2,12 @@
 nextflow.enable.dsl=2
 
 // resource information
-params.number_of_cpus = (int) (Runtime.getRuntime().availableProcessors() / params.max_number_of_parallel_jobs)
-if (params.number_of_cpus < 1) {
-   params.number_of_cpus = 1
-}
-params.amount_of_memory = ((int) (((java.lang.management.ManagementFactory.getOperatingSystemMXBean()
-   .getTotalPhysicalMemorySize() / (1024.0 * 1024.0 * 1024.0)) * 0.9) / params.max_number_of_parallel_jobs ))
-if (params.amount_of_memory < 1) {
-   params.amount_of_memory = 1
-}
+def number_of_cpus = (int) (Runtime.getRuntime().availableProcessors() / params.max_number_of_parallel_jobs)
+params.number_of_cpus = number_of_cpus < 1 ? 1 : number_of_cpus
 
-params.amount_of_memory = params.amount_of_memory.toString() + " GB"
+params.amount_of_memory_int = ((int) (((java.lang.management.ManagementFactory.getOperatingSystemMXBean()
+   .getTotalPhysicalMemorySize() / (1024.0 * 1024.0 * 1024.0)) * 0.9) / params.max_number_of_parallel_jobs ))
+params.amount_of_memory = (params.amount_of_memory_int < 1 ? 1 : params.amount_of_memory_int).toString() + " GB"
 
 // Default memory configuration for Picard's Java commands
 params.mem_command_sort_sam = "4g"
@@ -24,11 +19,8 @@ params.mem_command_build_bam_index = "4g"
 // at least 2.5 GB of memory, to avoid out-of-memory failure, unless the number of cpu is defined in
 // config.
 if (!params.containsKey("bwa_mem_number_of_cpus")) {
-   params.amount_of_memory_int = params.amount_of_memory.replace(" GB", "") as Integer
-   params.bwa_mem_number_of_cpus = (int) Math.min(params.number_of_cpus, Math.floor(params.amount_of_memory_int / 2.5))
-   if (params.bwa_mem_number_of_cpus < 1) {
-      params.bwa_mem_number_of_cpus  = 1
-   }
+   def bwa_mem_number_of_cpus = (int) Math.min(params.number_of_cpus, Math.floor(params.amount_of_memory_int / 2.5))
+   params.bwa_mem_number_of_cpus = bwa_mem_number_of_cpus < 1 ? 1 : bwa_mem_number_of_cpus
 }
 
 log.info """\
