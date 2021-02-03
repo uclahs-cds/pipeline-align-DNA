@@ -32,8 +32,6 @@ process Align_BWA_mem_convert_SAM_to_BAM_samtools {
          val(lane),
          file("${library}-${lane}.aligned.bam")
       )
-      //file ".command.*"
-      // into och_align_BWA_mem_convert_SAM_to_BAM_samtools
 
    script:
    """

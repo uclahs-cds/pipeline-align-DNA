@@ -21,7 +21,7 @@ process PicardTools_SortSam  {
       tuple(val(library), 
          val(lane),
          file(input_bam)
-      )// from och_align_BWA_mem_convert_SAM_to_BAM_samtools
+      )
    
    // the first value of the tuple will be used as a key to group aligned and filtered bams
    // from the same sample and library but different lane together
@@ -29,8 +29,7 @@ process PicardTools_SortSam  {
    // the next steps of the pipeline are merging so using a lane to differentiate between files is no londer needed
    // (files of same lane are merged together) so the lane information is dropped
    output:
-      file("${library}-${lane}.sorted.bam")// into och_PicardTools_SortSam
-      //file ".command.*"
+      file("${library}-${lane}.sorted.bam")
 
    script:
    """
