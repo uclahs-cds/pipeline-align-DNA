@@ -1,7 +1,7 @@
-include { validate_file } from '../modules/validation.nf'
-include { Align_BWA_mem_convert_SAM_to_BAM_samtools } from '../modules/samtools.nf'
-include { PicardTools_SortSam; PicardTools_MarkDuplicates; PicardTools_BuildBamIndex } from '../modules/picardtools.nf'
-include { Generate_Sha512sum } from '../modules/checksum.nf'
+include { validate_file } from '../validation.nf'
+include { Align_BWA_mem_convert_SAM_to_BAM_samtools } from './samtools.nf'
+include { PicardTools_SortSam; PicardTools_MarkDuplicates; PicardTools_BuildBamIndex } from './picardtools.nf'
+include { Generate_Sha512sum } from './checksum.nf'
 
 workflow aligndna {
    take:

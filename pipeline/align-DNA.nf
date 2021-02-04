@@ -64,7 +64,7 @@ log.info """\
    .stripIndent()
 
 include { validate_file } from './modules/validation.nf'
-include { aligndna } from './workflows/aligndna.nf'
+include { aligndna } from './modules/align-dna/main.nf'
 
 workflow {
    Channel
