@@ -21,7 +21,7 @@ process PicardTools_SortSam  {
       tuple(val(library), 
          val(lane),
          file(input_bam)
-      )
+         )
    
    // the first value of the tuple will be used as a key to group aligned and filtered bams
    // from the same sample and library but different lane together
@@ -43,7 +43,7 @@ process PicardTools_SortSam  {
       --OUTPUT ${library}-${lane}.sorted.bam \
       --SORT_ORDER coordinate
    """
-}
+   }
 
 // mark duplicates with picard
 process PicardTools_MarkDuplicates  {
@@ -88,7 +88,7 @@ process PicardTools_MarkDuplicates  {
       --ASSUME_SORT_ORDER coordinate \
       --PROGRAM_RECORD_ID MarkDuplicates
    '''
-}
+   }
 
 // index bams with picard
 process PicardTools_BuildBamIndex  {
@@ -125,4 +125,4 @@ process PicardTools_BuildBamIndex  {
       --INPUT ${input_bam} \
       --OUTPUT ${input_bam.getName()}.bai
    """
-}
+   }

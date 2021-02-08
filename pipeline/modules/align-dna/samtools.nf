@@ -21,7 +21,7 @@ process Align_BWA_mem_convert_SAM_to_BAM_samtools {
          val(read_group_name), 
          path(read1_fastq),
          path(read2_fastq) 
-      )
+         )
       each file(ref_fasta)
       file(ich_reference_index_files)
 
@@ -31,7 +31,7 @@ process Align_BWA_mem_convert_SAM_to_BAM_samtools {
       tuple(val(library), 
          val(lane),
          file("${library}-${lane}.aligned.bam")
-      )
+         )
 
    script:
    """
@@ -52,4 +52,4 @@ process Align_BWA_mem_convert_SAM_to_BAM_samtools {
       -b > \
       ${library}-${lane}.aligned.bam
    """
-}
+   }

@@ -19,4 +19,4 @@ process Generate_Sha512sum {
 
    sha512sum ${input_file} > ${input_file.getName()}.sha512
    """
-}
+   }

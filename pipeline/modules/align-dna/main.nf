@@ -13,7 +13,7 @@ workflow aligndna {
          ich_samples,
          ich_reference_fasta,
          ich_reference_index_files.collect()
-      )
+         )
       PicardTools_SortSam(Align_BWA_mem_convert_SAM_to_BAM_samtools.out)
       PicardTools_MarkDuplicates(PicardTools_SortSam.out.collect())
       PicardTools_BuildBamIndex(PicardTools_MarkDuplicates.out)
@@ -22,6 +22,6 @@ workflow aligndna {
          PicardTools_MarkDuplicates.out.mix(
             PicardTools_BuildBamIndex.out,
             Channel.from(params.temp_dir, params.output_dir)
+            )
          )
-      )
-}
+   }

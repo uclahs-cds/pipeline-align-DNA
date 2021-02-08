@@ -98,23 +98,23 @@ workflow {
             read_group_name,
             row.read1_fastq,
             row.read2_fastq
-         )
-      }
+            )
+         }
       .set{ ich_samples }
    
    ich_samples
       .flatMap { library, lane, read_group_name, read1_fastq, read2_fastq ->
          [read1_fastq, read2_fastq]
-      }
+         }
       .set { ich_samples_validate }
 
    validate_file(ich_samples_validate.mix(
       ich_reference_fasta,
       ich_reference_index_files
-   ))
+      ))
 
     aligndna(ich_samples,
        ich_reference_fasta,
        ich_reference_index_files
-    )
-}
+       )
+   }

@@ -10,4 +10,4 @@ process validate_file {
 
    python -m validate -t file-input ${file_to_validate} 1> /dev/null
    """
-}
+   }
