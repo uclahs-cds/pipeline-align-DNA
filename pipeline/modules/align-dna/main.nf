@@ -20,7 +20,6 @@ workflow aligndna {
       Generate_Sha512sum(PicardTools_BuildBamIndex.out.mix(PicardTools_MarkDuplicates.out))
       validate_file(
          PicardTools_MarkDuplicates.out.mix(
-            Generate_Sha512sum.out,
             PicardTools_BuildBamIndex.out,
             Channel.from(params.temp_dir, params.output_dir)
          )
