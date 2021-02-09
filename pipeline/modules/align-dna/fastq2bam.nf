@@ -1,5 +1,5 @@
 
-process Align_BWA_mem_convert_SAM_to_BAM_samtools {
+process Align_Fastq2Bam {
    container params.docker_image_bwa_and_samtools
    publishDir path: params.bam_output_dir,
       enabled: params.save_intermediate_files,
@@ -9,7 +9,7 @@ process Align_BWA_mem_convert_SAM_to_BAM_samtools {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "align_BWA_mem_convert_SAM_to_BAM_samtools/${path(read1_fastq).getSimpleName()}/log${path(it).getName()}" }
+      saveAs: { "Align_Fastq2Bam/${path(read1_fastq).getSimpleName()}/log${path(it).getName()}" }
 
    memory params.amount_of_memory
    cpus params.bwa_mem_number_of_cpus
