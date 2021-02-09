@@ -68,19 +68,16 @@ include { aligndna } from './modules/align-dna/main.nf'
 
 workflow {
    Channel
-      .fromPath(params.reference_fasta)
-      .ifEmpty { error "Cannot find reference: ${params.reference_fasta}" }
+      .fromPath(params.reference_fasta, checkIfExists: true)
       .set { ich_reference_fasta }
 
    Channel
-      .fromPath(params.reference_fasta_index_files)
-      .ifEmpty { error "Cannot find reference index files: ${params.reference_fasta_index_files}" }
+      .fromPath(params.reference_fasta_index_files, checkIfExists: true)
       .set { ich_reference_index_files }
 
    // get the input fastq pairs
    Channel
-      .fromPath(params.input_csv)
-      .ifEmpty { error "Cannot find input csv: ${params.input_csv}" }
+      .fromPath(params.input_csv, checkIfExists: true)
       .splitCsv(header:true)
       .map { row -> 
          def read_group_name = "@RG" +
