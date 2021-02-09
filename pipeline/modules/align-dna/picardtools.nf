@@ -12,7 +12,7 @@ process PicardTools_SortSam  {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "PicardTools_SortSam/log${file(it).getName()}" }
+      saveAs: { "PicardTools_SortSam/log${path(it).getName()}" }
 
    memory params.amount_of_memory
    cpus params.number_of_cpus
@@ -20,7 +20,7 @@ process PicardTools_SortSam  {
    input:
       tuple(val(library), 
          val(lane),
-         file(input_bam)
+         path(input_bam)
          )
    
    // the first value of the tuple will be used as a key to group aligned and filtered bams
@@ -29,7 +29,7 @@ process PicardTools_SortSam  {
    // the next steps of the pipeline are merging so using a lane to differentiate between files is no londer needed
    // (files of same lane are merged together) so the lane information is dropped
    output:
-      file("${library}-${lane}.sorted.bam")
+      path("${library}-${lane}.sorted.bam")
 
    script:
    """
@@ -57,18 +57,18 @@ process PicardTools_MarkDuplicates  {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "PicardTools_MarkDuplicates/log${file(it).getName()}" }
+      saveAs: { "PicardTools_MarkDuplicates/log${path(it).getName()}" }
 
    memory params.amount_of_memory
    cpus params.number_of_cpus
 
    input:
-      file(input_bams)
+      path(input_bams)
 
    // after marking duplicates, bams will be merged by library so the library name is not needed
    // just the sample name (global variable), do not pass it as a val
    output:
-      file(bam_output_filename)
+      path(bam_output_filename)
 
    shell:
    bam_output_filename = params.bam_output_filename
@@ -102,17 +102,17 @@ process PicardTools_BuildBamIndex  {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "PicardTools_BuildBamIndex/log${file(it).getName()}" }
+      saveAs: { "PicardTools_BuildBamIndex/log${path(it).getName()}" }
 
    memory params.amount_of_memory
    cpus params.number_of_cpus
    
    input:
-      file(input_bam)
+      path(input_bam)
 
    // no need for an output channel becuase this is the final stepp
    output:
-      file("${input_bam.getName()}.bai")
+      path("${input_bam.getName()}.bai")
 
    script:
    """

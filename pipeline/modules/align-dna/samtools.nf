@@ -9,7 +9,7 @@ process Align_BWA_mem_convert_SAM_to_BAM_samtools {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "align_BWA_mem_convert_SAM_to_BAM_samtools/${file(read1_fastq).getSimpleName()}/log${file(it).getName()}" }
+      saveAs: { "align_BWA_mem_convert_SAM_to_BAM_samtools/${path(read1_fastq).getSimpleName()}/log${path(it).getName()}" }
 
    memory params.amount_of_memory
    cpus params.bwa_mem_number_of_cpus
@@ -22,15 +22,15 @@ process Align_BWA_mem_convert_SAM_to_BAM_samtools {
          path(read1_fastq),
          path(read2_fastq) 
          )
-      each file(ref_fasta)
-      file(ich_reference_index_files)
+      each path(ref_fasta)
+      path(ich_reference_index_files)
 
    // output the lane information in the file name to differentiate bewteen aligments of the same
    // sample but different lanes
    output:
       tuple(val(library), 
          val(lane),
-         file("${library}-${lane}.bam")
+         path("${library}-${lane}.bam")
          )
 
    script:
