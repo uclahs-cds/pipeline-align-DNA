@@ -11,9 +11,6 @@ process Align_Fastq2Bam {
       mode: "copy",
       saveAs: { "Align_Fastq2Bam/${path(read1_fastq).getSimpleName()}/log${path(it).getName()}" }
 
-   memory params.amount_of_memory
-   cpus params.bwa_mem_number_of_cpus
-
    // use "each" so the the reference files are passed through for each fastq pair alignment 
    input: 
       tuple(val(library), 

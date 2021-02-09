@@ -3,9 +3,6 @@ process Generate_Sha512sum {
    container params.docker_image_sha512sum
 
    publishDir path: params.bam_output_dir, mode: 'copy'
-   
-   memory params.amount_of_memory
-   cpus params.number_of_cpus
 
    input:
       file(input_file)

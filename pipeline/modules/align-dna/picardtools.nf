@@ -14,9 +14,6 @@ process PicardTools_SortSam  {
       mode: "copy",
       saveAs: { "PicardTools_SortSam/log${path(it).getName()}" }
 
-   memory params.amount_of_memory
-   cpus params.number_of_cpus
-
    input:
       tuple(val(library), 
          val(lane),
@@ -59,9 +56,6 @@ process PicardTools_MarkDuplicates  {
       mode: "copy",
       saveAs: { "PicardTools_MarkDuplicates/log${path(it).getName()}" }
 
-   memory params.amount_of_memory
-   cpus params.number_of_cpus
-
    input:
       path(input_bams)
 
@@ -103,9 +97,6 @@ process PicardTools_BuildBamIndex  {
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "PicardTools_BuildBamIndex/log${path(it).getName()}" }
-
-   memory params.amount_of_memory
-   cpus params.number_of_cpus
    
    input:
       path(input_bam)

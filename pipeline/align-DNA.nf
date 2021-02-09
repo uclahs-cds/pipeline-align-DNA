@@ -1,28 +1,6 @@
 
 nextflow.enable.dsl=2
 
-// resource information
-def number_of_cpus = (int) (Runtime.getRuntime().availableProcessors() / params.max_number_of_parallel_jobs)
-params.number_of_cpus = number_of_cpus < 1 ? 1 : number_of_cpus
-
-params.amount_of_memory_int = ((int) (((java.lang.management.ManagementFactory.getOperatingSystemMXBean()
-   .getTotalPhysicalMemorySize() / (1024.0 * 1024.0 * 1024.0)) * 0.9) / params.max_number_of_parallel_jobs ))
-params.amount_of_memory = (params.amount_of_memory_int < 1 ? 1 : params.amount_of_memory_int).toString() + " GB"
-
-// Default memory configuration for Picard's Java commands
-params.mem_command_sort_sam = "4g"
-params.mem_command_mark_duplicates = "4g"
-params.mem_command_build_bam_index = "4g"
-
-// cpus for bwa-mem2
-// The memory requied by bwa-mem2 increases along with the threads. Here we ensure that each cpu has
-// at least 2.5 GB of memory, to avoid out-of-memory failure, unless the number of cpu is defined in
-// config.
-if (!params.containsKey("bwa_mem_number_of_cpus")) {
-   def bwa_mem_number_of_cpus = (int) Math.min(params.number_of_cpus, Math.floor(params.amount_of_memory_int / 2.5))
-   params.bwa_mem_number_of_cpus = bwa_mem_number_of_cpus < 1 ? 1 : bwa_mem_number_of_cpus
-}
-
 log.info """\
    ===================================
    P I P E L I N E - A L I G N - D N A
@@ -47,7 +25,6 @@ log.info """\
       save_intermediate_files = ${params.save_intermediate_files}
       cache_intermediate_pipeline_steps = ${params.cache_intermediate_pipeline_steps}
       max_number_of_parallel_jobs = ${params.max_number_of_parallel_jobs}
-      bwa_mem_number_of_cpus = ${params.bwa_mem_number_of_cpus}
       blcds_registered_dataset_input = ${params.blcds_registered_dataset_input}
       blcds_registered_dataset_output = ${params.blcds_registered_dataset_output}
 

@@ -1,5 +1,5 @@
 include { validate_file } from '../validation.nf'
-include { Align_Fastq2Bam} from './fastq2bam.nf'
+include { Align_Fastq2Bam } from './fastq2bam.nf'
 include { PicardTools_SortSam; PicardTools_MarkDuplicates; PicardTools_BuildBamIndex } from './picardtools.nf'
 include { Generate_Sha512sum } from './checksum.nf'
 
@@ -9,7 +9,7 @@ workflow aligndna {
       ich_reference_fasta
       ich_reference_index_files
    main:
-      Align_Fastq2Bam (
+      Align_Fastq2Bam(
          ich_samples,
          ich_reference_fasta,
          ich_reference_index_files.collect()
