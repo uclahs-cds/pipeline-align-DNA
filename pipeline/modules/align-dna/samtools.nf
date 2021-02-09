@@ -30,7 +30,7 @@ process Align_BWA_mem_convert_SAM_to_BAM_samtools {
    output:
       tuple(val(library), 
          val(lane),
-         file("${library}-${lane}.aligned.bam")
+         file("${library}-${lane}.bam")
          )
 
    script:
@@ -50,6 +50,6 @@ process Align_BWA_mem_convert_SAM_to_BAM_samtools {
       -@ ${task.cpus} \
       -S \
       -b > \
-      ${library}-${lane}.aligned.bam
+      ${library}-${lane}.bam
    """
    }
