@@ -23,7 +23,7 @@ process PicardTools_SortSam  {
    // the first value of the tuple will be used as a key to group aligned and filtered bams
    // from the same sample and library but different lane together
 
-   // the next steps of the pipeline are merging so using a lane to differentiate between files is no londer needed
+   // the next steps of the pipeline are merging so using a lane to differentiate between files is no longer needed
    // (files of same lane are merged together) so the lane information is dropped
    output:
       path("${library}-${lane}.sorted.bam")
