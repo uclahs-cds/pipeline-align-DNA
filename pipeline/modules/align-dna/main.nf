@@ -14,13 +14,13 @@ workflow aligndna {
          ich_reference_fasta,
          ich_reference_index_files.collect()
          )
-      PicardTools_SortSam(Align_Fastq2Bam.out)
-      PicardTools_MarkDuplicates(PicardTools_SortSam.out.collect())
-      PicardTools_BuildBamIndex(PicardTools_MarkDuplicates.out)
-      Generate_Sha512sum(PicardTools_BuildBamIndex.out.mix(PicardTools_MarkDuplicates.out))
+      PicardTools_SortSam(Align_Fastq2Bam.out.bam)
+      PicardTools_MarkDuplicates(PicardTools_SortSam.out.bam.collect())
+      PicardTools_BuildBamIndex(PicardTools_MarkDuplicates.out.bam)
+      Generate_Sha512sum(PicardTools_BuildBamIndex.out.bai.mix(PicardTools_MarkDuplicates.out.bam))
       validate_file(
-         PicardTools_MarkDuplicates.out.mix(
-            PicardTools_BuildBamIndex.out,
+         PicardTools_MarkDuplicates.out.bam.mix(
+            PicardTools_BuildBamIndex.out.bai,
             Channel.from(params.temp_dir, params.output_dir)
             )
          )

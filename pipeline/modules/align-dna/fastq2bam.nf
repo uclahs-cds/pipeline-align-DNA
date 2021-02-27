@@ -9,7 +9,7 @@ process Align_Fastq2Bam {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "Align_Fastq2Bam/${path(read1_fastq).getSimpleName()}/log${path(it).getName()}" }
+      saveAs: { "Align_Fastq2Bam/${file(read1_fastq).getSimpleName()}/log${file(it).getName()}" }
 
    // use "each" so the the reference files are passed through for each fastq pair alignment 
    input: 
@@ -25,10 +25,10 @@ process Align_Fastq2Bam {
    // output the lane information in the file name to differentiate bewteen aligments of the same
    // sample but different lanes
    output:
-      tuple(val(library), 
+      tuple val(library), 
          val(lane),
-         path("${library}-${lane}.bam")
-         )
+         path("${library}-${lane}.bam"), emit: bam
+      path(".command.*")
 
    script:
    """
