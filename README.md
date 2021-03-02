@@ -31,7 +31,7 @@ Pipelines should be run **WITH A SINGLE SAMPLE AT TIME**. Otherwise resource all
 
 1. Make sure the pipeline is already downloaded to your machine. You can either download the stable release or the dev version by cloning the repo.  
 
-2. Create a config file for input, output, and parameters. An example can be found [here](pipeline/config/align-DNA.config). See [Inputs](#Inputs) for the detailed description of each variable in the config file.
+2. Create a config file for input, output, and parameters. An example can be found [here](pipeline/nextflow.example.config). See [Inputs](#Inputs) for the detailed description of each variable in the config file.
 
 3. Create the input csv using the [template](pipeline/inputs/align-DNA.inputs.csv). The example csv is a single-lane sample, however this pipeline can take multi-lane sample as well, with each record in the csv file representing a lane (a paire of fastq). All records must have the same value in the **sample** column. See [Inputs](#Inputs) for detailed description of each column. All columns must exist in order to run the pipeline successfully.
 
