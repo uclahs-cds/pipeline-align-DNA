@@ -26,7 +26,7 @@ process PicardTools_SortSam  {
    // the next steps of the pipeline are merging so using a lane to differentiate between files is no longer needed
    // (files of same lane are merged together) so the lane information is dropped
    output:
-      path("${library}-${lane}.sorted.bam"), emit: bam
+      path "${library}-${lane}.sorted.bam", emit: bam
       path(".command.*")
 
    script:
@@ -63,7 +63,7 @@ process PicardTools_MarkDuplicates  {
    // after marking duplicates, bams will be merged by library so the library name is not needed
    // just the sample name (global variable), do not pass it as a val
    output:
-      path(bam_output_filename), emit: bam
+      path bam_output_filename, emit: bam
       path(".command.*")
 
    shell:
@@ -105,7 +105,7 @@ process PicardTools_BuildBamIndex  {
 
    // no need for an output channel becuase this is the final stepp
    output:
-      path("${input_bam.getName()}.bai"), emit: bai
+      path "${input_bam.getName()}.bai", emit: bai
       path(".command.*")
 
    script:
