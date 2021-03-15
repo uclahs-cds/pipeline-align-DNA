@@ -1,5 +1,9 @@
 # Changelog
 
+# 7.0.2
+## 2021-03-15
+* #70 Fixes crash related to checking default node CPU and memory configurations
+
 # 7.0.1
 ## 2021-03-11
 * #67 Run docker with group permissions of the user executing the pipeline
