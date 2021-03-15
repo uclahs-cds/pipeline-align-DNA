@@ -139,6 +139,7 @@ After marking dup BAM files, the BAM files are then indexed by utilizing Picard 
 | `blcds_patient_id` | no | string | The registered patient ID of this sample from the Boutros Lab data registry. Ignored if `blcds_registered_data_input = true` or `blcds_registered_output = false` |
 | `blcds_sample_id` | no | string | The registered sample ID from the Boutros Lab data registry. Ignored if `blcds_registered_data_input = true` or `blcds_registered_output = false` |
 | `blcds_mount_dir` | no | string | The directoyr that the storage is mounted to (e.g., /hot, /data). |
+| `check_node_config` | no | boolean | Whether to check pre-configured node settings used to set CPU and memory constraints. The default behavior, whether `true` or undefined is to check the pre-configured node settings. Set to `false` to skip this check. |
 
 ---
 
