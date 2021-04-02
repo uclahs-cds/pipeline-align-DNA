@@ -6,7 +6,7 @@ LABEL maintainer="Ben Carlin <bcarlin@mednet.ucla.edu>"
 # libc6 (for Intel GKL)
 # R for picard
 # ps and command for reporting mertics 
-RUN apk --update add \
+RUN apk --no-cache --update add \
       bash \
       openjdk8 \
       ca-certificates \
