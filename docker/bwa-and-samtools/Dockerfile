@@ -19,6 +19,6 @@ RUN conda update -n base -c defaults conda &&\
       conda clean --all -y 
 
 # ps and command for reporting mertics 
-RUN apt-gets update && \
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y procps && \
     rm -rf /var/lib/apt/lists/* && \
-    apt-get install --no-install-recommends -y procps
