@@ -12,7 +12,7 @@ process PicardTools_SortSam  {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "PicardTools_SortSam/log${file(it).getName()}" }
+      saveAs: { "PicardTools_SortSam/${library}-${lane}.log${file(it).getName()}" }
 
    input:
       tuple(val(library), 

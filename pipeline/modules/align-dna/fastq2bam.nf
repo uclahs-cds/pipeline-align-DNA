@@ -9,7 +9,7 @@ process Align_Fastq2Bam {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "Align_Fastq2Bam/${file(read1_fastq).getSimpleName()}/log${file(it).getName()}" }
+      saveAs: { "Align_Fastq2Bam/${file(read1_fastq).getSimpleName()}/${library}-${lane}.log${file(it).getName()}" }
 
    // use "each" so the the reference files are passed through for each fastq pair alignment 
    input: 
