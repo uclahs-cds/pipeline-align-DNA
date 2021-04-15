@@ -14,7 +14,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
-## [Unreleased]
+## [7.0.3] - 2021-04-15
 ### Changed
 - #79 Update CHANGELOG.md to reflect Keep a Changelog format.
 - #61 Update validation to 2.1.0.
