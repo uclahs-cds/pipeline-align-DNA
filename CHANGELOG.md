@@ -16,11 +16,15 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [7.0.3] - 2021-04-15
 ### Changed
-- #79 Update CHANGELOG.md to reflect Keep a Changelog format.
 - #61 Update validation to 2.1.0.
+- #76 Update version documentation and manifest.
+- #78 #81 update resources setting for alignment, sort, and markduplicate
+- #79 Update CHANGELOG.md to reflect Keep a Changelog format.
 - #82 Save outputs in directories based on FASTQ library/lane #2.
 - #83 Rename main workflow module.
-- #76 Update version documentation and manifest.
+- #88 node specific configs are not included properly
+- #89 docker permission is not set properly
+- #90 Fixed dockerfiles to pass dockerfilelint
 
 ---
 
