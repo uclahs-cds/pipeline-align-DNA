@@ -11,7 +11,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Changed
-- #79 Updated CHANGELOG.md to reflect Keep a Changelog format
+- #79 Updated CHANGELOG.md to reflect Keep a Changelog format.
+- #61 Update validation to 2.1.0.
+- #82 Save outputs in directories based on FASTQ library/lane #2.
+- #83 Rename main workflow module.
 
 ---
 
