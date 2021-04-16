@@ -7,12 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
----
 
 ## [Unreleased]
 
-
----
 
 ## [7.0.3] - 2021-04-15
 ### Changed
@@ -26,7 +23,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - #89 docker permission is not set properly
 - #90 Fixed dockerfiles to pass dockerfilelint
 
----
 
 ## [7.0.2] - 2021-03-15
 ### Changed
@@ -34,32 +30,27 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - #67 Run docker with group permissions of the user executing the pipeline
 - #65 Check for write permission on output directories before executing
 
----
 
 ## [7.0.1] - 2021-03-11 [YANKED]
 ### Changed
 - #67 Run docker with group permissions of the user executing the pipeline
 - #65 Check for write permission on output directories before executing
 
----
 
 ## [7.0.0] - 2021-03-02
 ### Changed
 - #43 Port to DSL2
 
----
 
 ## [6.1.0] - 2021-01-18
 ### Added
 - A small pipeline to generate the reference genome index files. This is a separate nextflow script from the main pipeline script.
 
----
 
 ## [6.0.2] - 2021-01-13
 ### Fixed
 - Processes in a Docker container are executed as the user automatically instead of root.
 
----
 
 ## [6.0.1] - 2020-12-08
 ### Changed
@@ -70,7 +61,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - #31 Error: Unknown method invocation `includeConfig`
 - #32 Error: Please specify the disease\_id, patient\_id, dataset\_id, sample\_id, analyte, and technology in the config file
 
----
 
 ## [6.0.0] - 2020-11-30
 ### Added
@@ -80,13 +70,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Simplified the config file opened to users with only essensial parameters included
 
----
 
 ## [5.0.0] - 2020-11-09
 ### Changed
 - bwa-mem2 is upgraded to v2.1. It provides a smaller indexed genome and lower cpu usage comparing to the previous version v2.0.
 
----
 
 ## [4.0.0-beta] - 2020-10-15
 ### Added
@@ -96,7 +84,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Version tool updates (BWA 0.7.17, Samtools 1.10, Picard Tools 2.23.3)
 
----
 
 ## [0.0.1] - 2020-10-08
 ### Added
