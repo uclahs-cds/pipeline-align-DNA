@@ -29,6 +29,7 @@ log.info """\
       blcds_registered_dataset_output = ${params.blcds_registered_dataset_output}
 
    Tools Used:
+   - Aligners: bwa-mem2: ${params.bwa_mem2}, hisat2: ${params.hisat2}
    - BWA-MEM2 and SAMtools: ${params.docker_image_bwa_and_samtools}
    - Picard Tools: ${params.docker_image_picardtools}
    - sha512sum: ${params.docker_image_sha512sum}
