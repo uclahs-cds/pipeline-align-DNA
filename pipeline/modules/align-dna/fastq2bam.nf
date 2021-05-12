@@ -1,5 +1,5 @@
 
-process Align_bwa_mem2 {
+process align_DNA_BWA_MEM2 {
    container params.docker_image_bwa_and_samtools
    publishDir path: params.bam_output_dir,
       enabled: params.save_intermediate_files,
@@ -9,7 +9,7 @@ process Align_bwa_mem2 {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "Align_bwa_mem2/${file(read1_fastq).getSimpleName()}/${library}-${lane}.log${file(it).getName()}" }
+      saveAs: { "align_DNA_BWA_MEM2/${file(read1_fastq).getSimpleName()}/${library}-${lane}.log${file(it).getName()}" }
 
    // use "each" so the the reference files are passed through for each fastq pair alignment 
    input: 
@@ -50,8 +50,8 @@ process Align_bwa_mem2 {
       ${library}-${lane}.bam
    """
    }
-process Align_hisat2 {
-   container params.docker_image_bwa_and_samtools
+process align_DNA_HISAT2 {
+   container params.docker_image_hisat2
    publishDir path: params.bam_output_dir,
       enabled: params.save_intermediate_files,
       pattern: "*.bam",
@@ -60,7 +60,7 @@ process Align_hisat2 {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "Align_hisat2/${file(read1_fastq).getSimpleName()}/${library}-${lane}.log${file(it).getName()}" }
+      saveAs: { "align_DNA_HISAT2/${file(read1_fastq).getSimpleName()}/${library}-${lane}.log${file(it).getName()}" }
 
    // use "each" so the the reference files are passed through for each fastq pair alignment 
    input: 
@@ -87,9 +87,9 @@ process Align_hisat2 {
 
    hisat2 \
       mem \
-      -t ${task.cpus} \
-      -M \
-      -R "${read_group_name}" \
+      -p ${task.cpus} \
+      --rg-id "${read_group_name}" \
+      --no-spliced-alignment \
       -x ${ref_fasta} \
       -1 ${read1_fastq} \
       -2 ${read2_fastq} | \
