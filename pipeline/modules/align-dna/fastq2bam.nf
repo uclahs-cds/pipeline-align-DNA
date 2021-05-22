@@ -1,3 +1,7 @@
+// The follwing processes run both alignment and SAM conversion in the same process.
+// While this is normally considered to go against the best practices for processes,
+// here it actually saves cost, time, and memory to directly pipe the output into 
+// samtools due to the large size of the uncompressed SAM files.
 
 process align_DNA_BWA_MEM2 {
    container params.docker_image_bwa_and_samtools
