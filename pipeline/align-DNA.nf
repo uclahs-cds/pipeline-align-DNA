@@ -30,7 +30,6 @@ log.info """\
 
    Tools Used:
    - Aligner: ${params.aligner}
-   - BWA-MEM2 and SAMtools: ${params.docker_image_bwa_and_samtools}
    - Picard Tools: ${params.docker_image_picardtools}
    - sha512sum: ${params.docker_image_sha512sum}
    - validate_params: ${params.docker_image_validate_params}
@@ -50,7 +49,7 @@ workflow {
       .set { ich_reference_fasta }
 
    Channel
-      .fromPath(params.reference_fasta_index_files, checkIfExists: true)
+      .fromPath(params.reference_fasta_index_files, checkIfExists: params.validate_inputs)
       .set { ich_reference_index_files }
 
    // get the input fastq pairs
@@ -83,11 +82,10 @@ workflow {
          }
       .set { ich_samples_validate }
 
-   validate_file(ich_samples_validate.mix(
-      ich_reference_fasta,
-      ich_reference_index_files
-      ))
-
+    validate_file(ich_samples_validate.mix(
+       ich_reference_fasta,
+       ich_reference_index_files
+       ))
     aligndna(ich_samples,
        ich_reference_fasta,
        ich_reference_index_files

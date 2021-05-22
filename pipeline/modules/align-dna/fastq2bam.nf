@@ -51,7 +51,7 @@ process align_DNA_BWA_MEM2 {
    """
    }
 process align_DNA_HISAT2 {
-   container params.docker_image_hisat2
+   container params.docker_image_hisat2_and_samtools
    publishDir path: params.bam_output_dir,
       enabled: params.save_intermediate_files,
       pattern: "*.bam",
@@ -86,11 +86,10 @@ process align_DNA_HISAT2 {
    set -euo pipefail
 
    hisat2 \
-      mem \
       -p ${task.cpus} \
       --rg-id "${read_group_name}" \
       --no-spliced-alignment \
-      -x ${ref_fasta} \
+      -x ${params.reference_fasta_index_files} \
       -1 ${read1_fastq} \
       -2 ${read2_fastq} | \
    samtools \
