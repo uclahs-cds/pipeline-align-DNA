@@ -4,9 +4,6 @@ process validate_file {
    input:
    path file_to_validate
 
-   when:
-   params.validate_inputs
-
    script:
    """
    set -euo pipefail

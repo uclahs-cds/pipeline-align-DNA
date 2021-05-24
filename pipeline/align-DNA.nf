@@ -48,8 +48,13 @@ workflow {
       .fromPath(params.reference_fasta, checkIfExists: true)
       .set { ich_reference_fasta }
 
+   ref_fasta_index_files = params.reference_fasta_index_files
+   if (params.aligner == "HISAT2") {
+      ref_fasta_index_files = ref_fasta_index_files + ".*.ht2"
+      }
+   
    Channel
-      .fromPath(params.reference_fasta_index_files, checkIfExists: params.validate_inputs)
+      .fromPath(ref_fasta_index_files, checkIfExists: true)
       .set { ich_reference_index_files }
 
    // get the input fastq pairs
