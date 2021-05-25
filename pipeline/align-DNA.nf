@@ -29,7 +29,7 @@ log.info """\
       blcds_registered_dataset_output = ${params.blcds_registered_dataset_output}
 
    Tools Used:
-   - Aligner: ${params.aligner}
+   - Aligner: ${params.docker_image_selected}
    - Picard Tools: ${params.docker_image_picardtools}
    - sha512sum: ${params.docker_image_sha512sum}
    - validate_params: ${params.docker_image_validate_params}
@@ -40,8 +40,13 @@ log.info """\
    """
    .stripIndent()
 
-include { validate_file } from './modules/validation.nf'
-include { aligndna } from './modules/align-dna/workflow.nf'
+include { validate_file; validate_file as validate_output_file } from './modules/run_validate.nf'
+include { align_DNA_BWA_MEM2 } from './modules/align_DNA_BWA_MEM2.nf'
+include { align_DNA_HISAT2 } from './modules/align_DNA_HISAT2.nf'
+include { PicardTools_SortSam } from './modules/sort_bam_picardtools.nf'
+include { PicardTools_MarkDuplicates } from './modules/mark_duplicate_picardtools.nf'
+include { PicardTools_BuildBamIndex } from './modules/index_bam_picardtools.nf'
+include { Generate_Sha512sum } from './modules/check_512sum.nf'
 
 workflow {
    Channel
@@ -73,6 +78,7 @@ workflow {
          // the library, sample and lane are used as keys downstream to group into 
          // sets of the same key for downstream merging
          return tuple(row.library_identifier,
+	    row,
             row.lane,
             read_group_name,
             row.read1_fastq,
@@ -80,19 +86,42 @@ workflow {
             )
          }
       .set{ ich_samples }
-   
+  
    ich_samples
-      .flatMap { library, lane, read_group_name, read1_fastq, read2_fastq ->
+      .flatMap { library, header, lane, read_group_name, read1_fastq, read2_fastq ->
          [read1_fastq, read2_fastq]
          }
       .set { ich_samples_validate }
 
-    validate_file(ich_samples_validate.mix(
-       ich_reference_fasta,
-       ich_reference_index_files
-       ))
-    aligndna(ich_samples,
-       ich_reference_fasta,
-       ich_reference_index_files
-       )
+   validate_file(ich_samples_validate.mix(
+      ich_reference_fasta,
+      ich_reference_index_files
+      ))
+
+   if (params.aligner == "BWA-MEM2") {
+      align_DNA_BWA_MEM2(
+         ich_samples,
+         ich_reference_fasta,
+         ich_reference_index_files.collect()
+         )
+      PicardTools_SortSam(align_DNA_BWA_MEM2.out.bam)
+      }  
+   else if (params.aligner == "HISAT2") { 
+      align_DNA_HISAT2(
+         ich_samples,
+         ich_reference_fasta,
+         ich_reference_index_files.collect()
+         )
+      PicardTools_SortSam(align_DNA_HISAT2.out.bam)   
+      } 
+   PicardTools_MarkDuplicates(PicardTools_SortSam.out.bam.collect())
+   PicardTools_BuildBamIndex(PicardTools_MarkDuplicates.out.bam)
+   Generate_Sha512sum(PicardTools_BuildBamIndex.out.bai.mix(PicardTools_MarkDuplicates.out.bam))
+   validate_output_file(
+      PicardTools_MarkDuplicates.out.bam.mix(
+         PicardTools_BuildBamIndex.out.bai,
+         Channel.from(params.temp_dir, params.output_dir)
+         )
+      )
+
    }
