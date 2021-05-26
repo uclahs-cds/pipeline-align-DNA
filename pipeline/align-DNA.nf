@@ -67,20 +67,12 @@ workflow {
       .fromPath(params.input_csv, checkIfExists: true)
       .splitCsv(header:true)
       .map { row -> 
-         def read_group_name = "@RG" +
-            "\\tID:" + row.read_group_identifier + ".Seq" + row.lane +
-            "\\tCN:" + row.sequencing_center +
-            "\\tLB:" + row.library_identifier +
-            "\\tPL:" + row.platform_technology +
-            "\\tPU:" + row.platform_unit +
-            "\\tSM:" + row.sample
 
          // the library, sample and lane are used as keys downstream to group into 
          // sets of the same key for downstream merging
          return tuple(row.library_identifier,
 	    row,
             row.lane,
-            read_group_name,
             row.read1_fastq,
             row.read2_fastq
             )
@@ -88,7 +80,7 @@ workflow {
       .set{ ich_samples }
   
    ich_samples
-      .flatMap { library, header, lane, read_group_name, read1_fastq, read2_fastq ->
+      .flatMap { library, header, lane, read1_fastq, read2_fastq ->
          [read1_fastq, read2_fastq]
          }
       .set { ich_samples_validate }

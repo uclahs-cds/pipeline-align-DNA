@@ -19,8 +19,7 @@ process align_DNA_HISAT2 {
    input: 
       tuple(val(library),
 	 val(header), 
-         val(lane),
-         val(read_group_name), 
+         val(lane), 
          path(read1_fastq),
          path(read2_fastq) 
          )
@@ -35,7 +34,7 @@ process align_DNA_HISAT2 {
          path("${library}-${lane}.bam"), emit: bam
       path(".command.*")
 
-   script:
+   script: 
    """
    set -euo pipefail
 

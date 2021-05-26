@@ -19,8 +19,7 @@ process align_DNA_BWA_MEM2 {
    input: 
       tuple(val(library),
 	 val(header), 
-         val(lane),
-         val(read_group_name), 
+         val(lane), 
          path(read1_fastq),
          path(read2_fastq) 
          )
@@ -43,7 +42,7 @@ process align_DNA_BWA_MEM2 {
       mem \
       -t ${task.cpus} \
       -M \
-      -R "${read_group_name}" \
+      -R \"@RG\tID:${header.read_group_identifier}.Seq${header.lane}\tCN:${header.sequencing_center}\tLB:${header.library_identifier}\tPL:${header.platform_technology}\tPU:${header.platform_unit}\tSM:${header.sample}\" \
       ${ref_fasta} \
       ${read1_fastq} \
       ${read2_fastq} | \
