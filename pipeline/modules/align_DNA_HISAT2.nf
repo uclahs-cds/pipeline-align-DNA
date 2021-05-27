@@ -46,7 +46,7 @@ process align_DNA_HISAT2 {
       --rg PU:${header.platform_unit} \
       --rg SM:${header.sample} \
       --no-spliced-alignment \
-      -x ${params.reference_fasta_index_files} \
+      -x ${file(ich_reference_index_files.get(0).baseName).baseName} \
       -1 ${read1_fastq} \
       -2 ${read2_fastq} | \
    samtools \
