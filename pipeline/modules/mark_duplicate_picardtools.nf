@@ -4,7 +4,7 @@ process PicardTools_MarkDuplicates  {
    container params.docker_image_picardtools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
-   publishDir path: params.bam_output_dir,
+   publishDir path: "${aligner_output_dir}",
       pattern: "*.bam",
       mode: 'copy'
 
@@ -15,6 +15,7 @@ process PicardTools_MarkDuplicates  {
 
    input:
       path(input_bams)
+      val(aligner_output_dir)
 
    // after marking duplicates, bams will be merged by library so the library name is not needed
    // just the sample name (global variable), do not pass it as a val
@@ -23,7 +24,7 @@ process PicardTools_MarkDuplicates  {
       path(".command.*")
 
    shell:
-   bam_output_filename = params.bam_output_filename
+   bam_output_filename = "${params.bam_output_filename}"
    ''' 
    set -euo pipefail
 
