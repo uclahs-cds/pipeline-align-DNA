@@ -11,8 +11,8 @@ log.info """\
    - input: 
       sample_name: ${params.sample_name}
       input_csv: ${params.input_csv}
-      reference_fasta: ${params.reference_fasta}
-      reference_fasta_index_files: ${params.aligner.contains("BWA-MEM2") ? params.bwa_reference_fasta_index_files : ""} ${params.aligner.contains("HISAT2") ? params.hisat2_reference_fasta_index_files : ""}
+      reference_fasta: ${params.aligner.contains("BWA-MEM2") ? params.reference_fasta_bwa : ""} ${params.aligner.contains("HISAT2") ? params.reference_fasta_hisat2 : ""}
+      reference_fasta_index_files: ${params.aligner.contains("BWA-MEM2") ? params.reference_fasta_index_files_bwa : ""} ${params.aligner.contains("HISAT2") ? params.reference_fasta_index_files_hisat2_full : ""}
 
    - output: 
       temp_dir: ${params.temp_dir}
@@ -40,25 +40,25 @@ log.info """\
    """
    .stripIndent()
 
-include { validate_file; validate_file as validate_bwa_output_file; validate_file as validate_hisat2_output_file } from './modules/run_validate.nf'
-include { align_DNA_BWA_MEM2 } from './modules/align_DNA_BWA_MEM2.nf'
-include { align_DNA_HISAT2 } from './modules/align_DNA_HISAT2.nf'
-include { PicardTools_SortSam; PicardTools_SortSam as PicardTools_SortSam_HISAT2 } from './modules/sort_bam_picardtools.nf'
-include { PicardTools_MarkDuplicates; PicardTools_MarkDuplicates as PicardTools_MarkDuplicates_HISAT2 } from './modules/mark_duplicate_picardtools.nf'
-include { PicardTools_BuildBamIndex; PicardTools_BuildBamIndex as PicardTools_BuildBamIndex_HISAT2 } from './modules/index_bam_picardtools.nf'
-include { Generate_Sha512sum; Generate_Sha512sum as Generate_Sha512sum_HISAT2 } from './modules/check_512sum.nf'
+include { validate_file } from './modules/run_validate.nf'
+include { workflow_align_DNA_BWA_MEM2 } from './modules/align_DNA_BWA_MEM2.nf'
+include { workflow_align_DNA_HISAT2 } from './modules/align_DNA_HISAT2.nf'
 
 workflow {
    Channel
-      .fromPath(params.reference_fasta, checkIfExists: true)
-      .set { ich_reference_fasta }
+      .fromPath(params.reference_fasta_bwa, checkIfExists: params.aligner.contains("BWA-MEM2"))
+      .set { ich_reference_fasta_bwa }
    
    Channel
-      .fromPath(params.bwa_reference_fasta_index_files, checkIfExists: params.aligner.contains("BWA-MEM2"))
+      .fromPath(params.reference_fasta_hisat2, checkIfExists: params.aligner.contains("HISAT2"))
+      .set { ich_reference_fasta_hisat2 }
+
+   Channel
+      .fromPath(params.reference_fasta_index_files_bwa, checkIfExists: params.aligner.contains("BWA-MEM2"))
       .set { ich_bwa_reference_index_files }
 
    Channel
-      .fromPath(params.hisat2_full_reference_fasta_index_files, checkIfExists: params.aligner.contains("HISAT2"))
+      .fromPath(params.reference_fasta_index_files_hisat2_full, checkIfExists: params.aligner.contains("HISAT2"))
       .set { ich_hisat2_reference_index_files }
 
    // get the input fastq pairs
@@ -84,60 +84,20 @@ workflow {
          }
       .set { ich_samples_validate }
 
-   if (params.aligner.contains("BWA-MEM2") && params.aligner.contains("HISAT2")) {
-      validate_file(ich_samples_validate.mix(
-         ich_reference_fasta,
-         ich_bwa_reference_index_files,
-         ich_hisat2_reference_index_files
-         ))
-      }
-   else if (params.aligner.contains("BWA-MEM2")) {
-      validate_file(ich_samples_validate.mix(
-         ich_reference_fasta,
-         ich_bwa_reference_index_files
-         ))
-      }
-   else if (params.aligner.contains("HISAT2")) {
-      validate_file(ich_samples_validate.mix(
-         ich_reference_fasta,
-         ich_hisat2_reference_index_files
-         ))
-      }
-
    if (params.aligner.contains("BWA-MEM2")) {
-      aligner_output_dir = "${params.bam_output_dir}-BWA-MEM2"
-      align_DNA_BWA_MEM2(
-         ich_samples,
-         ich_reference_fasta,
-         ich_bwa_reference_index_files.collect()
-         )
-      PicardTools_SortSam(align_DNA_BWA_MEM2.out.bam)
-      PicardTools_MarkDuplicates(PicardTools_SortSam.out.bam.collect(), aligner_output_dir)
-      PicardTools_BuildBamIndex(PicardTools_MarkDuplicates.out.bam, aligner_output_dir)
-      Generate_Sha512sum(PicardTools_BuildBamIndex.out.bai.mix(PicardTools_MarkDuplicates.out.bam), aligner_output_dir)
-         validate_bwa_output_file(
-            PicardTools_MarkDuplicates.out.bam.mix(
-               PicardTools_BuildBamIndex.out.bai,
-               Channel.from(params.temp_dir, params.output_dir)
-               )
-            )
+      workflow_align_DNA_BWA_MEM2(
+	 ich_samples,
+	 ich_samples_validate,
+	 ich_reference_fasta_bwa,
+	 ich_bwa_reference_index_files
+	 )
       }  
    if (params.aligner.contains("HISAT2")) {
-      aligner_output_dir = "${params.bam_output_dir}-HISAT2" 
-      align_DNA_HISAT2(
+      workflow_align_DNA_HISAT2(
          ich_samples,
-         ich_reference_fasta,
-         ich_hisat2_reference_index_files.collect()
+	 ich_samples_validate,
+         ich_reference_fasta_hisat2,
+         ich_hisat2_reference_index_files
          )
-      PicardTools_SortSam_HISAT2(align_DNA_HISAT2.out.bam)   
-      PicardTools_MarkDuplicates_HISAT2(PicardTools_SortSam_HISAT2.out.bam.collect(), aligner_output_dir)
-      PicardTools_BuildBamIndex_HISAT2(PicardTools_MarkDuplicates_HISAT2.out.bam, aligner_output_dir)
-      Generate_Sha512sum_HISAT2(PicardTools_BuildBamIndex_HISAT2.out.bai.mix(PicardTools_MarkDuplicates_HISAT2.out.bam), aligner_output_dir)
-         validate_hisat2_output_file(
-            PicardTools_MarkDuplicates_HISAT2.out.bam.mix(
-               PicardTools_BuildBamIndex_HISAT2.out.bai,
-               Channel.from(params.temp_dir, params.output_dir)
-               )
-            )
       } 
    }
