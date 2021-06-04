@@ -61,7 +61,7 @@ workflow {
          // the library, sample and lane are used as keys downstream to group into 
          // sets of the same key for downstream merging
          return tuple(row.library_identifier,
-	    row,
+            row,
             row.lane,
             row.read1_fastq,
             row.read2_fastq
@@ -84,10 +84,10 @@ workflow {
          .fromPath(params.reference_fasta_index_files_bwa, checkIfExists: true)
          .set { ich_bwa_reference_index_files }
       align_DNA_BWA_MEM2_workflow(
-	 ich_samples,
-	 ich_samples_validate,
-	 ich_reference_fasta_bwa,
-	 ich_bwa_reference_index_files
+         ich_samples,
+         ich_samples_validate,
+         ich_reference_fasta_bwa,
+         ich_bwa_reference_index_files
 	 )
       }  
    if (params.aligner.contains("HISAT2")) {

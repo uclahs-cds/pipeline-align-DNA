@@ -24,7 +24,7 @@ process align_DNA_HISAT2 {
    // use "each" so the the reference files are passed through for each fastq pair alignment 
    input: 
       tuple(val(library),
-	 val(header), 
+         val(header), 
          val(lane), 
          path(read1_fastq),
          path(read2_fastq) 

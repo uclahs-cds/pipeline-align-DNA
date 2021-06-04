@@ -22,9 +22,9 @@ process align_DNA_BWA_MEM2 {
       saveAs: { "align_DNA_BWA_MEM2/${file(read1_fastq).getSimpleName()}/${library}-${lane}.log${file(it).getName()}" }
 
    // use "each" so the the reference files are passed through for each fastq pair alignment 
-   input: 
+   input:
       tuple(val(library),
-	 val(header), 
+         val(header), 
          val(lane), 
          path(read1_fastq),
          path(read2_fastq) 
