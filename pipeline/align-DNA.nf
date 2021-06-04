@@ -51,25 +51,6 @@ workflow {
    if (!(params.aligner.contains("BWA-MEM2") || params.aligner.contains("HISAT2"))) {
       throw new Exception('ERROR: Please specify at least one valid aligner! Options: BWA-MEM2, HISAT2')
       }
-   
-   // Only create input channels for files which aligners are using
-   if (params.aligner.contains("BWA-MEM2")) {
-      Channel
-         .fromPath(params.reference_fasta_bwa, checkIfExists: true)
-         .set { ich_reference_fasta_bwa }
-      Channel
-         .fromPath(params.reference_fasta_index_files_bwa, checkIfExists: true)
-         .set { ich_bwa_reference_index_files }
-      }
-
-   if (params.aligner.contains("HISAT2")) {
-      Channel
-         .fromPath(params.reference_fasta_hisat2, checkIfExists: true)
-         .set { ich_reference_fasta_hisat2 }
-      Channel
-         .fromPath(params.reference_fasta_index_files_hisat2, checkIfExists: true)
-         .set { ich_hisat2_reference_index_files }
-      }
 
    // get the input fastq pairs
    Channel
@@ -94,7 +75,14 @@ workflow {
          }
       .set { ich_samples_validate }
 
+   // Only create input channels for files which aligners are using
    if (params.aligner.contains("BWA-MEM2")) {
+      Channel
+         .fromPath(params.reference_fasta_bwa, checkIfExists: true)
+         .set { ich_reference_fasta_bwa }
+      Channel
+         .fromPath(params.reference_fasta_index_files_bwa, checkIfExists: true)
+         .set { ich_bwa_reference_index_files }
       align_DNA_BWA_MEM2_workflow(
 	 ich_samples,
 	 ich_samples_validate,
@@ -103,6 +91,12 @@ workflow {
 	 )
       }  
    if (params.aligner.contains("HISAT2")) {
+      Channel
+         .fromPath(params.reference_fasta_hisat2, checkIfExists: true)
+         .set { ich_reference_fasta_hisat2 }
+      Channel
+         .fromPath(params.reference_fasta_index_files_hisat2, checkIfExists: true)
+         .set { ich_hisat2_reference_index_files }
       align_DNA_HISAT2_workflow(
          ich_samples,
          ich_samples_validate,
