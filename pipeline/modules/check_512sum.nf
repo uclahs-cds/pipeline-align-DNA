@@ -2,10 +2,11 @@
 process Generate_Sha512sum {    
    container params.docker_image_sha512sum
 
-   publishDir path: params.bam_output_dir, mode: 'copy'
+   publishDir path: "${aligner_output_dir}", mode: 'copy'
 
    input:
       file(input_file)
+      val(aligner_output_dir)
 
    output:
       file("${input_file.getName()}.sha512")
