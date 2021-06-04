@@ -88,7 +88,7 @@ workflow {
          ich_samples_validate,
          ich_reference_fasta_bwa,
          ich_bwa_reference_index_files
-	 )
+         )
       }  
    if (params.aligner.contains("HISAT2")) {
       Channel
