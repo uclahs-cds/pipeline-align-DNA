@@ -31,7 +31,8 @@ log.info """\
       blcds_registered_dataset_output = ${params.blcds_registered_dataset_output}
 
    Tools Used:
-   - ${params.aligner}: ${params.aligner.contains("BWA-MEM2") ? params.docker_image_bwa_and_samtools : ""} ${params.aligner.contains("HISAT2") ? params.docker_image_hisat2_and_samtools : ""}
+   - BWA-MEM2: ${params.aligner.contains("BWA-MEM2") ? params.docker_image_bwa_and_samtools : "None"}
+   - HISAT2:  ${params.aligner.contains("HISAT2") ? params.docker_image_hisat2_and_samtools : "None"}
    - Picard Tools: ${params.docker_image_picardtools}
    - sha512sum: ${params.docker_image_sha512sum}
    - validate_params: ${params.docker_image_validate_params}
@@ -50,22 +51,25 @@ workflow {
    if (!(params.aligner.contains("BWA-MEM2") || params.aligner.contains("HISAT2"))) {
       throw new Exception('ERROR: Please specify at least one valid aligner! Options: BWA-MEM2, HISAT2')
       }
-
-   Channel
-      .fromPath(params.reference_fasta_bwa, checkIfExists: params.aligner.contains("BWA-MEM2"))
-      .set { ich_reference_fasta_bwa }
    
-   Channel
-      .fromPath(params.reference_fasta_hisat2, checkIfExists: params.aligner.contains("HISAT2"))
-      .set { ich_reference_fasta_hisat2 }
+   // Only create input channels for files which aligners are using
+   if (params.aligner.contains("BWA-MEM2")) {
+      Channel
+         .fromPath(params.reference_fasta_bwa, checkIfExists: params.aligner.contains("BWA-MEM2"))
+         .set { ich_reference_fasta_bwa }
+      Channel
+         .fromPath(params.reference_fasta_index_files_bwa, checkIfExists: params.aligner.contains("BWA-MEM2"))
+         .set { ich_bwa_reference_index_files }
+      }
 
-   Channel
-      .fromPath(params.reference_fasta_index_files_bwa, checkIfExists: params.aligner.contains("BWA-MEM2"))
-      .set { ich_bwa_reference_index_files }
-
-   Channel
-      .fromPath(params.reference_fasta_index_files_hisat2, checkIfExists: params.aligner.contains("HISAT2"))
-      .set { ich_hisat2_reference_index_files }
+   if (params.aligner.contains("HISAT2")) {
+      Channel
+         .fromPath(params.reference_fasta_hisat2, checkIfExists: params.aligner.contains("HISAT2"))
+         .set { ich_reference_fasta_hisat2 }
+      Channel
+         .fromPath(params.reference_fasta_index_files_hisat2, checkIfExists: params.aligner.contains("HISAT2"))
+         .set { ich_hisat2_reference_index_files }
+      }
 
    // get the input fastq pairs
    Channel
