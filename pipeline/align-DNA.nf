@@ -55,19 +55,19 @@ workflow {
    // Only create input channels for files which aligners are using
    if (params.aligner.contains("BWA-MEM2")) {
       Channel
-         .fromPath(params.reference_fasta_bwa, checkIfExists: params.aligner.contains("BWA-MEM2"))
+         .fromPath(params.reference_fasta_bwa, checkIfExists: true)
          .set { ich_reference_fasta_bwa }
       Channel
-         .fromPath(params.reference_fasta_index_files_bwa, checkIfExists: params.aligner.contains("BWA-MEM2"))
+         .fromPath(params.reference_fasta_index_files_bwa, checkIfExists: true)
          .set { ich_bwa_reference_index_files }
       }
 
    if (params.aligner.contains("HISAT2")) {
       Channel
-         .fromPath(params.reference_fasta_hisat2, checkIfExists: params.aligner.contains("HISAT2"))
+         .fromPath(params.reference_fasta_hisat2, checkIfExists: true)
          .set { ich_reference_fasta_hisat2 }
       Channel
-         .fromPath(params.reference_fasta_index_files_hisat2, checkIfExists: params.aligner.contains("HISAT2"))
+         .fromPath(params.reference_fasta_index_files_hisat2, checkIfExists: true)
          .set { ich_hisat2_reference_index_files }
       }
 
