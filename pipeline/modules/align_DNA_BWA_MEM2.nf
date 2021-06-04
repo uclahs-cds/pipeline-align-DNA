@@ -61,7 +61,7 @@ process align_DNA_BWA_MEM2 {
    """
    }
 
-workflow workflow_align_DNA_BWA_MEM2 {
+workflow align_DNA_BWA_MEM2_workflow {
    aligner_output_dir = "${params.bam_output_dir}-BWA-MEM2"
    take:
       ich_samples

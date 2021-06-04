@@ -11,8 +11,10 @@ log.info """\
    - input: 
       sample_name: ${params.sample_name}
       input_csv: ${params.input_csv}
-      reference_fasta: ${params.aligner.contains("BWA-MEM2") ? params.reference_fasta_bwa : ""} ${params.aligner.contains("HISAT2") ? params.reference_fasta_hisat2 : ""}
-      reference_fasta_index_files: ${params.aligner.contains("BWA-MEM2") ? params.reference_fasta_index_files_bwa : ""} ${params.aligner.contains("HISAT2") ? params.reference_fasta_index_files_hisat2_full : ""}
+      reference_fasta_bwa: ${params.aligner.contains("BWA-MEM2") ? params.reference_fasta_bwa : "None"}
+      reference_fasta_index_files_bwa: ${params.aligner.contains("BWA-MEM2") ? params.reference_fasta_index_files_bwa : "None"}
+      reference_fasta_hisat2: ${params.aligner.contains("HISAT2") ? params.reference_fasta_hisat2 : "None"}
+      reference_fasta_index_files_hisat2: ${params.aligner.contains("HISAT2") ? params.reference_fasta_index_files_hisat2 : "None"}
 
    - output: 
       temp_dir: ${params.temp_dir}
@@ -41,10 +43,14 @@ log.info """\
    .stripIndent()
 
 include { validate_file } from './modules/run_validate.nf'
-include { workflow_align_DNA_BWA_MEM2 } from './modules/align_DNA_BWA_MEM2.nf'
-include { workflow_align_DNA_HISAT2 } from './modules/align_DNA_HISAT2.nf'
+include { align_DNA_BWA_MEM2_workflow } from './modules/align_DNA_BWA_MEM2.nf'
+include { align_DNA_HISAT2_workflow } from './modules/align_DNA_HISAT2.nf'
 
 workflow {
+   if (!(params.aligner.contains("BWA-MEM2") || params.aligner.contains("HISAT2"))) {
+      throw new Exception('ERROR: Please specify at least one valid aligner! Options: BWA-MEM2, HISAT2')
+      }
+
    Channel
       .fromPath(params.reference_fasta_bwa, checkIfExists: params.aligner.contains("BWA-MEM2"))
       .set { ich_reference_fasta_bwa }
@@ -58,7 +64,7 @@ workflow {
       .set { ich_bwa_reference_index_files }
 
    Channel
-      .fromPath(params.reference_fasta_index_files_hisat2_full, checkIfExists: params.aligner.contains("HISAT2"))
+      .fromPath(params.reference_fasta_index_files_hisat2, checkIfExists: params.aligner.contains("HISAT2"))
       .set { ich_hisat2_reference_index_files }
 
    // get the input fastq pairs
@@ -85,7 +91,7 @@ workflow {
       .set { ich_samples_validate }
 
    if (params.aligner.contains("BWA-MEM2")) {
-      workflow_align_DNA_BWA_MEM2(
+      align_DNA_BWA_MEM2_workflow(
 	 ich_samples,
 	 ich_samples_validate,
 	 ich_reference_fasta_bwa,
@@ -93,9 +99,9 @@ workflow {
 	 )
       }  
    if (params.aligner.contains("HISAT2")) {
-      workflow_align_DNA_HISAT2(
+      align_DNA_HISAT2_workflow(
          ich_samples,
-	 ich_samples_validate,
+         ich_samples_validate,
          ich_reference_fasta_hisat2,
          ich_hisat2_reference_index_files
          )
