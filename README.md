@@ -74,6 +74,8 @@ The reference genome index must be generated from HISAT2 using [hisat2-build](ht
 
 A directed acyclic graph of your pipeline.
 
+>Following alignment, processes are run separately for each aligner used.
+
 ![align-DNA flow diagram](flowchart-diagram.drawio.svg?raw=true)
 
 ---
