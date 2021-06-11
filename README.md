@@ -11,7 +11,7 @@
 
 ## Overview
 
-The align-DNA nextflow pipeline, aligns paired-end data utilizing [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2), [Picard](https://github.com/broadinstitute/picard) Tools and [Samtools](https://github.com/samtools/samtools). The pipeline has been engineered to run in a 4 layer stack in a cloud-based scalable environment of CycleCloud, Slurm, Nextflow and Docker. Additionally, it has been validated with the SMC-HET dataset and reference GRCh38, where paired-end fastq’s were created with BAM Surgeon.
+The align-DNA nextflow pipeline, aligns paired-end data utilizing [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) and/or [HISAT2](http://daehwankimlab.github.io/hisat2/main), [Picard](https://github.com/broadinstitute/picard) Tools and [Samtools](https://github.com/samtools/samtools). The pipeline has been engineered to run in a 4 layer stack in a cloud-based scalable environment of CycleCloud, Slurm, Nextflow and Docker. Additionally, it has been validated with the SMC-HET dataset and reference GRCh38, where paired-end fastq’s were created with BAM Surgeon.
 
 The pipeline should be run **WITH A SINGLE SAMPLE AT A TIME**. Otherwise resource allocation and Nextflow errors could cause the pipeline to fail.
 
@@ -63,11 +63,18 @@ This can also be submitted using the [submission script](https://github.com/ucla
 
 > The BWA-MEM2 expects the reference genome index to be at the same directory as the reference genome FASTA, so it's important to keep them together.
 
+<b><i> HISAT2 Genome Index </i></b>
+The reference genome index must be generated from HISAT2 using [hisat2-build](http://daehwankimlab.github.io/hisat2/howto/). When passing the hisat2 index to the config, only the path up to the prefix(basename) must be specified:
+
+> The basename is the name of any of the index files up to but not including the final .1.ht2 / etc. hisat2 looks for the specified index first in the current directory, then in the directory specified in the HISAT2_INDEXES environment variable.
+
 ---
 
 ## Flow Diagram
 
 A directed acyclic graph of your pipeline.
+
+>Following alignment, processes are run separately for each aligner used.
 
 ![align-DNA flow diagram](flowchart-diagram.drawio.svg?raw=true)
 
@@ -77,7 +84,7 @@ A directed acyclic graph of your pipeline.
 
 ### 1A. Alignment
 
-The first step of the pipeline utilizes [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) to align paired reads, (see Tools and Infrastructure Section for details). BWA-MEM2 is the successor for the well-known aligner BWA. The bwa-mem2 mem command utilizes the -M option for marking shorter splitsas secondary. This allows for compatibility with Picard Tools in downstream process and in particular prevents the underlying library of Picard Tools from recognizing these splits as duplicate reads (read names). Additionally, the -t option is utilized toincrease the number of threads used for alignment. The number of threads used in this step is by default to allow at least 2.5Gb memory per CPU, because of the large memory usage by BWA-MEM2. This can be overwritten by setting the bwa_mem_number_of_cpus parameter from the config file. For more details regarding the specific command that was run please refer to the Source Code section.
+The first step of the pipeline utilizes [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) or [HISAT2](http://daehwankimlab.github.io/hisat2/main) to align paired reads, (see Tools and Infrastructure Section for details). BWA-MEM2 is the successor for the well-known aligner BWA. The bwa-mem2 mem command utilizes the -M option for marking shorter splits as secondary. This allows for compatibility with Picard Tools in downstream process and in particular prevents the underlying library of Picard Tools from recognizing these splits as duplicate reads (read names). Additionally, the -t option is utilized toincrease the number of threads used for alignment. The number of threads used in this step is by default to allow at least 2.5Gb memory per CPU, because of the large memory usage by BWA-MEM2. This can be overwritten by setting the bwa_mem_number_of_cpus parameter from the config file. For more details regarding the specific command that was run please refer to the Source Code section.
 
 ### 1B. Convert Align SAM File to BAM Format
 
@@ -122,8 +129,10 @@ After marking dup BAM files, the BAM files are then indexed by utilizing Picard 
 |:----------------|:---------|:-----|:------------|
 | `sample_name` | yes | string | The sample name. This is ignored if the output files are directly saved to the Boutros Lab data storage registry, by setting `blcds_registered_dataset_output = true` |
 | `input_csv` | yes | path | Absolute path to the input csv. See [here](pipeline/inputs/align-DNA.inputs.csv) for example and above for the detail of required fields. |
-| `reference_fasta` | yes | path | Absolute path to the reference genome `fasta` file. The reference genome is used by BWA-MEM2 for alignment. |
-| `reference_fasta_index_files` | yes | path | Absolute path to the genome index with a pattern matching. The index must be generated by the `bwa-mem2 index` command using the correct version of BWA-MEM2. |
+| `reference_fasta_bwa` | yes for BWA-MEM2 | path | Absolute path to the reference genome `fasta` file. The reference genome is used by BWA-MEM2 for alignment. |
+| `reference_fasta_hisat2` | yes for HISAT2 | path | Absolute path to the reference genome `fasta` file. The reference genome is used by HISAT2 for alignment. |
+| `hisat2_index_prefix` | yes for HISAT2 | path | Absolute path up to the genome index basename. The index must be generated by the `hisat2-build` command. |
+| `aligner` | yes | list | Which aligners to use as strings in list format. Current options: `BWA-MEM2, HISAT2`. |
 | `reference_genome_version` | no | string | The genome build version. This is only used when the output files are directly saved to the Boutros Lab data storage registry, by setting `blcds_registered_dataset_output = true`. |
 | `output_dir` | yes | path | Absolute path to the directory where the output files to be saved. This is ignored if the output files are directly saved to the Boutros Lab data storage registry, by setting `blcds_registered_dataset_output = true` |
 | `temp_dir` | yes | path | Absolute path to the directory where the nextflow's intermediate files are saved. If your cluster worker node has the `/scratch` set up, this can be set to it. |
@@ -145,13 +154,15 @@ After marking dup BAM files, the BAM files are then indexed by utilizing Picard 
 
 ## Outputs
 
-| Output | Description |
-|:-------|:------------|
-| `.bam` | Aligned, sorted, filtered and if needed, merged, BAM file(s) |
-| `.bam.bai` | Index file for each BAM file |
-| `.bam` files and metrics files | Intermediate outputs for each scientific tool (OPTIONAL) |
-| `report.html`, `timeline.html` and `trace.txt` | A Nextflowreport, timeline and trace files |
-| `log.command.*` | Process specific logging files created by nextflow. |
+>Separate folders for each aligner used are created to store bam files while a base folder is used to store overall Nextflow information.
+
+| Output | Description | Folder |
+|:-------|:------------|:-------|
+| `.bam` | Aligned, sorted, filtered and if needed, merged, BAM file(s) | align-DNA-*DATE*-*ALIGNER* |
+| `.bam.bai` | Index file for each BAM file | align-DNA-*DATE*-*ALIGNER* |
+| `.bam` files and metrics files | Intermediate outputs for each scientific tool (OPTIONAL) | align-DNA-*DATE*-*ALIGNER* | 
+| `report.html`, `timeline.html` and `trace.txt` | A Nextflowreport, timeline and trace files | align-DNA-*DATE* |
+| `log.command.*` | Process specific logging files created by nextflow. | align-DNA-*DATE* |
 
 ---
 
@@ -202,3 +213,5 @@ This pipeline was tested using the synthesized SMC-HET dataset as well as a mult
 ## References
 
 Vasimuddin Md, Sanchit Misra, Heng Li, Srinivas Aluru. Efficient Architecture-Aware Acceleration of BWA-MEM for Multicore Systems. IEEE Parallel and Distributed Processing Symposium (IPDPS), 2019.
+
+Daehwan Kim, Ben Langmead, Steven L Salzberg. HISAT: a fast spliced aligner with low memory requirements. Nature Methods, 2015
