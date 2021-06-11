@@ -24,7 +24,7 @@ def print_params():
     params = """
     Parameters:
         <input_file>: absolute path to the input fastq file
-        (BWA-MEM2 | HISAT2): choose between 2 aligners (for HISAT2 fasta_index option is required)
+        (bwa-mem2 | hisat2): choose between 2 aligners (for HISAT2 fasta_index option is required)
         <reference_fasta>: absolute path to the refernce fasta file
         <output_dir>: absolute path to the output directory
         <temp_dir>: absolute path to a temp directory
@@ -55,7 +55,7 @@ def aligner_type_choice(args):
                 "for HISAT2 aligner, --HISAT2_fasta_index=<path> must be given' "
                 )
         return 'reference_fasta_hisat2 = "' + args['<reference_fasta>'] + '"\n\t' +  \
-            'reference_fasta_index_prefix = "' + args['--HISAT2_fasta_index'] + '"\n\t' \
+            'hisat2_index_prefix = "' + args['--HISAT2_fasta_index'] + '"\n\t' \
             + 'aligner = ["HISAT2"]'
     return ''
 def is_save_inter(args):
