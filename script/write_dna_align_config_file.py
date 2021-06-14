@@ -183,13 +183,12 @@ if __name__ == '__main__':
         sys.exit()
 
     sample_name = os.path.basename(arguments['<input_file>'])
-
     # create the string for writing to the config file
     string_for_writing = "final String SAMPLE = '" + sample_name + "'\n" \
         + 'params {' + '\n' \
         + '\t' + 'sample_name = SAMPLE' + '\n' \
-        + '\t' + 'input_csv = "' + os.path.dirname(arguments['<input_file>']) + '${SAMPLE}.csv' \
-        + '"\n' \
+        + '\t' + 'input_csv = "' \
+        + os.path.join(os.path.dirname(arguments['<input_file>']), '${SAMPLE}.csv') + '"\n' \
         + '\t' + aligner_type_choice(arguments) + '\n' \
         + '\t' + 'output_dir = "' + os.path.join(arguments['<output_dir>'], '${SAMPLE}') + '"\n' \
         + '\t' + 'temp_dir = "' + arguments['<temp_dir>'] + '"\n' \
@@ -198,7 +197,8 @@ if __name__ == '__main__':
         + '\t' + is_blcds_registered_dataset_input(arguments) + '\n' \
         + '\t' + blcds_registered_dataset_output(arguments) + '\n' \
         + is_save_bam_and_log_to_blcds(arguments) \
-        + 'includeConfig "${projectDir}/config/methods.config\n' \
+        + '\t' + '}' + '\n' \
+        + 'includeConfig "${projectDir}/config/methods.config"\n' \
         + 'methods.setup()'
     # writing to the file
     with open(sample_name + '_DNA_align.config', 'w') as config:
