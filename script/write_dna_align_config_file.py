@@ -2,9 +2,20 @@
 Usage:
     write_dna_align_config_file.py param
     write_dna_align_config_file.py <input_file> (bwa-mem2 | hisat2) <reference_fasta>
-        <output_dir> <temp_dir> [--save_intermediate_files] [--cache_intermediate_pipeline_steps]
-        [--HISAT2_fasta_index=<path>] [--blcds_registered_dataset_input]
-        [--blcds_registered_dataset_output] [--save_bam_and_log_to_blcds]
+        <output_dir> <temp_dir>
+        [--save_intermediate_files]
+        [--cache_intermediate_pipeline_steps]
+        [--HISAT2_fasta_index=<path>]
+        [--blcds_registered_dataset_input]
+        [--blcds_registered_dataset_output]
+        [--save_bam_and_log_to_blcds]
+        [--blcds_disease_id=<disease_id>]
+        [--tblcds_dataset_id=<dataset_id>]
+        [--tblcds_patient_id=<patient_id>] 
+        [--tblcds_sample_id=<sample_id>]
+        [--tblcds_analyte=<analyte>]
+        [--tblcds_technology=<technology>]
+        [--tblcds_mount_dir=</data>]
 
 Options:
   -h --help           Show this screen.
@@ -28,16 +39,27 @@ def print_params():
         <reference_fasta>: absolute path to the refernce fasta file
         <output_dir>: absolute path to the output directory
         <temp_dir>: absolute path to a temp directory
+
     Options:
-        --HISAT2_fasta_index=<path>: Only if HISAT2 is chosen, the reference fasta index should be given
-        --save_intermediate_files: enter to save intermediate files. [default: None]
+        --HISAT2_fasta_index=<path>: Only if hisat2 is chosen, the reference fasta index should be given
+
+        --save_intermediate_files: use to save intermediate files. [default: None]
         --cache_intermediate_pipeline_steps default  : [default: None]
-        --blcds_registered_dataset_input: set to true if the data input fastq files are registered 
+        --blcds_registered_dataset_input: use if the data input fastq files are registered 
             in the Boutros Lab [default: None]
-        --blcds_registered_dataset_output  : set to true to redirect output files directly to the Boutros 
+        --blcds_registered_dataset_output  : use to redirect output files directly to the Boutros 
             Lab data storage [default: None]
-        --save_bam_and_log_to_blcds: enter in order to save output bam and log directly to blcds data 
+
+        --save_bam_and_log_to_blcds: use in order to save output bam and log directly to blcds data 
             storage [default: None]
+        if save_bam_and_log_to_blcds is used the following parameters must be given
+            disease_id (by using --blcds_disease_id)
+            dataset_id (by using --tblcds_dataset_id)
+            patient_id (by using --tblcds_patient_id)
+            sample_id (by using --tblcds_sample_id)
+            analyte (for example: DNA or RNA) (by using --tblcds_analyte)
+            technology (for example: WGS or WTS (by using --tblcds_technology)
+            mount_dir (by using --tblcds_mount_dir)
     """
     print(params)
 
@@ -105,14 +127,20 @@ def is_save_bam_and_log_to_blcds(args):
         writing to the file. If not, nothing is printed (return '')
     """
     if args['--save_bam_and_log_to_blcds']:
+        # test if all required flages were used
+        if not(args['--blcds_disease_id'] and args['--tblcds_dataset_id'] and args['--tblcds_patient_id']
+        and  args['--tblcds_sample_id'] and args['--tblcds_analyte'] and args['--tblcds_technology']
+            and args['--tblcds_mount_dir']):
+            raise TypeError("if save_bam_and_log_to_blcds is used, disease_id, dataset_id, patient_id" \
+                "sample_id, analyte, technology', and mount_dir must be given")
         return '\tblcds_cluster_slurm = true\n' \
-            + '\tblcds_disease_id = "disease_id"\n' \
-            + '\tblcds_dataset_id = "dataset_id"\n' \
-            + '\tblcds_patient_id = "patient_id"\n' \
-            + '\tblcds_sample_id  = "sample_id"\n' \
-            + '\tblcds_analyte = "DNA"\n' \
-            + '\tblcds_technology = "WGS"\n' \
-            + '\tblcds_mount_dir = "/data"\n'
+            + '\tblcds_disease_id = "' + args['--blcds_disease_id'] + '"\n' \
+            + '\tblcds_dataset_id = "' + args['--tblcds_dataset_id'] + '"\n' \
+            + '\tblcds_patient_id = "' + args['--tblcds_patient_id'] + '"\n' \
+            + '\tblcds_sample_id  = "' + args['--tblcds_sample_id'] + '"\n' \
+            + '\tblcds_analyte = "' + args['--tblcds_analyte'] + '"\n' \
+            + '\tblcds_technology = "' + args['--tblcds_technology'] + '"\n' \
+            + '\tblcds_mount_dir = "' + args['--tblcds_mount_dir'] + '"\n'
     return ''
 
 
