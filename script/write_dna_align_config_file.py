@@ -97,6 +97,7 @@ def blcds_registered_dataset_output(args):
     if args['--blcds_registered_dataset_output']:
         return 'blcds_registered_dataset_output = true'
     return 'blcds_registered_dataset_output = false'
+
 def is_save_bam_and_log_to_blcds(args):
     """
     :param args: docopt arguments
@@ -141,5 +142,5 @@ if __name__ == '__main__':
         + 'includeConfig "${projectDir}/config/methods.config\n' \
         + 'methods.setup()'
     # writing to the file
-    with open('DNA_align_config_file', 'w') as config:
+    with open(sample_name + '_DNA_align.config', 'w') as config:
         config.write(string_for_writing)
