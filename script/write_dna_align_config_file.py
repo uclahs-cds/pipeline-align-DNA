@@ -1,6 +1,7 @@
 """write_dna_align_config_file
 Usage:
     write_dna_align_config_file.py param
+    write_dna_align_config_file.py example
     write_dna_align_config_file.py <input_file> (bwa-mem2 | hisat2) <reference_fasta>
         <output_dir> <temp_dir>
         [--save_intermediate_files]
@@ -11,7 +12,7 @@ Usage:
         [--save_bam_and_log_to_blcds]
         [--blcds_disease_id=<disease_id>]
         [--tblcds_dataset_id=<dataset_id>]
-        [--tblcds_patient_id=<patient_id>] 
+        [--tblcds_patient_id=<patient_id>]
         [--tblcds_sample_id=<sample_id>]
         [--tblcds_analyte=<analyte>]
         [--tblcds_technology=<technology>]
@@ -62,6 +63,26 @@ def print_params():
             mount_dir (by using --tblcds_mount_dir)
     """
     print(params)
+
+
+def print_example():
+    """
+    printing commands for example
+    """
+    example = "example command 1: here the bwa-mem2 aligner is chosen:\n\n" \
+        + "python3 write_DNA_align_config_file.py" \
+        + "path/to/input/name_of_sample_with_no_spaces bwa-mem2 /path/to/bwa/fasta/genome.fa" \
+        + "where/to/save/outputs/ /local/disk/for/temp/file/dir/\n\n" \
+        + "example command 2: here the hisat2 aligner is chosen and " \
+        + "--cache_intermediate_pipeline_steps, and --save_bam_and_log_to_blcds flages are used:" \
+        + "\n\npython3 write_dna_align_config_file.py" \
+        + "path/to/input/name_of_sample_with_no_spaces hisat2 /path/to/bwa/fasta/genome.fa" \
+        + "where/to/save/outputs/ /local/disk/for/temp/file/dir/ --save_bam_and_log_to_blcds" \
+        + "--cache_intermediate_pipeline_steps --HISAT2_fasta_index=path/to/index" \
+        + "--blcds_disease_id=my_disease_id --tblcds_patient_id=my_patient_id" \
+        + "--tblcds_sample_id=my_sample_id --tblcds_analyte=RNA --tblcds_technology=WTS" \
+        + "--tblcds_mount_dir=/hot --tblcds_dataset_id=my_dataset-i"
+    print(example)
 
 def aligner_type_choice(args):
     """
@@ -128,11 +149,17 @@ def is_save_bam_and_log_to_blcds(args):
     """
     if args['--save_bam_and_log_to_blcds']:
         # test if all required flages were used
-        if not(args['--blcds_disease_id'] and args['--tblcds_dataset_id'] and args['--tblcds_patient_id']
-        and  args['--tblcds_sample_id'] and args['--tblcds_analyte'] and args['--tblcds_technology']
+        if not(args['--blcds_disease_id']
+            and args['--tblcds_dataset_id']
+            and args['--tblcds_patient_id']
+            and  args['--tblcds_sample_id']
+            and args['--tblcds_analyte']
+            and args['--tblcds_technology']
             and args['--tblcds_mount_dir']):
-            raise TypeError("if save_bam_and_log_to_blcds is used, disease_id, dataset_id, patient_id" \
-                "sample_id, analyte, technology', and mount_dir must be given")
+            raise TypeError(
+                "if save_bam_and_log_to_blcds is used, disease_id, dataset_id, patient_id" \
+                "sample_id, analyte, technology', and mount_dir must be given"
+                )
         return '\tblcds_cluster_slurm = true\n' \
             + '\tblcds_disease_id = "' + args['--blcds_disease_id'] + '"\n' \
             + '\tblcds_dataset_id = "' + args['--tblcds_dataset_id'] + '"\n' \
@@ -149,6 +176,10 @@ if __name__ == '__main__':
 
     if arguments['param']:
         print_params()
+        sys.exit()
+
+    if arguments['example']:
+        print_example()
         sys.exit()
 
     sample_name = os.path.basename(arguments['<input_file>'])
