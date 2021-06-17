@@ -98,7 +98,7 @@ def aligner_type_choice(args):
             raise ValueError(
                 "for HISAT2 aligner, --HISAT2_fasta_index=<path> must be given"
                 )
-        hisat2_fasta_index = args['--HISAT2_fasta_index']
+        hisat2_fasta_index = args["--HISAT2_fasta_index"]
         return f"reference_fasta_hisat2 = \"{reference_fasta}\"\n\t\
 hisat2_index_prefix = \"{hisat2_fasta_index}\"\n\t\
 aligner = [\"HISAT2\"]"
@@ -150,7 +150,7 @@ def is_save_bam_and_log_to_blcds(args):
     :return: if save_bam_and_log_to_blcds flag is used, return several lines that should be
         writing to the file. If not, nothing is printed (return ")
     """
-    if args['--save_bam_and_log_to_blcds']:
+    if args["--save_bam_and_log_to_blcds"]:
         # test if all required args were used
         required_args =  [
         "blcds_disease_id",
