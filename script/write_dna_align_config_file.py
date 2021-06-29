@@ -3,7 +3,7 @@
 Usage:
     write_dna_align_config_file.py param
     write_dna_align_config_file.py example
-    write_dna_align_config_file.py <input_file> (bwa-mem2 | hisat2) <reference_fasta> \
+    write_dna_align_config_file.py <input_csv> (bwa-mem2 | hisat2) <reference_fasta> \
 <output_dir> <temp_dir>
         [--save_intermediate_files]
         [--cache_intermediate_pipeline_steps]
@@ -36,7 +36,7 @@ def print_params():
     """
     params = """
     Parameters:
-        <input_file>: absolute path to the input fastq file
+        <input_csv>: absolute path to the csv file. NOTE: the file name MUST be "sample_name.csv"
         (bwa-mem2 | hisat2): choose between 2 aligners (for HISAT2 fasta_index option is required)
         <reference_fasta>: absolute path to the refernce fasta file
         <output_dir>: absolute path to the output directory
@@ -72,12 +72,14 @@ def print_example():
     """
     example = "example command 1: here the bwa-mem2 aligner is chosen:\n\n" \
         + "python3 write_DNA_align_config_file.py " \
-        + "path/to/input/name_of_sample_with_no_spaces bwa-mem2 /path/to/bwa/fasta/genome.fa " \
+        + "path/to/input_csv/name_of_sample_with_no_spaces.csv bwa-mem2 "\
+        + "/path/to/bwa/fasta/genome.fa " \
         + "where/to/save/outputs/ /local/disk/for/temp/file/dir/\n\n" \
         + "example command 2: here the hisat2 aligner is chosen and " \
         + "--cache_intermediate_pipeline_steps, and --save_bam_and_log_to_blcds flages are used:" \
         + "\n\npython3 write_dna_align_config_file.py " \
-        + "path/to/input/name_of_sample_with_no_spaces hisat2 /path/to/bwa/fasta/genome.fa " \
+        + "path/to/input_csv/name_of_sample_with_no_spaces.csv hisat2 "\
+        + "/path/to/bwa/fasta/genome.fa " \
         + "where/to/save/outputs/ /local/disk/for/temp/file/dir/ --save_bam_and_log_to_blcds " \
         + "--cache_intermediate_pipeline_steps --HISAT2_fasta_index=path/to/index " \
         + "--blcds_disease_id=my_disease_id --blcds_patient_id=my_patient_id " \
@@ -185,8 +187,8 @@ if __name__ == "__main__":
         print_example()
         sys.exit()
 
-    sample_name = os.path.basename(arguments["<input_file>"])
-    input_csv = os.path.join(os.path.dirname(arguments["<input_file>"]), "${SAMPLE}.csv")
+    sample_name = os.path.basename(arguments["<input_csv>"]).split(".")[0]
+    input_csv = os.path.join(os.path.dirname(arguments["<input_csv>"]), "${SAMPLE}.csv")
     output_dir = os.path.join(arguments["<output_dir>"], "${SAMPLE}")
     temp_dir = arguments["<temp_dir>"]
 
