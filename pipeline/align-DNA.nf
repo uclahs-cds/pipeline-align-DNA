@@ -5,7 +5,7 @@ log.info """\
    ===================================
    P I P E L I N E - A L I G N - D N A
    ===================================
-   Boutros Lab
+   Boutros Lab, version 7.0.4
 
    Current Configuration:
    - input: 
