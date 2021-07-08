@@ -8,6 +8,10 @@ log.info """\
    Boutros Lab, version 7.0.4
 
    Current Configuration:
+   - pipeline:
+      name: ${workflow.manifest.name}
+      version: ${workflow.manifest.version}
+
    - input: 
       sample_name: ${params.sample_name}
       input_csv: ${params.input_csv}
