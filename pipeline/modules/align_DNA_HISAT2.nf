@@ -65,7 +65,7 @@ process align_DNA_HISAT2 {
    }
 
 workflow align_DNA_HISAT2_workflow {
-   aligner_output_dir = "${params.bam_output_dir}-HISAT2"
+   aligner_output_dir = "${params.bam_output_dir}/HISAT2-2.2.1"
    take:
       ich_samples
       ich_samples_validate

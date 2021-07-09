@@ -9,7 +9,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 
 ## [Unreleased]
-
+### Added
+- HISAT2 aligner functionality and the option to run either BWA-MEM2/HISAT2 or both at once.
+### Changed
+- Update config file to process inputs for each aligner separately. Old config files still work and BWA-MEM2 will be run as usual.
 
 ## [7.0.3] - 2021-04-15
 ### Changed
