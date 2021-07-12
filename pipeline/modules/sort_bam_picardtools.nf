@@ -4,7 +4,7 @@ process PicardTools_SortSam  {
    container params.docker_image_picardtools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
    
-   publishDir path: "${aligner_output_dir}",
+   publishDir path: "${intermediate_output_dir}",
       enabled: params.save_intermediate_files,
       pattern: "*.sorted.bam",
       mode: 'copy'
@@ -19,7 +19,7 @@ process PicardTools_SortSam  {
          val(lane),
          path(input_bam)
          )
-      val(aligner_output_dir)
+      val(intermediate_output_dir)
    
    // the first value of the tuple will be used as a key to group aligned and filtered bams
    // from the same sample and library but different lane together
