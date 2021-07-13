@@ -11,7 +11,7 @@ include { Generate_Sha512sum } from './check_512sum.nf'
 
 process align_DNA_HISAT2 {
    container params.docker_image_hisat2_and_samtools
-   publishDir path: params.bam_output_dir,
+   publishDir path: "${params.bam_output_dir}/${params.hisat2_version}",
       enabled: params.save_intermediate_files,
       pattern: "*.bam",
       mode: 'copy'
@@ -65,7 +65,7 @@ process align_DNA_HISAT2 {
    }
 
 workflow align_DNA_HISAT2_workflow {
-   aligner_output_dir = "${params.bam_output_dir}-HISAT2"
+   aligner_output_dir = "${params.bam_output_dir}/${params.hisat2_version}"
    take:
       ich_samples
       ich_samples_validate
@@ -81,7 +81,7 @@ workflow align_DNA_HISAT2_workflow {
          ich_reference_fasta,
          ich_reference_index_files.collect()
          )
-      PicardTools_SortSam(align_DNA_HISAT2.out.bam)
+      PicardTools_SortSam(align_DNA_HISAT2.out.bam, aligner_output_dir)
       PicardTools_MarkDuplicates(PicardTools_SortSam.out.bam.collect(), aligner_output_dir)
       PicardTools_BuildBamIndex(PicardTools_MarkDuplicates.out.bam, aligner_output_dir)
       Generate_Sha512sum(PicardTools_BuildBamIndex.out.bai.mix(PicardTools_MarkDuplicates.out.bam), aligner_output_dir)

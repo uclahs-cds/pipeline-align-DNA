@@ -4,7 +4,7 @@ process PicardTools_BuildBamIndex  {
    container params.docker_image_picardtools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
-   publishDir path: "${aligner_output_dir}",
+   publishDir path: "${bam_output_dir}",
       pattern: "*.bam.bai",
       mode: 'copy'
 
@@ -15,7 +15,7 @@ process PicardTools_BuildBamIndex  {
    
    input:
       path(input_bam)
-      val(aligner_output_dir)
+      val(bam_output_dir)
 
    // no need for an output channel becuase this is the final stepp
    output:

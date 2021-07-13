@@ -158,10 +158,10 @@ After marking dup BAM files, the BAM files are then indexed by utilizing Picard 
 
 | Output | Description | Folder |
 |:-------|:------------|:-------|
-| `.bam` | Aligned, sorted, filtered and if needed, merged, BAM file(s) | align-DNA-*DATE*-*ALIGNER* |
-| `.bam.bai` | Index file for each BAM file | align-DNA-*DATE*-*ALIGNER* |
-| `.bam` files and metrics files | Intermediate outputs for each scientific tool (OPTIONAL) | align-DNA-*DATE*-*ALIGNER* | 
-| `report.html`, `timeline.html` and `trace.txt` | A Nextflowreport, timeline and trace files | align-DNA-*DATE* |
+| `.bam` | Aligned, sorted, filtered and if needed, merged, BAM file(s) | align-DNA-*DATE*/*ALIGNER* |
+| `.bam.bai` | Index file for each BAM file | align-DNA-*DATE*/*ALIGNER* |
+| `.bam` files and metrics files | Intermediate outputs for each scientific tool (OPTIONAL) | align-DNA-*DATE*/*ALIGNER* | 
+| `report.html`, `timeline.html` and `trace.txt` | A Nextflowreport, timeline and trace files | align-DNA-*DATE*/log |
 | `log.command.*` | Process specific logging files created by nextflow. | align-DNA-*DATE* |
 
 ---

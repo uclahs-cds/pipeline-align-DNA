@@ -4,7 +4,7 @@ process PicardTools_MarkDuplicates  {
    container params.docker_image_picardtools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
-   publishDir path: "${aligner_output_dir}",
+   publishDir path: "${bam_output_dir}",
       pattern: "*.bam",
       mode: 'copy'
 
@@ -15,7 +15,7 @@ process PicardTools_MarkDuplicates  {
 
    input:
       path(input_bams)
-      val(aligner_output_dir)
+      val(bam_output_dir)
 
    // after marking duplicates, bams will be merged by library so the library name is not needed
    // just the sample name (global variable), do not pass it as a val
