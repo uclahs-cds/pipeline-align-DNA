@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow 
 
-def dockeri_BWA_and_SAMtools = "blcdsdockerregistry/align-dna:${params.bwa_version}_samtools-1.10"
+def dockeri_BWA_and_SAMtools = "blcdsdockerregistry/bwa-mem2_samtools-1.12:2.2.1"
 def dockeri_validate_params = "blcdsdockerregistry/validate:1.0.0"
 
 // output details of the pipeline run to stdout
