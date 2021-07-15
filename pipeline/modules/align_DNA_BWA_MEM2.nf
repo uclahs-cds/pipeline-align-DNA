@@ -5,8 +5,8 @@
 
 include { validate_file; validate_file as validate_output_file } from './run_validate.nf'
 include { run_SortSam_Picard } from './sort_bam_picardtools.nf'
-include { PicardTools_MarkDuplicates } from './mark_duplicate_picardtools.nf'
-include { PicardTools_BuildBamIndex } from './index_bam_picardtools.nf'
+include { run_MarkDuplicate_Picard } from './mark_duplicate_picardtools.nf'
+include { run_BuildBamIndex_Picard } from './index_bam_picardtools.nf'
 include { Generate_Sha512sum } from './check_512sum.nf'
 
 process align_DNA_BWA_MEM2 {
@@ -79,12 +79,12 @@ workflow align_DNA_BWA_MEM2_workflow {
          ich_reference_index_files.collect()
          )
       run_SortSam_Picard(align_DNA_BWA_MEM2.out.bam, aligner_output_dir)
-      PicardTools_MarkDuplicates(run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
-      PicardTools_BuildBamIndex(PicardTools_MarkDuplicates.out.bam, aligner_output_dir)
-      Generate_Sha512sum(PicardTools_BuildBamIndex.out.bai.mix(PicardTools_MarkDuplicates.out.bam), aligner_output_dir)
+      run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
+      run_BuildBamIndex_Picard(run_MarkDuplicate_Picard.out.bam, aligner_output_dir)
+      Generate_Sha512sum(run_BuildBamIndex_Picard.out.bai.mix(run_MarkDuplicate_Picard.out.bam), aligner_output_dir)
       validate_output_file(
-         PicardTools_MarkDuplicates.out.bam.mix(
-            PicardTools_BuildBamIndex.out.bai,
+         run_MarkDuplicate_Picard.out.bam.mix(
+            run_BuildBamIndex_Picard.out.bai,
             Channel.from(params.temp_dir, params.output_dir)
             )
          )
