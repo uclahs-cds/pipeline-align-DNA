@@ -1,13 +1,11 @@
 ---
 Category: "pipeline"
-Description: >
- "DNA Alignment pipeline for aligning,
-sorting, marking duplicates and indexing paired fastqs":
+Description: "DNA Alignment pipeline for aligning, sorting, marking duplicates and indexing paired fastqs"
 Maintainers: "Boutros Lab Infrastructure"
-Contributors: ["Benjamin Carlin", "Chenghao Zhu", "Aaron Holmes"]
+Contributors: ["Benjamin Carlin", "Chenghao Zhu", "Aaron Holmes", "Takafumi Yamaguchi", "Aakarsh Anand", "Yash Patel"]
 Languages: ["Nextflow", "Docker"]
 Dependencies: ["Java", "Nextflow", "Docker"]
 References: "https://uclahs.box.com/s/qfzr99sc8ntmfddn30ii62wx4273utoz"
-Tools: ["BWA-MEM2 2.1", "SAMTools 1.10", "Picard Tools 2.23.3"]
+Tools: ["BWA-MEM2 2.2.1", "HISAT2 2.2.1", "SAMTools 1.12", "Picard Tools 2.23.3"]
 Engineering_Owner: "Aaron Holmes"
 Scientific_Owner: "Takafumi Yamaguchi"
