@@ -4,7 +4,7 @@
 // samtools due to the large size of the uncompressed SAM files.
 
 include { validate_file; validate_file as validate_output_file } from './run_validate.nf'
-include { PicardTools_SortSam } from './sort_bam_picardtools.nf'
+include { run_SortSam_Picard } from './sort_bam_picardtools.nf'
 include { PicardTools_MarkDuplicates } from './mark_duplicate_picardtools.nf'
 include { PicardTools_BuildBamIndex } from './index_bam_picardtools.nf'
 include { Generate_Sha512sum } from './check_512sum.nf'
@@ -81,8 +81,8 @@ workflow align_DNA_HISAT2_workflow {
          ich_reference_fasta,
          ich_reference_index_files.collect()
          )
-      PicardTools_SortSam(align_DNA_HISAT2.out.bam, aligner_output_dir)
-      PicardTools_MarkDuplicates(PicardTools_SortSam.out.bam.collect(), aligner_output_dir)
+      run_SortSam_Picard(run_SortSam_Picard.out.bam, aligner_output_dir)
+      PicardTools_MarkDuplicates(run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
       PicardTools_BuildBamIndex(PicardTools_MarkDuplicates.out.bam, aligner_output_dir)
       Generate_Sha512sum(PicardTools_BuildBamIndex.out.bai.mix(PicardTools_MarkDuplicates.out.bam), aligner_output_dir)
       validate_output_file(
