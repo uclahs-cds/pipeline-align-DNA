@@ -19,6 +19,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - #112 Update BWA-MEM2 and SAMtools docker to SAMtools 1.12
 - #121 Update version information in the main script
 - #126 Update output directory structure
+### Removed
+- Dockerfiles for BWA-MEM2, jvarkit-cmpbams, and Picard removed and moved to their own separate repositories (docker-BWA-MEM2, docker-jvarkit-cmpbams, and docker-Picard, respectively).
 
 ## [7.0.3] - 2021-04-15
 ### Changed
