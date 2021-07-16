@@ -3,7 +3,7 @@
 // here it actually saves cost, time, and memory to directly pipe the output into 
 // samtools due to the large size of the uncompressed SAM files.
 
-include { validate_file; validate_file as validate_output_file } from './run_validate.nf'
+include { run_validate; run_validate as validate_output_file } from './run_validate.nf'
 include { run_SortSam_Picard } from './sort_bam_picardtools.nf'
 include { run_MarkDuplicate_Picard } from './mark_duplicate_picardtools.nf'
 include { run_BuildBamIndex_Picard } from './index_bam_picardtools.nf'
@@ -69,7 +69,7 @@ workflow align_DNA_BWA_MEM2_workflow {
       ich_reference_fasta
       ich_reference_index_files
    main:
-      validate_file(ich_samples_validate.mix(
+      run_validate(ich_samples_validate.mix(
          ich_reference_fasta,
          ich_reference_index_files
          ))

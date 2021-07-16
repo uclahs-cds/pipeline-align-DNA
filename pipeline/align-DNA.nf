@@ -47,7 +47,7 @@ log.info """\
    """
    .stripIndent()
 
-include { validate_file } from './modules/run_validate.nf'
+include { run_validate } from './modules/run_validate.nf'
 include { align_DNA_BWA_MEM2_workflow } from './modules/align_DNA_BWA_MEM2.nf'
 include { align_DNA_HISAT2_workflow } from './modules/align_DNA_HISAT2.nf'
 
