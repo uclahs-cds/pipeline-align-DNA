@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 
-## [7.1.0] - 2021-07-15
+## [7.1.0] - 2021-07-16
 ### Added
 - HISAT2 aligner functionality and the option to run either BWA-MEM2/HISAT2 or both at once. The default aligner is BWA-MEM2.
 ### Changed
@@ -19,7 +19,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - #112 Update BWA-MEM2 and SAMtools docker to SAMtools 1.12
 - #121 Update version information in the main script
 - #126 Update output directory structure
-- #128 Use explicit tab delimiters to ensure proper program tagging
 - Process names standardized
 ### Removed
 - Dockerfiles for BWA-MEM2, jvarkit-cmpbams, and Picard removed and moved to their own separate repositories (docker-BWA-MEM2, docker-jvarkit-cmpbams, and docker-Picard, respectively).
