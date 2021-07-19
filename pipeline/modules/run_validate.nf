@@ -1,4 +1,4 @@
-process validate_file {
+process run_validate {
    container params.docker_image_validate_params
 
    input:

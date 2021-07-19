@@ -1,6 +1,6 @@
 
 // mark duplicates with picard
-process PicardTools_MarkDuplicates  {
+process run_MarkDuplicate_Picard  {
    container params.docker_image_picardtools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
@@ -11,7 +11,7 @@ process PicardTools_MarkDuplicates  {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "PicardTools_MarkDuplicates/log${file(it).getName()}" }
+      saveAs: { "run_MarkDuplicate_Picard/log${file(it).getName()}" }
 
    input:
       path(input_bams)

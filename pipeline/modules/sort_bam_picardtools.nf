@@ -1,6 +1,6 @@
 
 // sort coordinate order with picard
-process PicardTools_SortSam  {
+process run_SortSam_Picard  {
    container params.docker_image_picardtools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
    
@@ -12,7 +12,7 @@ process PicardTools_SortSam  {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "PicardTools_SortSam/${library}-${lane}.log${file(it).getName()}" }
+      saveAs: { "run_SortSam_Picard/${library}-${lane}.log${file(it).getName()}" }
 
    input:
       tuple(val(library), 

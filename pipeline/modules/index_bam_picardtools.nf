@@ -1,6 +1,6 @@
 
 // index bams with picard
-process PicardTools_BuildBamIndex  {
+process run_BuildBamIndex_Picard  {
    container params.docker_image_picardtools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
@@ -11,7 +11,7 @@ process PicardTools_BuildBamIndex  {
    publishDir path: params.log_output_dir,
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "PicardTools_BuildBamIndex/log${file(it).getName()}" }
+      saveAs: { "run_BuildBamIndex_Picard/log${file(it).getName()}" }
    
    input:
       path(input_bam)
