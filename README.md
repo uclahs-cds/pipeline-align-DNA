@@ -31,7 +31,7 @@ Pipelines should be run **WITH A SINGLE SAMPLE AT TIME**. Otherwise resource all
 
 1. Make sure the pipeline is already downloaded to your machine. You can either download the stable release or the dev version by cloning the repo.  
 
-2. Create a config file for input, output, and parameters. An example can be found [here](pipeline/nextflow.example.config). See [Inputs](#Inputs) for the detailed description of each variable in the config file.
+2. Create a config file for input, output, and parameters. An example for a config file can be found [here](pipeline/nextflow.example.config). See [Inputs](#Inputs) for the detailed description of each variable in the config file. The config file can be generated using a python script (see below).
 
 3. Create the input csv using the [template](pipeline/inputs/align-DNA.inputs.csv). The example csv is a single-lane sample, however this pipeline can take multi-lane sample as well, with each record in the csv file representing a lane (a paire of fastq). All records must have the same value in the **sample** column. See [Inputs](#Inputs) for detailed description of each column. All columns must exist in order to run the pipeline successfully.
 
@@ -68,6 +68,26 @@ The reference genome index must be generated from HISAT2 using [hisat2-build](ht
 
 > The basename is the name of any of the index files up to but not including the final .1.ht2 / etc. hisat2 looks for the specified index first in the current directory, then in the directory specified in the HISAT2_INDEXES environment variable.
 
+<b><i> Generating the config file using a script </i></b>
+
+To learn how to run the script, use one of the following commands:
+```bash
+python path/to/pipeline-align-DNA/script/write_dna_align_config_file.py -h
+python path/to/pipeline-align-DNA/script/write_dna_align_config_file.py param
+python path/to/pipeline-align-DNA/script/write_dna_align_config_file.py example
+
+```
+
+See the following command for example:
+```bash
+python path/to/pipeline-align-DNA/script/write_dna_align_config_file.py \
+	/my/path/to/sample_name.csv \
+	bwa-mem2 \
+	/hot/ref/hg38/bwa-mem2/v2.1/genome.fa \
+	/my/path/to/output_directory \
+	/my/path/to/temp_directory \
+	--save_intermediate_files --cache_intermediate_pipeline_steps
+```
 ---
 
 ## Flow Diagram
