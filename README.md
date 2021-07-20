@@ -86,7 +86,8 @@ python path/to/pipeline-align-DNA/script/write_dna_align_config_file.py \
 	/hot/ref/hg38/bwa-mem2/v2.1/genome.fa \
 	/my/path/to/output_directory \
 	/my/path/to/temp_directory \
-	--save_intermediate_files --cache_intermediate_pipeline_steps
+	--save_intermediate_files \
+	--cache_intermediate_pipeline_steps
 ```
 ---
 
