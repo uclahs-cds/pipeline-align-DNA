@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - #126 Update output directory structure
 - Process names standardized
 - #128 Use explicit tab delimiters to ensure proper program tagging
+- Updated validation docker image to v2.1.5
 ### Removed
 - Dockerfiles for BWA-MEM2, jvarkit-cmpbams, and Picard removed and moved to their own separate repositories (docker-BWA-MEM2, docker-jvarkit-cmpbams, and docker-Picard, respectively).
 
