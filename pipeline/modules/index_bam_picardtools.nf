@@ -8,7 +8,7 @@ process run_BuildBamIndex_Picard  {
       pattern: "*.bam.bai",
       mode: 'copy'
 
-   publishDir path: params.log_output_dir,
+   publishDir path: "${bam_log_output_dir}",
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "run_BuildBamIndex_Picard/log${file(it).getName()}" }
@@ -16,6 +16,7 @@ process run_BuildBamIndex_Picard  {
    input:
       path(input_bam)
       val(bam_output_dir)
+      val(bam_log_output_dir)
 
    // no need for an output channel becuase this is the final stepp
    output:
