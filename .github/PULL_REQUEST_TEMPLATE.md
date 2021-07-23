@@ -9,7 +9,7 @@
 ``metadata.yaml`` and the ``manifest`` block in the config as part of this pull request, am listed
 already, or do not wish to be listed. (*This acknowledgement is optional.*)
 
-- [ ] I have updated the next version number in the `metadata.yaml` and config file following [semver](https://semver.org/), or the next version number has already been updated. (*Leave it unchecked if you are unsure what the new version number should be.*)
+- [ ] I have updated the version number in the `metadata.yaml` and config file following [semver](https://semver.org/), or the version number has already been updated. (*Leave it unchecked if you are unsure what the new version number should be.*)
 
 - [ ] I have added the changes included in this pull request to the `CHANGELOG.md` under the next release version or unreleased, and updated the date.
 
