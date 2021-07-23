@@ -1,6 +1,10 @@
 <!--- Please read each of the following items and confirm by replacing
  !--the [ ] with a [X] --->
 
+- [ ] I have read the [code review guidelines](https://confluence.mednet.ucla.edu/display/BOUTROSLAB/Code+Review+Guidelines) and the [code review best practice on GitHub check-list](https://confluence.mednet.ucla.edu/pages/viewpage.action?pageId=84091668).
+
+- [ ] I have set up the branch protection rule following the [github standards](https://confluence.mednet.ucla.edu/pages/viewpage.action?spaceKey=BOUTROSLAB&title=GitHub+Standards#GitHubStandards-Branchprotectionrule) before opening this pull request, or the branch protection rule has already been set up.
+
 - [ ] I have added my name to the contributors listings in the
 ``metadata.yaml`` and the ``manifest`` block in the config as part of this pull request, am listed
 already, or do not wish to be listed. (*This acknowledgement is optional.*)
