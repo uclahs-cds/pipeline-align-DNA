@@ -16,7 +16,7 @@ process align_DNA_BWA_MEM2 {
       pattern: "*.bam",
       mode: 'copy'
 
-   publishDir path: "${params.log_output_dir}/align_DNA_BWA_MEM2_workflow",
+   publishDir path: "${params.log_output_dir}/${task.process.substring(0, task.process.indexOf(':'))}",
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "align_DNA_BWA_MEM2/${file(read1_fastq).getSimpleName()}/${library}-${lane}.log${file(it).getName()}" }
