@@ -8,10 +8,10 @@ process run_BuildBamIndex_Picard  {
       pattern: "*.bam.bai",
       mode: 'copy'
 
-   publishDir path: params.log_output_dir,
+   publishDir path: "${params.log_output_dir}/${task.process.replace(':', '/')}",
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "run_BuildBamIndex_Picard/log${file(it).getName()}" }
+      saveAs: { "log${file(it).getName()}" }
    
    input:
       path(input_bam)

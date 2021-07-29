@@ -9,10 +9,10 @@ process run_SortSam_Picard  {
       pattern: "*.sorted.bam",
       mode: 'copy'
 
-   publishDir path: params.log_output_dir,
+   publishDir path: "${params.log_output_dir}/${task.process.replace(':', '/')}",
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "run_SortSam_Picard/${library}-${lane}.log${file(it).getName()}" }
+      saveAs: { "${library}-${lane}.log${file(it).getName()}" }
 
    input:
       tuple(val(library), 
