@@ -11,9 +11,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 
-## [7.1.0] - 2021-07-16
+## [7.1.0] - 2021-07-29
 ### Added
 - HISAT2 aligner functionality and the option to run either BWA-MEM2/HISAT2 or both at once. The default aligner is BWA-MEM2.
+- A python script to generate config files from command line.
 ### Changed
 - Update config file to process inputs for each aligner separately. Old config files still work and BWA-MEM2 will be run as usual.
 - #112 Update BWA-MEM2 and SAMtools docker to SAMtools 1.12
