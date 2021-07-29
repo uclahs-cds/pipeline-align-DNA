@@ -63,7 +63,6 @@ process align_DNA_BWA_MEM2 {
 
 workflow align_DNA_BWA_MEM2_workflow {
    aligner_output_dir = "${params.bam_output_dir}/${params.bwa_version}"
-   aligner_log_output_dir = "${params.log_output_dir}/align_DNA_BWA_MEM2_workflow"
    take:
       ich_samples
       ich_samples_validate
@@ -79,9 +78,9 @@ workflow align_DNA_BWA_MEM2_workflow {
          ich_reference_fasta,
          ich_reference_index_files.collect()
          )
-      run_SortSam_Picard(align_DNA_BWA_MEM2.out.bam, aligner_output_dir, aligner_log_output_dir)
-      run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir, aligner_log_output_dir)
-      run_BuildBamIndex_Picard(run_MarkDuplicate_Picard.out.bam, aligner_output_dir, aligner_log_output_dir)
+      run_SortSam_Picard(align_DNA_BWA_MEM2.out.bam, aligner_output_dir)
+      run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
+      run_BuildBamIndex_Picard(run_MarkDuplicate_Picard.out.bam, aligner_output_dir)
       Generate_Sha512sum(run_BuildBamIndex_Picard.out.bai.mix(run_MarkDuplicate_Picard.out.bam), aligner_output_dir)
       validate_output_file(
          run_MarkDuplicate_Picard.out.bam.mix(

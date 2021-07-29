@@ -8,15 +8,14 @@ process run_MarkDuplicate_Picard  {
       pattern: "*.bam",
       mode: 'copy'
 
-   publishDir path: "${bam_log_output_dir}",
+   publishDir path: "${params.log_output_dir}/${task.process.replace(':', '/')}",
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "run_MarkDuplicate_Picard/log${file(it).getName()}" }
+      saveAs: { "log${file(it).getName()}" }
 
    input:
       path(input_bams)
       val(bam_output_dir)
-      val(bam_log_output_dir)
 
    // after marking duplicates, bams will be merged by library so the library name is not needed
    // just the sample name (global variable), do not pass it as a val

@@ -9,10 +9,10 @@ process run_SortSam_Picard  {
       pattern: "*.sorted.bam",
       mode: 'copy'
 
-   publishDir path: "${intermediate_log_output_dir}",
+   publishDir path: "${params.log_output_dir}/${task.process.replace(':', '/')}",
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "run_SortSam_Picard/${library}-${lane}.log${file(it).getName()}" }
+      saveAs: { "${library}-${lane}.log${file(it).getName()}" }
 
    input:
       tuple(val(library), 
@@ -20,7 +20,6 @@ process run_SortSam_Picard  {
          path(input_bam)
          )
       val(intermediate_output_dir)
-      val(intermediate_log_output_dir)
    
    // the first value of the tuple will be used as a key to group aligned and filtered bams
    // from the same sample and library but different lane together
