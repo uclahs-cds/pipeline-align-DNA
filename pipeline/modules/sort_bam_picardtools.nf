@@ -40,6 +40,6 @@ process run_SortSam_Picard  {
       --VALIDATION_STRINGENCY LENIENT \
       --INPUT ${input_bam} \
       --OUTPUT ${library}-${lane}.sorted.bam \
-      --SORT_ORDER coordinate
+      --SORT_ORDER queryname
    """
    }
