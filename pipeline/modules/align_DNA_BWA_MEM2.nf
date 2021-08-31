@@ -80,11 +80,19 @@ workflow align_DNA_BWA_MEM2_workflow {
          ich_reference_index_files.collect()
          )
       run_SortSam_Picard(align_DNA_BWA_MEM2.out.bam, aligner_output_dir)
-      run_MarkDuplicatesSpark_GATK(run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
-      Generate_Sha512sum(run_MarkDuplicatesSpark_GATK.out.bam_index.mix(run_MarkDuplicatesSpark_GATK.out.bam), aligner_output_dir)
+      if (params.disable_spark) {
+         run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
+         och_markduplicates_bam = run_MarkDuplicate_Picard.out.bam
+         och_markduplicates_bam_index = run_MarkDuplicate_Picard.out.bam_index
+      } else {
+         run_MarkDuplicatesSpark_GATK(run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
+         och_markduplicates_bam = run_MarkDuplicatesSpark_GATK.out.bam
+         och_markduplicates_bam_index = run_MarkDuplicatesSpark_GATK.out.bam_index
+      }
+      Generate_Sha512sum(och_markduplicates_bam_index.mix(och_markduplicates_bam), aligner_output_dir)
       validate_output_file(
-         run_MarkDuplicatesSpark_GATK.out.bam.mix(
-            run_MarkDuplicatesSpark_GATK.out.bam_index,
+         och_markduplicates_bam.mix(
+            och_markduplicates_bam_index,
             Channel.from(params.temp_dir, params.output_dir)
             )
          )

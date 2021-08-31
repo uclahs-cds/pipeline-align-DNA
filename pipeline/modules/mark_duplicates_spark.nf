@@ -1,11 +1,16 @@
 
-// mark duplicates with picard
+// mark duplicates with Spark-enabled tool from GATK
 process run_MarkDuplicatesSpark_GATK  {
-   container 'mygatk:1.0.0'
-   containerOptions "--volume ${params.temp_dir}:/temp_dir -u sparkuser"
+   container params.docker_image_gatk
+   containerOptions "--volume ${params.temp_dir}:/temp_dir -u nobody"
 
    publishDir path: "${bam_output_dir}",
       pattern: "*.bam{,.bai}",
+      mode: 'copy'
+
+   publishDir path: "${bam_output_dir}"
+      pattern: "*.metrics",
+      enabled: params.save_intermediate_files,
       mode: 'copy'
 
    publishDir path: "${params.log_output_dir}/${task.process.replace(':', '/')}",
@@ -22,6 +27,7 @@ process run_MarkDuplicatesSpark_GATK  {
    output:
       path bam_output_filename, emit: bam
       path bam_index_output_filename, emit: bam_index
+      path "${params.sample_name}.mark_dup.metrics"
       path(".command.*")
 
    beforeScript 'chmod 777 `pwd`'
@@ -43,7 +49,7 @@ process run_MarkDuplicatesSpark_GATK  {
       --program-name MarkDuplicatesSpark \
       --create-output-bam-index \
       --conf 'spark.executor.cores=${task.cpus}' \
+      --conf 'spark.local.dir=${spark_temp_dir}' \
       --tmp-dir /temp_dir
-
    '''
    }

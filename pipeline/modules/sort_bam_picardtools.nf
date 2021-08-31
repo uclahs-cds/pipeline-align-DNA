@@ -31,6 +31,7 @@ process run_SortSam_Picard  {
       path(".command.*")
 
    script:
+   sort_order = (params.disable_spark) ? "coordinate" : "queryname"
    """
    set -euo pipefail
 
@@ -40,6 +41,6 @@ process run_SortSam_Picard  {
       --VALIDATION_STRINGENCY LENIENT \
       --INPUT ${input_bam} \
       --OUTPUT ${library}-${lane}.sorted.bam \
-      --SORT_ORDER queryname
+      --SORT_ORDER ${sort_order}
    """
    }
