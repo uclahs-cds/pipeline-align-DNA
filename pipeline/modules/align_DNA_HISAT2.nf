@@ -6,6 +6,7 @@
 include { run_validate; run_validate as validate_output_file } from './run_validate.nf'
 include { run_SortSam_Picard } from './sort_bam_picardtools.nf'
 include { run_MarkDuplicate_Picard } from './mark_duplicate_picardtools.nf'
+include { run_MarkDuplicatesSpark_GATK } from './mark_duplicates_spark.nf'
 include { run_BuildBamIndex_Picard } from './index_bam_picardtools.nf'
 include { Generate_Sha512sum } from './check_512sum.nf'
 

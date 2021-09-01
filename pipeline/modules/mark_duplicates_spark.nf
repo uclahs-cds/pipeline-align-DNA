@@ -8,7 +8,7 @@ process run_MarkDuplicatesSpark_GATK  {
       pattern: "*.bam{,.bai}",
       mode: 'copy'
 
-   publishDir path: "${bam_output_dir}"
+   publishDir path: "${bam_output_dir}",
       pattern: "*.metrics",
       enabled: params.save_intermediate_files,
       mode: 'copy'
@@ -26,7 +26,7 @@ process run_MarkDuplicatesSpark_GATK  {
    // just the sample name (global variable), do not pass it as a val
    output:
       path bam_output_filename, emit: bam
-      path bam_index_output_filename, emit: bam_index
+      path "*.bai", emit: bam_index
       path "${params.sample_name}.mark_dup.metrics"
       path(".command.*")
 
@@ -34,7 +34,6 @@ process run_MarkDuplicatesSpark_GATK  {
 
    shell:
    bam_output_filename = "${params.bam_output_filename}"
-   bam_index_output_filename = "${params.bam_output_filename}.bai"
    ''' 
    set -euo pipefail
 
@@ -45,7 +44,7 @@ process run_MarkDuplicatesSpark_GATK  {
       --read-validation-stringency LENIENT \
       $INPUT \
       --output !{bam_output_filename} \
-      --metrics-file !{params.sample_name}.mark_dup_metrics \
+      --metrics-file !{params.sample_name}.mark_dup.metrics \
       --program-name MarkDuplicatesSpark \
       --create-output-bam-index \
       --conf 'spark.executor.cores=${task.cpus}' \

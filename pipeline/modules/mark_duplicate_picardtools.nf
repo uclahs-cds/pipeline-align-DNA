@@ -1,14 +1,14 @@
 
 // mark duplicates with picard
-process run_MarkDuplicate_Picard  {
+process run_MarkDuplicate_Picard {
    container params.docker_image_picardtools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
 
    publishDir path: "${bam_output_dir}",
-      pattern: "*.bam{,.bai}",
+      pattern: "*.{bam,bai}",
       mode: 'copy'
 
-   publishDir path: "${bam_output_dir}"
+   publishDir path: "${bam_output_dir}",
       pattern: "*.metrics",
       enabled: params.save_intermediate_files,
       mode: 'copy'
@@ -26,13 +26,12 @@ process run_MarkDuplicate_Picard  {
    // just the sample name (global variable), do not pass it as a val
    output:
       path bam_output_filename, emit: bam
-      path bam_index_output_filename, emit: bam_index
+      path "*.bai", emit: bam_index
       path "${params.sample_name}.mark_dup.metrics"
       path(".command.*")
 
    shell:
    bam_output_filename = "${params.bam_output_filename}"
-   bam_index_output_filename = "${params.bam_output_filename}.bai"
    ''' 
    set -euo pipefail
 
