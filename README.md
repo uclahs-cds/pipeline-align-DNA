@@ -241,7 +241,7 @@ Daehwan Kim, Ben Langmead, Steven L Salzberg. HISAT: a fast spliced aligner with
 
 ## License
 
-Author: Chenghao Zhu (ChenghaoZhu@mednet.ucla.edu), Aaron Holmes (AHolmes@mednet.ucla.edu)
+Authors: Benjamin Carlin, Chenghao Zhu (ChenghaoZhu@mednet.ucla.edu), Aaron Holmes (AHolmes@mednet.ucla.edu), Takafumi Yamaguchi (TYamaguchi@mednet.ucla.edu), Aakarsh Anand (AakarshAnand@mednet.ucla.edu), Yash Patel (YashPatel@mednet.ucla.edu)
 
 Align-DNA is licensed under the GNU General Public License version 2. See the file LICENSE for the terms of the GNU GPL license.
 
