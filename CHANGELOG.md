@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 
 ## [Unreleased]
+### Added
+- GPL2 license added
 
 
 ## [7.1.0] - 2021-07-29
