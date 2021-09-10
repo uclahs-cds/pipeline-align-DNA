@@ -2,7 +2,7 @@
 // mark duplicates with Spark-enabled tool from GATK
 process run_MarkDuplicatesSpark_GATK  {
    container params.docker_image_gatk
-   containerOptions "--volume ${params.temp_dir}:/temp_dir -u nobody"
+   containerOptions "--volume ${params.temp_dir}:/temp_dir --volume ${params.spark_temp_dir}:/spark_temp_dir -u nobody"
 
    publishDir path: "${bam_output_dir}",
       pattern: "*.bam{,.bai}",
@@ -40,7 +40,8 @@ process run_MarkDuplicatesSpark_GATK  {
    # add gatk option prefix, '--input' to each input bam
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --input /g' | sed '1s/^/--input /')
 
-   gatk MarkDuplicatesSpark \
+   gatk --java-options "-Djava.io.tmpdir=/temp_dir" \
+      MarkDuplicatesSpark \
       --read-validation-stringency LENIENT \
       $INPUT \
       --output !{bam_output_filename} \
@@ -48,7 +49,7 @@ process run_MarkDuplicatesSpark_GATK  {
       --program-name MarkDuplicatesSpark \
       --create-output-bam-index \
       --conf 'spark.executor.cores=${task.cpus}' \
-      --conf 'spark.local.dir=${spark_temp_dir}' \
+      --conf 'spark.local.dir=/spark_temp_dir' \
       --tmp-dir /temp_dir
    '''
    }

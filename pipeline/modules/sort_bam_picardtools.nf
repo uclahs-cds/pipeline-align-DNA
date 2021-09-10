@@ -31,7 +31,7 @@ process run_SortSam_Picard  {
       path(".command.*")
 
    script:
-   sort_order = (params.disable_spark) ? "coordinate" : "queryname"
+   sort_order = (params.enable_spark) ? "queryname" : "coordinate"
    """
    set -euo pipefail
 
