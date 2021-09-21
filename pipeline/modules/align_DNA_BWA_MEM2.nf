@@ -80,7 +80,7 @@ workflow align_DNA_BWA_MEM2_workflow {
          )
       run_SortSam_Picard(align_DNA_BWA_MEM2.out.bam, aligner_output_dir)
       if (params.enable_spark) {
-         run_MarkDuplicatesSpark_GATK(run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
+         run_MarkDuplicatesSpark_GATK("completion_placeholder", run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
          och_markduplicates_bam = run_MarkDuplicatesSpark_GATK.out.bam
          och_markduplicates_bam_index = run_MarkDuplicatesSpark_GATK.out.bam_index
       } else {
@@ -95,4 +95,7 @@ workflow align_DNA_BWA_MEM2_workflow {
             Channel.from(params.temp_dir, params.output_dir)
             )
          )
+      
+      emit:
+      complete_signal = och_markduplicates_bam.collect()
    }

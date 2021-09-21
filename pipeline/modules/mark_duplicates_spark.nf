@@ -1,5 +1,6 @@
-
-// mark duplicates with Spark-enabled tool from GATK
+/*
+   Nextflow module for marking duplicates using Spark. The containerOptions specifying user 'nobody' allow for Spark to be run without root access. The beforeScript command allows the user 'nobody' to create the output files into the working directory.
+*/
 process run_MarkDuplicatesSpark_GATK  {
    container params.docker_image_gatk
    containerOptions "--volume ${params.temp_dir}:/temp_dir --volume ${params.spark_temp_dir}:/spark_temp_dir -u nobody"
@@ -19,6 +20,7 @@ process run_MarkDuplicatesSpark_GATK  {
       saveAs: { "log${file(it).getName()}" }
 
    input:
+      val(completion_signal)
       path(input_bams)
       val(bam_output_dir)
 

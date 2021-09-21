@@ -93,6 +93,9 @@ workflow {
          ich_reference_fasta_bwa,
          ich_bwa_reference_index_files
          )
+      bwa_mem2_complete_signal = align_DNA_BWA_MEM2_workflow.out.complete_signal
+      } else {// If only running HISAT2, generate dummy signal
+         bwa_mem2_complete_signal = "bwa_mem2_complete"
       }  
    if (params.aligner.contains("HISAT2")) {
       Channel
@@ -102,6 +105,7 @@ workflow {
          .fromPath(params.reference_fasta_index_files_hisat2, checkIfExists: true)
          .set { ich_hisat2_reference_index_files }
       align_DNA_HISAT2_workflow(
+         bwa_mem2_complete_signal,
          ich_samples,
          ich_samples_validate,
          ich_reference_fasta_hisat2,
