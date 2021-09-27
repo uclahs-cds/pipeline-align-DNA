@@ -30,7 +30,6 @@ log.info """\
    - options:
       save_intermediate_files = ${params.save_intermediate_files}
       cache_intermediate_pipeline_steps = ${params.cache_intermediate_pipeline_steps}
-      max_number_of_parallel_jobs = ${params.max_number_of_parallel_jobs}
       blcds_registered_dataset_input = ${params.blcds_registered_dataset_input}
       blcds_registered_dataset_output = ${params.blcds_registered_dataset_output}
 
@@ -94,8 +93,9 @@ workflow {
          ich_bwa_reference_index_files
          )
       bwa_mem2_complete_signal = align_DNA_BWA_MEM2_workflow.out.complete_signal
-      } else {// If only running HISAT2, generate dummy signal
-         bwa_mem2_complete_signal = "bwa_mem2_complete"
+      } 
+   else {// If only running HISAT2, generate dummy signal
+      bwa_mem2_complete_signal = "bwa_mem2_complete"
       }  
    if (params.aligner.contains("HISAT2")) {
       Channel
