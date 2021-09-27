@@ -20,7 +20,7 @@ process run_MarkDuplicatesSpark_GATK  {
       saveAs: { "log${file(it).getName()}" }
 
    input:
-      val(completion_signal)
+      val(completion_signal) //Completion signal: output bam from previous markduplicatesspark process to ensure only one spark process runs at a time
       path(input_bams)
       val(bam_output_dir)
 

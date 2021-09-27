@@ -67,7 +67,7 @@ process align_DNA_HISAT2 {
 workflow align_DNA_HISAT2_workflow {
    aligner_output_dir = "${params.bam_output_dir}/${params.hisat2_version}"
    take:
-      bwa_mem2_complete_signal
+      bwa_mem2_complete_signal //Output bam from BWA-MEM2 markduplicatesspark
       ich_samples
       ich_samples_validate
       ich_reference_fasta
@@ -84,6 +84,7 @@ workflow align_DNA_HISAT2_workflow {
          )
       run_SortSam_Picard(align_DNA_HISAT2.out.bam, aligner_output_dir)
       if (params.enable_spark) {
+         //Run MarkduplicatesSpark only after BWA-MEM2 markduplicatesspark completes
          run_MarkDuplicatesSpark_GATK(bwa_mem2_complete_signal, run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
          och_markduplicates_bam = run_MarkDuplicatesSpark_GATK.out.bam
          och_markduplicates_bam_index = run_MarkDuplicatesSpark_GATK.out.bam_index
