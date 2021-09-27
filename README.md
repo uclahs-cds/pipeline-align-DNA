@@ -238,3 +238,19 @@ This pipeline was tested using the synthesized SMC-HET dataset as well as a mult
 Vasimuddin Md, Sanchit Misra, Heng Li, Srinivas Aluru. Efficient Architecture-Aware Acceleration of BWA-MEM for Multicore Systems. IEEE Parallel and Distributed Processing Symposium (IPDPS), 2019.
 
 Daehwan Kim, Ben Langmead, Steven L Salzberg. HISAT: a fast spliced aligner with low memory requirements. Nature Methods, 2015
+
+---
+
+## License
+
+Authors: Benjamin Carlin, Chenghao Zhu (ChenghaoZhu@mednet.ucla.edu), Aaron Holmes (AHolmes@mednet.ucla.edu), Takafumi Yamaguchi (TYamaguchi@mednet.ucla.edu), Aakarsh Anand (AakarshAnand@mednet.ucla.edu), Yash Patel (YashPatel@mednet.ucla.edu)
+
+Align-DNA is licensed under the GNU General Public License version 2. See the file LICENSE for the terms of the GNU GPL license.
+
+Align-DNA aligned paired-end reads using the BWA-MEM2 and/or HISAT2 aligners.
+
+Copyright (C) 2021 University of California Los Angeles ("Boutros Lab") All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
