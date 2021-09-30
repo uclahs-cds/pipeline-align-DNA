@@ -117,7 +117,9 @@ The next step of the pipeline utilizes Picard Tool’s SortSam command to sort t
 
 ## 3. Mark Duplicates in BAM Files
 
-The next step of the pipeline utilizes Picard Tool’s MarkDuplicates command to mark duplicates in the BAM files, (see Tools and Infrastructure Section for details). The MarkDuplicates command utilizes the VALIDATION_STRINGENCY=LENIENT option to indicate how errors should be handled and keep the process running if possible. Additionally, the Program_Record_Id is set to “MarkDuplicates”. For more details regarding the specific command that was run please refer to the Source Code section
+The next step of the pipeline utilizes Picard Tool’s MarkDuplicates command to mark duplicates in the BAM files, (see Tools and Infrastructure Section for details). The MarkDuplicates command utilizes the VALIDATION_STRINGENCY=LENIENT option to indicate how errors should be handled and keep the process running if possible. Additionally, the Program_Record_Id is set to “MarkDuplicates”. For more details regarding the specific command that was run please refer to the Source Code section.
+
+A faster Spark implementation of MarkDuplicates can also be used (MarkDuplicatesSpark from GATK). The process matches the output of Picard's MarkDuplicates with significant runtime improvements. An important note, however, the Spark version requires more disk space and can fail with large inputs with multiple aligners being specified due to insufficient disk space. In such cases, Picard's MarkDuplicates should be used instead.
 
 ## 4. Index BAM Files
 
