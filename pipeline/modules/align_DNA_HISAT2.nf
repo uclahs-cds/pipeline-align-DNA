@@ -67,7 +67,7 @@ process align_DNA_HISAT2 {
 workflow align_DNA_HISAT2_workflow {
    aligner_output_dir = "${params.bam_output_dir}/${params.hisat2_version}"
    take:
-      complete_signal //Output bam from previous MarkDuplicatesSpark process
+      complete_signal //Output bam from previous MarkDuplicatesSpark process to ensure only one Spark process runs at a time
       ich_samples
       ich_samples_validate
       ich_reference_fasta
