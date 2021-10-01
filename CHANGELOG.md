@@ -10,7 +10,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Added
-- GPL2 license added
+- GPL2 License added
+- MarkDuplicatesSpark process added as an option
+### Changed
+- Removed explicit index creation process and enabled option for MarkDuplicate process to create index
+- Removed explicit maxForks allocation and instead allow CPU and memory allocation to dictate parallelization
 
 
 ## [7.1.0] - 2021-07-29

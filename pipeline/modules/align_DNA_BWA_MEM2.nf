@@ -6,7 +6,7 @@
 include { run_validate; run_validate as validate_output_file } from './run_validate.nf'
 include { run_SortSam_Picard } from './sort_bam_picardtools.nf'
 include { run_MarkDuplicate_Picard } from './mark_duplicate_picardtools.nf'
-include { run_BuildBamIndex_Picard } from './index_bam_picardtools.nf'
+include { run_MarkDuplicatesSpark_GATK } from './mark_duplicates_spark.nf'
 include { Generate_Sha512sum } from './check_512sum.nf'
 
 process align_DNA_BWA_MEM2 {
@@ -79,13 +79,23 @@ workflow align_DNA_BWA_MEM2_workflow {
          ich_reference_index_files.collect()
          )
       run_SortSam_Picard(align_DNA_BWA_MEM2.out.bam, aligner_output_dir)
-      run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
-      run_BuildBamIndex_Picard(run_MarkDuplicate_Picard.out.bam, aligner_output_dir)
-      Generate_Sha512sum(run_BuildBamIndex_Picard.out.bai.mix(run_MarkDuplicate_Picard.out.bam), aligner_output_dir)
+      if (params.enable_spark) {
+         run_MarkDuplicatesSpark_GATK("completion_placeholder", run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
+         och_markduplicates_bam = run_MarkDuplicatesSpark_GATK.out.bam
+         och_markduplicates_bam_index = run_MarkDuplicatesSpark_GATK.out.bam_index
+      } else {
+         run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
+         och_markduplicates_bam = run_MarkDuplicate_Picard.out.bam
+         och_markduplicates_bam_index = run_MarkDuplicate_Picard.out.bam_index
+      }
+      Generate_Sha512sum(och_markduplicates_bam_index.mix(och_markduplicates_bam), aligner_output_dir)
       validate_output_file(
-         run_MarkDuplicate_Picard.out.bam.mix(
-            run_BuildBamIndex_Picard.out.bai,
+         och_markduplicates_bam.mix(
+            och_markduplicates_bam_index,
             Channel.from(params.temp_dir, params.output_dir)
             )
          )
+      
+      emit:
+      complete_signal = och_markduplicates_bam.collect()
    }

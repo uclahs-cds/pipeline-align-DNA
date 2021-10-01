@@ -31,6 +31,8 @@ process run_SortSam_Picard  {
       path(".command.*")
 
    script:
+   // Determine sort order based on markduplicates process: queryname for spark and coordinate for Picard
+   sort_order = (params.enable_spark) ? "queryname" : "coordinate"
    """
    set -euo pipefail
 
@@ -40,6 +42,6 @@ process run_SortSam_Picard  {
       --VALIDATION_STRINGENCY LENIENT \
       --INPUT ${input_bam} \
       --OUTPUT ${library}-${lane}.sorted.bam \
-      --SORT_ORDER coordinate
+      --SORT_ORDER ${sort_order}
    """
    }
