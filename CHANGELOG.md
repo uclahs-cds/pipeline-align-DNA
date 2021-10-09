@@ -10,6 +10,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+- Benchmarking report with BWA-MEM 2.1 added
+
 ## [7.2.0] - 2021-10-01
 ### Added
 - GPL2 License added
