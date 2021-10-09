@@ -10,50 +10,37 @@ Figure 1 showed the alignment and pipeline wallclock using different number of t
 
 ![Figure 1a](../img/cpus/alignment_wallclock_barplot.png)
 ![Figure 1b](../img/cpus/pipeline_wallclock_barplot.png)
-<center>Figure 1. ALignment and pipeline wallclock of BWA-MEM2 using 48, 56, 64, and 72 threads.</center>
-
-<br/>
 
 Figure 3 showed the linear relationship between number of records in the FASTQ files against the corresponding runtime when using different number of threads. It is clear that the alignment time grows along with the number of records. 56 threads seems to provide the best overall alignment speed across all samples.
 
 ![Figure 2a](../img/cpus/alignment_wallclock_reads_scatter.png)
 ![FIgure 2b](../img/cpus/pipeline_wallclock_nreads_scatter.png)
-<center>Figure 2. ALignment and pipeline wallclock of BWA-MEM2 using 48, 56, 64, and 72 threads.</center>
 
-<br/>
 Figure 3 showed the peak real memory and virtual memory used by BWA-MEM2 with different number of
 threads. It's clear that more threads leads to a higher peak memory.
 
 ![Figure 3a](../img/cpus/peak_rss_reads_scatterplot.png)
 ![Figure 3b](../img/cpus/peak_vmem_reads_scatterplot.png)
-<center>Figure 3. Peak real memory and virtual memory usaged by BWA-MEM2 with 48, 56, 64, and 72 threads.</center>
 
-<br/>
 ## BWA-MEM2 2.1 vs 2.0 vs Original BWA
 
 We then compared the alignment performence and peak memory usage of BWA-MEM2 2.1 vs BWA-MEM2 2.0 as well as the original BWA (Figure 4). The test results of the original BWA used 72 threads, so here we compared the BWA-MEM2 2.1 using both 56 and 72 threads, because using 56 threads provides the best performance according to above. To be noted that, for the BWA-MEM2 2.0, the CPCG1096-B1 samples only used 56 threads because of the out-of-memory issue. Again, BWA-MEM2 2.0 using 56 threads provided the best performance across all samples.
 
 ![Figure 4a](../img/versions/alignment_wallclock_barplot.png)
 ![figure 4b](../img/versions/pipeline_wallclock_barplot.png)
-<center>Figure 4. ALignment and pipeline wallclock of BWA-MEM2 using 48, 56, 64, and 72 threads.</center>
 
-<br/>
 The scatter plots of Figure 5 also support the idea that BWA-MEM2 2.1 with 56 threads performs the
 best.
 
 ![Figure 5a](../img/versions/alignment_wallclock_reads_scatter.png)
 ![Figure 5b](../img/versions/pipeline_wallclock_nreads_scatter.png)
-<center>Figure 5. ALignment and pipeline wallclock of BWA-MEM2 using 48, 56, 64, and 72 threads.</center>
 
-<br/>
 Figure 6 showed that the peak memory needed by BWA-MEM2 2.1 was reduced for about 50% of that of
 BWA-MEM2 2.0, although still about twice as much as the original BWA.
 
 ![Figure 6a](../img/versions/peak_rss_reads_scatterplot.png)
 ![Figure 6b](../img/versions/peak_vmem_reads_scatterplot.png)
-<center>Figure 6. ALignment and pipeline wallclock of BWA-MEM2 using 48, 56, 64, and 72 threads.</center>
 
-<br/>
 We performed benchmarking tests on the new released BWA-MEM2 2.1, the previous version 2.0, as well
 as the original BWA, using our A-partial and A-full datasets. The new version 2.1 is able to
 significantly reduce the alignment time comparing to the original BWA, and also reduce the peak
