@@ -11,7 +11,7 @@ Figure 1 showed the alignment and pipeline wallclock using different number of t
 ![Figure 1a](../img/cpus/alignment_wallclock_barplot.png)
 ![Figure 1b](../img/cpus/pipeline_wallclock_barplot.png)
 
-Figure 3 showed the linear relationship between number of records in the FASTQ files against the corresponding runtime when using different number of threads. It is clear that the alignment time grows along with the number of records. 56 threads seems to provide the best overall alignment speed across all samples.
+Figure 2 showed the linear relationship between number of records in the FASTQ files against the corresponding runtime when using different number of threads. It is clear that the alignment time grows along with the number of records. 56 threads seems to provide the best overall alignment speed across all samples.
 
 ![Figure 2a](../img/cpus/alignment_wallclock_reads_scatter.png)
 ![FIgure 2b](../img/cpus/pipeline_wallclock_nreads_scatter.png)
