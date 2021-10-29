@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 
 ## [Unreleased]
+### Changed
+- Changed names of midmem.config and execute.config into F72.config and M64.config respectively.
 
 ## [7.2.0] - 2021-10-01
 ### Added
