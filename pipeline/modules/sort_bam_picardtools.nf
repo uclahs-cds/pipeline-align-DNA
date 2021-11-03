@@ -1,5 +1,5 @@
 
-// sort coordinate order with picard
+// sort coordinate or queryname order with picard
 process run_SortSam_Picard  {
    container params.docker_image_picardtools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
@@ -27,14 +27,15 @@ process run_SortSam_Picard  {
    // the next steps of the pipeline are merging so using a lane to differentiate between files is no longer needed
    // (files of same lane are merged together) so the lane information is dropped
    output:
-      //path "${library}-${lane}.sorted.bam", emit: bam
       path "*.bam", emit: bam
       path "*.bai", emit: bam_index optional true
       path(".command.*")
 
    script:
    // Determine sort order based on markduplicates process: queryname for spark and coordinate for Picard
-   
+   // Determine filename based on whether markduplicates processes are enabled.
+   // Index output file if sorting is the final step in the pipeline (if markduplicates disabled)
+
    if (!params.mark_duplicates) {
          sort_order = "coordinate"
          bam_output_filename = "${params.bam_output_filename}"
@@ -58,5 +59,3 @@ process run_SortSam_Picard  {
       --CREATE_INDEX ${index}
    """
    }
-
-//${index}
