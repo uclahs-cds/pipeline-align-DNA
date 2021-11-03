@@ -5,8 +5,8 @@ process run_SortSam_Picard  {
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
    
    publishDir path: "${intermediate_output_dir}",
-      enabled: params.save_intermediate_files,
-      pattern: "*.sorted.bam",
+      enabled: params.save_intermediate_files || !params.mark_duplicates,
+      pattern: "*.{bam,bai}",
       mode: 'copy'
 
    publishDir path: "${params.log_output_dir}/${task.process.replace(':', '/')}",
@@ -27,12 +27,24 @@ process run_SortSam_Picard  {
    // the next steps of the pipeline are merging so using a lane to differentiate between files is no longer needed
    // (files of same lane are merged together) so the lane information is dropped
    output:
-      path "${library}-${lane}.sorted.bam", emit: bam
+      //path "${library}-${lane}.sorted.bam", emit: bam
+      path "*.bam", emit: bam
+      path "*.bai", emit: bam_index optional true
       path(".command.*")
 
    script:
    // Determine sort order based on markduplicates process: queryname for spark and coordinate for Picard
-   sort_order = (params.enable_spark) ? "queryname" : "coordinate"
+   
+   if (!params.mark_duplicates) {
+         sort_order = "coordinate"
+         bam_output_filename = "${params.bam_output_filename}"
+         index = true
+      } else {
+         sort_order = (params.enable_spark) ? "queryname" : "coordinate"
+         bam_output_filename = "${library}-${lane}.sorted.bam"
+         index = false
+      }
+   
    """
    set -euo pipefail
 
@@ -41,7 +53,10 @@ process run_SortSam_Picard  {
       SortSam \
       --VALIDATION_STRINGENCY LENIENT \
       --INPUT ${input_bam} \
-      --OUTPUT ${library}-${lane}.sorted.bam \
-      --SORT_ORDER ${sort_order}
+      --OUTPUT ${bam_output_filename} \
+      --SORT_ORDER ${sort_order} \
+      --CREATE_INDEX ${index}
    """
    }
+
+//${index}

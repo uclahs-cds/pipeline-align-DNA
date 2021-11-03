@@ -161,6 +161,7 @@ After marking dup BAM files, the BAM files are then indexed by utilizing Picard 
 | `temp_dir` | yes | path | Absolute path to the directory where the nextflow's intermediate files are saved. If your cluster worker node has the `/scratch` set up, this can be set to it. |
 | `save_intermediate_files` | yes | boolean | Save intermediate files. If yes, not only the final BAM, but also the unmerged, unsorted, and duplicates unmarked BAM files will also be saved. |
 | `cache_intermediate_pipeline_steps` | yes | boolean | Enable cahcing to resume pipeline and the end of the last successful process completion when a pipeline fails (if true the default submission script must be modified). |
+| `mark_duplicates` | yes | boolean | Enable processes which mark duplicates. When false, the pipeline stops at the sorting step, outputting a sorted, unmerged BAM with unmarked duplicates. |
 | `enable_spark` | yes | boolean | Enable use of Spark processes. When true, `MarkDuplicatesSpark` will be used. When false, `MarkDuplicates` will be used. Default value is true. |
 | `spark_temp_dir` | yes | path | Path to temp dir for Spark processes. Defaults to `/scratch`. |
 | `max_number_of_parallel_jobs` | no | int | The maximum number of jobs or steps of the pipeline that can be ran in parallel. Default is 1. Be very cautious setting this to any value larger than 1, as it may cause out-of-memory error. It may be helpful when running on a big memory computing node. |
