@@ -81,27 +81,27 @@ workflow align_DNA_BWA_MEM2_workflow {
       run_SortSam_Picard(align_DNA_BWA_MEM2.out.bam, aligner_output_dir)
       
       if (!params.mark_duplicates) {
-         och_markduplicates_bam_index = run_SortSam_Picard.out.bam_index
-         och_markduplicates_bam = run_SortSam_Picard.out.bam
+         och_bam_index = run_SortSam_Picard.out.bam_index
+         och_bam = run_SortSam_Picard.out.bam
       } else {
          if (params.enable_spark) {
             run_MarkDuplicatesSpark_GATK("completion_placeholder", run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
-            och_markduplicates_bam = run_MarkDuplicatesSpark_GATK.out.bam
-            och_markduplicates_bam_index = run_MarkDuplicatesSpark_GATK.out.bam_index
+            och_bam = run_MarkDuplicatesSpark_GATK.out.bam
+            och_bam_index = run_MarkDuplicatesSpark_GATK.out.bam_index
          } else {
             run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
-            och_markduplicates_bam = run_MarkDuplicate_Picard.out.bam
-            och_markduplicates_bam_index = run_MarkDuplicate_Picard.out.bam_index
+            och_bam = run_MarkDuplicate_Picard.out.bam
+            och_bam_index = run_MarkDuplicate_Picard.out.bam_index
          }
       }
-      Generate_Sha512sum(och_markduplicates_bam_index.mix(och_markduplicates_bam), aligner_output_dir)
+      Generate_Sha512sum(och_bam_index.mix(och_bam), aligner_output_dir)
       validate_output_file(
-         och_markduplicates_bam.mix(
-            och_markduplicates_bam_index,
+         och_bam.mix(
+            och_bam_index,
             Channel.from(params.temp_dir, params.output_dir)
             )
          )
       
       emit:
-      complete_signal = och_markduplicates_bam.collect()
+      complete_signal = och_bam.collect()
    }
