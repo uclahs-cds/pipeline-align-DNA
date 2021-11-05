@@ -78,7 +78,7 @@ workflow align_DNA_BWA_MEM2_workflow {
          ich_reference_fasta,
          ich_reference_index_files.collect()
          )
-      run_SortSam_Picard(align_DNA_BWA_MEM2.out.bam, aligner_output_dir)
+      run_SortSam_Picard(align_DNA_BWA_MEM2.out.bam, aligner_output_dir, aligner_output_dir)
       
       if (!params.mark_duplicates) {
          och_bam_index = run_SortSam_Picard.out.bam_index

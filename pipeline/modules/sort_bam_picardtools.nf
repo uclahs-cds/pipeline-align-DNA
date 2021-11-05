@@ -5,7 +5,12 @@ process run_SortSam_Picard  {
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
    
    publishDir path: "${intermediate_output_dir}",
-      enabled: params.save_intermediate_files || !params.mark_duplicates,
+      enabled: params.save_intermediate_files && params.mark_duplicates,
+      pattern: "*.{bam,bai}",
+      mode: 'copy'
+
+   publishDir path: "${bam_output_dir}",
+      enabled: !params.mark_duplicates,
       pattern: "*.{bam,bai}",
       mode: 'copy'
 
@@ -20,21 +25,26 @@ process run_SortSam_Picard  {
          path(input_bam)
          )
       val(intermediate_output_dir)
+      val(bam_output_dir)
    
-   // the first value of the tuple will be used as a key to group aligned and filtered bams
-   // from the same sample and library but different lane together
+   /** the first value of the tuple will be used as a key to group aligned and filtered bams
+   * from the same sample and library but different lane together
 
-   // the next steps of the pipeline are merging so using a lane to differentiate between files is no longer needed
-   // (files of same lane are merged together) so the lane information is dropped
+   * the next steps of the pipeline are merging so using a lane to differentiate between files is no longer needed
+   * (files of same lane are merged together) so the lane information is dropped
+   */
+   
    output:
       path "*.bam", emit: bam
       path "*.bai", emit: bam_index optional true
       path(".command.*")
 
    script:
-   // Determine sort order based on markduplicates process: queryname for spark and coordinate for Picard
-   // Determine filename based on whether markduplicates processes are enabled.
-   // Index output file if sorting is the final step in the pipeline (if markduplicates disabled)
+   /** 
+   * Determine sort order based on markduplicates process: queryname for spark and coordinate for Picard
+   * Determine filename based on whether markduplicates processes are enabled.
+   * Index output file if sorting is the final step in the pipeline (if markduplicates disabled)
+   */
 
    if (!params.mark_duplicates) {
          sort_order = "coordinate"
