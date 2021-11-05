@@ -111,9 +111,11 @@ The first step of the pipeline utilizes [BWA-MEM2](https://github.com/bwa-mem2/b
 
 In the sampe step of the pipeline utilizes Samtool’sview command to convert the aligned SAM files into the compressed BAM format, (see Tools and Infrastructure Section for details). The Samtools view command utilizes the -s option for increasing the speed by removing duplicates and outputs the reads as they are ordered in the file.  Additionally, the -b option ensures the output is in BAM format and the -@ option is utilized to increase the number of threads. For more details regarding the specific command that was run please refer to the Source Code section.
 
-### 2. Sort BAM Files in Coordinate Order
+### 2. Sort BAM Files in Coordinate or Queryname Order
 
-The next step of the pipeline utilizes Picard Tool’s SortSam command to sort the aligned BAM files in coordinate order that is needed for downstream tools, (see Tools and Infrastructure Section for details). The SortSam command utilizes the VALIDATION_STRINGENCY=LENIENT option to indicate how errors should be handled and keep the process running if possible. Additionally, the SORT_ORDER option is utilized to ensure the file is sorted in coordinate order, opposed to being sorted by read group name. For more details regarding the specific command that was run please refer to the Source Code section.
+The next step of the pipeline utilizes Picard Tool’s SortSam command to sort the aligned BAM files in coordinate order or queryname order that is needed for downstream tools, (see Tools and Infrastructure Section for details). The SortSam command utilizes the VALIDATION_STRINGENCY=LENIENT option to indicate how errors should be handled and keep the process running if possible. Additionally, the SORT_ORDER option is utilized to ensure the file is sorted in coordinate order or queryname order depending on the downstream Mark Duplicates tool, since Picard and Spark have different sort-order requirements. For more details regarding the specific command that was run please refer to the Source Code section.
+
+The pipeline may be configured to stop after this step using the mark_duplicates parameter in the config file. In this case the file is sorted in coordinate order and the SortSam command utilizes the CREATE_INDEX option to index the sorted BAM file.
 
 ## 3. Mark Duplicates in BAM Files
 
@@ -161,7 +163,7 @@ After marking dup BAM files, the BAM files are then indexed by utilizing Picard 
 | `temp_dir` | yes | path | Absolute path to the directory where the nextflow's intermediate files are saved. If your cluster worker node has the `/scratch` set up, this can be set to it. |
 | `save_intermediate_files` | yes | boolean | Save intermediate files. If yes, not only the final BAM, but also the unmerged, unsorted, and duplicates unmarked BAM files will also be saved. |
 | `cache_intermediate_pipeline_steps` | yes | boolean | Enable cahcing to resume pipeline and the end of the last successful process completion when a pipeline fails (if true the default submission script must be modified). |
-| `mark_duplicates` | yes | boolean | Enable processes which mark duplicates. When false, the pipeline stops at the sorting step, outputting a sorted, unmerged BAM with unmarked duplicates. |
+| `mark_duplicates` | yes | boolean | Enable processes which mark duplicates. When false, the pipeline stops at the sorting step, outputting a sorted, indexed, unmerged BAM with unmarked duplicates. |
 | `enable_spark` | yes | boolean | Enable use of Spark processes. When true, `MarkDuplicatesSpark` will be used. When false, `MarkDuplicates` will be used. Default value is true. |
 | `spark_temp_dir` | yes | path | Path to temp dir for Spark processes. Defaults to `/scratch`. |
 | `max_number_of_parallel_jobs` | no | int | The maximum number of jobs or steps of the pipeline that can be ran in parallel. Default is 1. Be very cautious setting this to any value larger than 1, as it may cause out-of-memory error. It may be helpful when running on a big memory computing node. |
