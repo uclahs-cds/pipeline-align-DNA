@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 ### Added
 - Add mark_duplicates parameter to enable exclusion or inclusion of MarkDuplicates processes.
+### Changed
+- Rename bug report to "Issue report" and remove old node names from it
 
 ## [7.2.1] - 2021-10-28
 ### Changed
