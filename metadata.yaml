@@ -2,7 +2,7 @@
 Category: "pipeline"
 Description: "DNA Alignment pipeline for aligning, sorting, marking duplicates and indexing paired fastqs"
 Maintainers: "Boutros Lab Infrastructure"
-Contributors: ["Benjamin Carlin", "Chenghao Zhu", "Aaron Holmes", "Takafumi Yamaguchi", "Aakarsh Anand", "Yash Patel"]
+Contributors: ["Benjamin Carlin", "Chenghao Zhu", "Aaron Holmes", "Takafumi Yamaguchi", "Aakarsh Anand", "Yash Patel", "Jieun Oh"]
 Languages: ["Nextflow", "Docker"]
 Dependencies: ["Java", "Nextflow", "Docker"]
 References: "https://uclahs.box.com/s/qfzr99sc8ntmfddn30ii62wx4273utoz"
