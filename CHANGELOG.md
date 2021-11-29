@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 
 ## [Unreleased]
+### Added
+- Added F32 config file
 
 ## [7.2.0] - 2021-10-01
 ### Added
