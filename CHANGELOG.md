@@ -7,10 +7,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
 ## [Unreleased]
+
 ### Added 
 - Update Picard version to 2.26.3
+
+### Changed
+- Rename bug report to "Issue report" and remove old node names from it
+
+## [7.2.1] - 2021-10-28
+### Changed
+- Fix potential Spark temp directory permissions issue
 
 ## [7.2.0] - 2021-10-01
 ### Added
