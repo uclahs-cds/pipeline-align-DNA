@@ -38,7 +38,28 @@ process run_MarkDuplicatesSpark_GATK  {
       path "${params.sample_name}.mark_dup.metrics"
       path(".command.*")
 
-   beforeScript 'chmod 777 `pwd`'
+   //Update tempdir permissions for user 'nobody'
+   beforeScript "chmod 777 `pwd`; \
+      if [[ ! -d ${params.temp_dir} ]]; \
+      then \
+         mkdir -p ${params.temp_dir}; \
+         chmod 777 ${params.temp_dir}; \
+      else \
+         if [[ ! `stat -c %a ${params.temp_dir}` == 777 ]]; \
+         then \
+            chmod 777 ${params.temp_dir}; \
+         fi; \
+      fi; \
+      if [[ ! -d ${params.spark_temp_dir} ]]; \
+      then \
+         mkdir -p ${params.spark_temp_dir}; \
+         chmod 777 ${params.spark_temp_dir}; \
+      else \
+         if [[ ! `stat -c %a ${params.spark_temp_dir}` == 777 ]]; \
+         then \
+            chmod 777 ${params.spark_temp_dir}; \
+         fi; \
+      fi"
 
    shell:
    bam_output_filename = "${params.bam_output_filename}"
