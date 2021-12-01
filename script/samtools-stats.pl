@@ -94,17 +94,17 @@ sub main {
 		# submit samtool stat job using sbatch or qsub (using 4 cores)
 		if($opts{cluster} eq 'Slurm'){
 			
-			my $sbatch = join(' ', 'sbatch -p midmem -J', $job, '-o', $job.'.err', '--mem=5G -c 4 --wrap='.'"'.$cmd.'"');
+			my $sbatch = join(' ', 'sbatch -p F72 -J', $job, '-o', $job.'.err', '--mem=5G -c 4 --wrap='.'"'.$cmd.'"');
 			#print $sbatch."\n";
 			#system($sbatch);
 
 		} else {
 
-			my $qsub = join(' ', 'qsub -cwd -b y -m aes -N', $job, '-l h_vmem=2g,slot_type=midmem -pe smpslots 4 ', '"'.$cmd.'"');
+			my $qsub = join(' ', 'qsub -cwd -b y -m aes -N', $job, '-l h_vmem=2g,slot_type=F72 -pe smpslots 4 ', '"'.$cmd.'"');
 			#print $qsub."\n";
 			#system($qsub);
 			#exit;
-
+s
 		}
 
 		# simple grep command to extract core bam stats 
