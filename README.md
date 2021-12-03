@@ -48,7 +48,7 @@ python path/to/submit_nextflow_pipeline.py \
     --nextflow_script path/to/pipeline-align-DNA.nf \
     --nextflow_config path/to/sample-specific.config \
     --pipeline_run_name <sample_name> \
-    --partition_type midmem \
+    --partition_type F72 \
     --email jdoe@ucla.edu
 ```
 

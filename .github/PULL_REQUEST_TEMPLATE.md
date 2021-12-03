@@ -26,11 +26,14 @@ Closes #...
 	- sample:    <!-- e.g. A-mini S2.T-1, A-mini S2.T-n1 -->
 	- input csv: <!-- path/to/input.csv -->
 	- config:    <!-- path/to/xxx.config -->
+	- output:    <!-- path/to/output -->
 - HISAT2
 	- sample:    <!-- e.g. A-mini S2.T-1, A-mini S2.T-n1 --> 
 	- input csv: <!-- path/to/input.csv -->
-	- config:    <!-- path/to/xxx.config -->  
+	- config:    <!-- path/to/xxx.config --> 
+	- output:    <!-- path/to/output --> 
 - BWA-MEM2 & HISAT2
 	- sample:    <!-- e.g. A-mini S2.T-1, A-mini S2.T-n1 --> 
 	- input csv: <!-- path/to/input.csv -->
 	- config:    <!-- path/to/xxx.config -->
+	- output:    <!-- path/to/output -->
