@@ -13,7 +13,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Changed names of midmem.config and execute.config into F72.config and M64.config respectively.
 - Rename bug report to "Issue report" and remove old node names from it
-- Update GATK to 4.2.4.0
+- Update GATK to 4.2.4.0 to address Log4j critical vulnerability (https://github.com/advisories/GHSA-jfh8-c2jp-5v3q)
 
 ## [7.2.1] - 2021-10-28
 ### Changed
