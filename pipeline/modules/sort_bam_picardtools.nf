@@ -37,7 +37,7 @@ process run_SortSam_Picard  {
    set -euo pipefail
 
    java -Xmx${params.mem_command_sort_sam} -Djava.io.tmpdir=/temp_dir \
-      -jar /picard-tools/picard.jar \
+      -jar /usr/local/share/picard-slim-2.26.8-0/picard.jar \
       SortSam \
       --VALIDATION_STRINGENCY LENIENT \
       --INPUT ${input_bam} \

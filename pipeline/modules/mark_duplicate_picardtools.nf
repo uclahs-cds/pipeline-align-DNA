@@ -39,7 +39,7 @@ process run_MarkDuplicate_Picard {
    declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --INPUT /g' | sed '1s/^/--INPUT /')
 
    java -Xmx!{params.mem_command_mark_duplicates} -Djava.io.tmpdir=/temp_dir \
-      -jar /picard-tools/picard.jar \
+      -jar /usr/local/share/picard-slim-2.26.8-0/picard.jar \
       MarkDuplicates \
       --VALIDATION_STRINGENCY LENIENT \
       $INPUT \
