@@ -39,6 +39,7 @@ log.info """\
    - Picard Tools: ${params.docker_image_picardtools}
    - sha512sum: ${params.docker_image_sha512sum}
    - validate_params: ${params.docker_image_validate_params}
+   - GATK: ${params.docker_image_gatk}
 
    ------------------------------------
    Starting workflow...
