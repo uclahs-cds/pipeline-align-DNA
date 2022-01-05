@@ -11,9 +11,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Update GATK to 4.2.4.1 to address Log4j vulnerabilities (https://github.com/advisories/GHSA-8489-44mv-ggj8, https://github.com/advisories/GHSA-p6xc-xr62-6r2g)
 
+### Added
+- Add F32 config file
+
 ## [7.3.0] - 2021-12-16
 ### Added
 - Add mark_duplicates parameter to enable exclusion or inclusion of MarkDuplicates processes.
+
 ### Changed
 - Changed names of midmem.config and execute.config into F72.config and M64.config respectively.
 - Rename bug report to "Issue report" and remove old node names from it
