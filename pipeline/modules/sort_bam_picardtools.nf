@@ -59,7 +59,7 @@ process run_SortSam_Picard  {
    """
    set -euo pipefail
 
-   java -Xmx${params.mem_command_sort_sam} -Djava.io.tmpdir=/temp_dir \
+   java -Xmx${task.memory.getMega()}m -Djava.io.tmpdir=/temp_dir \
       -jar /picard-tools/picard.jar \
       SortSam \
       --VALIDATION_STRINGENCY LENIENT \
