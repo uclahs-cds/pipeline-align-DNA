@@ -13,7 +13,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 - Add F32 config file
-- Update Picard version to 2.26.10 to address Log4j critical vulnerability 
+- Update Picard version to 2.26.10 to address Log4j moderate vulnerability (https://github.com/advisories/GHSA-8489-44mv-ggj8)
 
 ## [7.3.0] - 2021-12-16
 ### Added
