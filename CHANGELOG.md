@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [7.3.1] - 2022-01-14
 ### Changed
 - Update GATK to 4.2.4.1 to address Log4j vulnerabilities (https://github.com/advisories/GHSA-8489-44mv-ggj8, https://github.com/advisories/GHSA-p6xc-xr62-6r2g)
 - Update Picard version to 2.26.10 to address Log4j moderate vulnerability (https://github.com/advisories/GHSA-8489-44mv-ggj8)
