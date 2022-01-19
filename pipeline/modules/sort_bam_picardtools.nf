@@ -7,12 +7,14 @@ process run_SortSam_Picard  {
    publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       enabled: params.save_intermediate_files && params.mark_duplicates,
       pattern: "*.{bam,bai}",
-      mode: 'copy'
+      mode: 'copy',
+      saveAs: { filename -> (file(filename).getExtension() == "bai") ? "${file(filename).baseName}.bam.bai" : "${filename}" }
 
    publishDir path: "${bam_output_dir}",
       enabled: !params.mark_duplicates,
       pattern: "*.{bam,bai}",
-      mode: 'copy'
+      mode: 'copy',
+      saveAs: { filename -> (file(filename).getExtension() == "bai") ? "${file(filename).baseName}.bam.bai" : "${filename}" }
 
    publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: ".command.*",
