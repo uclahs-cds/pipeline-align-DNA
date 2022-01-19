@@ -64,7 +64,9 @@ process align_DNA_BWA_MEM2 {
 workflow align_DNA_BWA_MEM2_workflow {
    aligner_output_dir = "${params.base_output_dir}/${params.bwa_version}/output"
    aligner_intermediate_dir = "${params.base_output_dir}/${params.bwa_version}/intermediate"
+   aligner_validation_dir = "${params.base_output_dir}/${params.bwa_version}/validation"
    aligner_log_dir = "${params.log_output_dir}/process-log/${params.bwa_version}"
+  
    take:
       ich_samples
       ich_samples_validate
@@ -74,7 +76,9 @@ workflow align_DNA_BWA_MEM2_workflow {
       run_validate(ich_samples_validate.mix(
          ich_reference_fasta,
          ich_reference_index_files
-         ))
+         ),
+         aligner_validation_dir
+         )
       align_DNA_BWA_MEM2(
          ich_samples,
          ich_reference_fasta,

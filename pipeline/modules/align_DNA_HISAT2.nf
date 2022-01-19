@@ -67,6 +67,7 @@ process align_DNA_HISAT2 {
 workflow align_DNA_HISAT2_workflow {
    aligner_output_dir = "${params.base_output_dir}/${params.hisat2_version}/output"
    aligner_intermediate_dir = "${params.base_output_dir}/${params.hisat2_version}/intermediate"
+   aligner_validation_dir = "${params.base_output_dir}/${params.hisat2_version}/validation"
    aligner_log_dir = "${params.log_output_dir}/process-log/${params.hisat2_version}"
    take:
       complete_signal //Output bam from previous MarkDuplicatesSpark process to ensure only one Spark process runs at a time
@@ -78,7 +79,9 @@ workflow align_DNA_HISAT2_workflow {
       run_validate(ich_samples_validate.mix(
          ich_reference_fasta,
          ich_reference_index_files
-         ))
+         ),
+         aligner_validation_dir
+         )
       align_DNA_HISAT2(
          ich_samples,
          ich_reference_fasta,
