@@ -77,7 +77,14 @@ workflow align_DNA_BWA_MEM2_workflow {
          ich_reference_fasta,
          ich_reference_index_files
          ),
-         aligner_validation_dir
+         aligner_log_dir
+         )
+
+      // change validation file name depending on whether inputs or outputs are being validated
+      //val_filename = ${task.process.split(':')[1].replace('_', '-')} == run-validate ? "input_validation.txt" : "output_validation.txt"
+      run_validate.out.val_file.collectFile(
+         name: 'input_validation.txt',
+         storeDir: "${aligner_validation_dir}"
          )
       align_DNA_BWA_MEM2(
          ich_samples,
@@ -105,7 +112,12 @@ workflow align_DNA_BWA_MEM2_workflow {
          och_bam.mix(
             och_bam_index,
             Channel.from(params.temp_dir, params.output_dir)
-            )
+            ),
+            aligner_log_dir
+         )
+      validate_output_file.out.val_file.collectFile(
+         name: 'output_validation.txt',
+         storeDir: "${aligner_validation_dir}"
          )
       
       emit:

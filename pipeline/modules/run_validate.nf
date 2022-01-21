@@ -1,14 +1,14 @@
 process run_validate {
    container params.docker_image_validate_params
 
-   publishDir path: "${aligner_validation_dir}",
+   publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}/${task.index}",
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "${task.process}/${task.process}-${task.index}/log${file(it).getName()}" }
+      saveAs: { "log${file(it).getName()}" }
 
    input:
    path(file_to_validate)
-   val(aligner_validation_dir)
+   val(log_output_dir)
 
    output:
    path(".command.*")
@@ -18,6 +18,6 @@ process run_validate {
    """
    set -euo pipefail
 
-   python -m validate -t file-input ${file_to_validate} > 'input_validation.txt'
+   python -m validate -t file-input ${file_to_validate} > "input_validation.txt"
    """
    }

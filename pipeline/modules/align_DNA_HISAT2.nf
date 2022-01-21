@@ -80,7 +80,11 @@ workflow align_DNA_HISAT2_workflow {
          ich_reference_fasta,
          ich_reference_index_files
          ),
-         aligner_validation_dir
+         aligner_log_dir
+         )
+      run_validate.out.val_file.collectFile(
+         name: 'input_validation.txt',
+         storeDir: "${aligner_validation_dir}"
          )
       align_DNA_HISAT2(
          ich_samples,
@@ -109,7 +113,13 @@ workflow align_DNA_HISAT2_workflow {
          och_bam.mix(
             och_bam_index,
             Channel.from(params.temp_dir, params.output_dir)
-            )
+            ),
+            aligner_log_dir
+         )
+
+      validate_output_file.out.val_file.collectFile(
+         name: 'output_validation.txt',
+         storeDir: "${aligner_validation_dir}"
          )
    }
 
