@@ -19,7 +19,7 @@ process run_SortSam_Picard  {
    publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "${library}-${lane}.log${file(it).getName()}" }
+      saveAs: { "${library}/${lane}/log${file(it).getName()}" }
 
    input:
       tuple(val(library), 

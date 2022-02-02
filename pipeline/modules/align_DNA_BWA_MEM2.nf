@@ -19,7 +19,7 @@ process align_DNA_BWA_MEM2 {
    publishDir path: "${params.log_output_dir}/process-log/${params.bwa_version}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "${file(read1_fastq).getSimpleName()}/${library}-${lane}.log${file(it).getName()}" }
+      saveAs: { "${library}/${lane}/log${file(it).getName()}" }
 
    // use "each" so the the reference files are passed through for each fastq pair alignment 
    input:
