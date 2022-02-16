@@ -6,7 +6,8 @@ process run_MarkDuplicate_Picard {
 
    publishDir path: "${bam_output_dir}",
       pattern: "*.{bam,bai}",
-      mode: 'copy'
+      mode: 'copy',
+      saveAs: { filename -> (file(filename).getExtension() == "bai") ? "${file(filename).baseName}.bam.bai" : "${filename}" }
 
    publishDir path: "${qc_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: "*.metrics",
