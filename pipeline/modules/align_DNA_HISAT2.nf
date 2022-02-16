@@ -69,6 +69,7 @@ workflow align_DNA_HISAT2_workflow {
    aligner_intermediate_dir = "${params.base_output_dir}/${params.hisat2_version}/intermediate"
    aligner_validation_dir = "${params.base_output_dir}/${params.hisat2_version}/validation"
    aligner_log_dir = "${params.log_output_dir}/process-log/${params.hisat2_version}"
+   aligner_qc_dir = "${params.base_output_dir}/${params.hisat2_version}/QC"
    take:
       complete_signal //Output bam from previous MarkDuplicatesSpark process to ensure only one Spark process runs at a time
       ich_samples
@@ -99,11 +100,11 @@ workflow align_DNA_HISAT2_workflow {
       } else {
          if (params.enable_spark) {
             //Run MarkduplicatesSpark only after BWA-MEM2 markduplicatesspark completes
-            run_MarkDuplicatesSpark_GATK(complete_signal, run_SortSam_Picard.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
+            run_MarkDuplicatesSpark_GATK(complete_signal, run_SortSam_Picard.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir, aligner_qc_dir)
             och_bam = run_MarkDuplicatesSpark_GATK.out.bam
             och_bam_index = run_MarkDuplicatesSpark_GATK.out.bam_index
          } else {
-            run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
+            run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir, aligner_qc_dir)
             och_bam = run_MarkDuplicate_Picard.out.bam
             och_bam_index = run_MarkDuplicate_Picard.out.bam_index
          }

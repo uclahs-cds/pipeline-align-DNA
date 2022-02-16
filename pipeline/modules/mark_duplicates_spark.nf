@@ -15,7 +15,7 @@ process run_MarkDuplicatesSpark_GATK  {
       pattern: "*.bam{,.bai}",
       mode: 'copy'
 
-   publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
+   publishDir path: "${qc_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: "*.metrics",
       enabled: params.save_intermediate_files,
       mode: 'copy'
@@ -31,6 +31,7 @@ process run_MarkDuplicatesSpark_GATK  {
       val(bam_output_dir)
       val(intermediate_output_dir)
       val(log_output_dir)
+      val(qc_output_dir)
 
    // after marking duplicates, bams will be merged by library so the library name is not needed
    // just the sample name (global variable), do not pass it as a val

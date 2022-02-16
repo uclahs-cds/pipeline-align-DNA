@@ -66,6 +66,7 @@ workflow align_DNA_BWA_MEM2_workflow {
    aligner_intermediate_dir = "${params.base_output_dir}/${params.bwa_version}/intermediate"
    aligner_validation_dir = "${params.base_output_dir}/${params.bwa_version}/validation"
    aligner_log_dir = "${params.log_output_dir}/process-log/${params.bwa_version}"
+   aligner_qc_dir = "${params.base_output_dir}/${params.bwa_version}/QC"
   
    take:
       ich_samples
@@ -98,11 +99,11 @@ workflow align_DNA_BWA_MEM2_workflow {
          och_bam = run_SortSam_Picard.out.bam
       } else {
          if (params.enable_spark) {
-            run_MarkDuplicatesSpark_GATK("completion_placeholder", run_SortSam_Picard.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
+            run_MarkDuplicatesSpark_GATK("completion_placeholder", run_SortSam_Picard.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir, aligner_qc_dir)
             och_bam = run_MarkDuplicatesSpark_GATK.out.bam
             och_bam_index = run_MarkDuplicatesSpark_GATK.out.bam_index
          } else {
-            run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
+            run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir, aligner_qc_dir)
             och_bam = run_MarkDuplicate_Picard.out.bam
             och_bam_index = run_MarkDuplicate_Picard.out.bam_index
          }
