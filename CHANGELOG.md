@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 ### Changed
 - Update `.gitignore` file according to [template] (https://github.com/uclahs-cds/template-NextflowPipeline/blob/main/.gitignore)
+- Standardize output and log directory structure
 
 ## [7.3.1] - 2022-01-14
 ### Changed

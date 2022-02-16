@@ -11,15 +11,15 @@ include { Generate_Sha512sum } from './check_512sum.nf'
 
 process align_DNA_BWA_MEM2 {
    container params.docker_image_bwa_and_samtools
-   publishDir path: "${params.bam_output_dir}/${params.bwa_version}",
+   publishDir path: "${params.base_output_dir}/${params.bwa_version}/intermediate/${task.process.split(':')[1].replace('_', '-')}",
       enabled: params.save_intermediate_files,
       pattern: "*.bam",
       mode: 'copy'
 
-   publishDir path: "${params.log_output_dir}/${task.process.replace(':', '/')}",
+   publishDir path: "${params.log_output_dir}/process-log/${params.bwa_version}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "${file(read1_fastq).getSimpleName()}/${library}-${lane}.log${file(it).getName()}" }
+      saveAs: { "${library}/${lane}/log${file(it).getName()}" }
 
    // use "each" so the the reference files are passed through for each fastq pair alignment 
    input:
@@ -62,7 +62,11 @@ process align_DNA_BWA_MEM2 {
    }
 
 workflow align_DNA_BWA_MEM2_workflow {
-   aligner_output_dir = "${params.bam_output_dir}/${params.bwa_version}"
+   aligner_output_dir = "${params.base_output_dir}/${params.bwa_version}/output"
+   aligner_intermediate_dir = "${params.base_output_dir}/${params.bwa_version}/intermediate"
+   aligner_validation_dir = "${params.base_output_dir}/${params.bwa_version}/validation"
+   aligner_log_dir = "${params.log_output_dir}/process-log/${params.bwa_version}"
+  
    take:
       ich_samples
       ich_samples_validate
@@ -72,24 +76,33 @@ workflow align_DNA_BWA_MEM2_workflow {
       run_validate(ich_samples_validate.mix(
          ich_reference_fasta,
          ich_reference_index_files
-         ))
+         ),
+         aligner_log_dir
+         )
+
+      // change validation file name depending on whether inputs or outputs are being validated
+      //val_filename = ${task.process.split(':')[1].replace('_', '-')} == run-validate ? "input_validation.txt" : "output_validation.txt"
+      run_validate.out.val_file.collectFile(
+         name: 'input_validation.txt',
+         storeDir: "${aligner_validation_dir}"
+         )
       align_DNA_BWA_MEM2(
          ich_samples,
          ich_reference_fasta,
          ich_reference_index_files.collect()
          )
-      run_SortSam_Picard(align_DNA_BWA_MEM2.out.bam, aligner_output_dir, aligner_output_dir)
+      run_SortSam_Picard(align_DNA_BWA_MEM2.out.bam, aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
       
       if (!params.mark_duplicates) {
          och_bam_index = run_SortSam_Picard.out.bam_index
          och_bam = run_SortSam_Picard.out.bam
       } else {
          if (params.enable_spark) {
-            run_MarkDuplicatesSpark_GATK("completion_placeholder", run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
+            run_MarkDuplicatesSpark_GATK("completion_placeholder", run_SortSam_Picard.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
             och_bam = run_MarkDuplicatesSpark_GATK.out.bam
             och_bam_index = run_MarkDuplicatesSpark_GATK.out.bam_index
          } else {
-            run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir)
+            run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
             och_bam = run_MarkDuplicate_Picard.out.bam
             och_bam_index = run_MarkDuplicate_Picard.out.bam_index
          }
@@ -99,7 +112,12 @@ workflow align_DNA_BWA_MEM2_workflow {
          och_bam.mix(
             och_bam_index,
             Channel.from(params.temp_dir, params.output_dir)
-            )
+            ),
+            aligner_log_dir
+         )
+      validate_output_file.out.val_file.collectFile(
+         name: 'output_validation.txt',
+         storeDir: "${aligner_validation_dir}"
          )
       
       emit:

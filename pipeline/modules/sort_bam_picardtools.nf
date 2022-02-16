@@ -4,28 +4,31 @@ process run_SortSam_Picard  {
    container params.docker_image_picardtools
    containerOptions "--volume ${params.temp_dir}:/temp_dir"
    
-   publishDir path: "${intermediate_output_dir}",
+   publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       enabled: params.save_intermediate_files && params.mark_duplicates,
       pattern: "*.{bam,bai}",
-      mode: 'copy'
+      mode: 'copy',
+      saveAs: { filename -> (file(filename).getExtension() == "bai") ? "${file(filename).baseName}.bam.bai" : "${filename}" }
 
    publishDir path: "${bam_output_dir}",
       enabled: !params.mark_duplicates,
       pattern: "*.{bam,bai}",
-      mode: 'copy'
+      mode: 'copy',
+      saveAs: { filename -> (file(filename).getExtension() == "bai") ? "${file(filename).baseName}.bam.bai" : "${filename}" }
 
-   publishDir path: "${params.log_output_dir}/${task.process.replace(':', '/')}",
+   publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "${library}-${lane}.log${file(it).getName()}" }
+      saveAs: { "${library}/${lane}/log${file(it).getName()}" }
 
    input:
       tuple(val(library), 
          val(lane),
          path(input_bam)
          )
-      val(intermediate_output_dir)
       val(bam_output_dir)
+      val(intermediate_output_dir)
+      val(log_output_dir)
    
    /** the first value of the tuple will be used as a key to group aligned and filtered bams
    * from the same sample and library but different lane together
