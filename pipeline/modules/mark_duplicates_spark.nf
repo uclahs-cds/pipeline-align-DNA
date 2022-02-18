@@ -15,12 +15,12 @@ process run_MarkDuplicatesSpark_GATK  {
       pattern: "*.bam{,.bai}",
       mode: 'copy'
 
-   publishDir path: "${bam_output_dir}",
+   publishDir path: "${qc_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: "*.metrics",
       enabled: params.save_intermediate_files,
       mode: 'copy'
 
-   publishDir path: "${params.log_output_dir}/${task.process.replace(':', '/')}",
+   publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "log${file(it).getName()}" }
@@ -29,6 +29,9 @@ process run_MarkDuplicatesSpark_GATK  {
       val(completion_signal)
       path(input_bams)
       val(bam_output_dir)
+      val(intermediate_output_dir)
+      val(log_output_dir)
+      val(qc_output_dir)
 
    // after marking duplicates, bams will be merged by library so the library name is not needed
    // just the sample name (global variable), do not pass it as a val
@@ -38,7 +41,28 @@ process run_MarkDuplicatesSpark_GATK  {
       path "${params.sample_name}.mark_dup.metrics"
       path(".command.*")
 
-   beforeScript 'chmod 777 `pwd`'
+   //Update tempdir permissions for user 'nobody'
+   beforeScript "chmod 777 `pwd`; \
+      if [[ ! -d ${params.temp_dir} ]]; \
+      then \
+         mkdir -p ${params.temp_dir}; \
+         chmod 777 ${params.temp_dir}; \
+      else \
+         if [[ ! `stat -c %a ${params.temp_dir}` == 777 ]]; \
+         then \
+            chmod 777 ${params.temp_dir}; \
+         fi; \
+      fi; \
+      if [[ ! -d ${params.spark_temp_dir} ]]; \
+      then \
+         mkdir -p ${params.spark_temp_dir}; \
+         chmod 777 ${params.spark_temp_dir}; \
+      else \
+         if [[ ! `stat -c %a ${params.spark_temp_dir}` == 777 ]]; \
+         then \
+            chmod 777 ${params.spark_temp_dir}; \
+         fi; \
+      fi"
 
    shell:
    bam_output_filename = "${params.bam_output_filename}"

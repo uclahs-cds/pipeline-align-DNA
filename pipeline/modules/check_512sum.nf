@@ -2,7 +2,10 @@
 process Generate_Sha512sum {    
    container params.docker_image_sha512sum
 
-   publishDir path: "${checksum_output_dir}", mode: 'copy'
+   publishDir path: "${checksum_output_dir}",
+      mode: "copy",
+      pattern: "*.sha512",
+      saveAs: { filename -> (filename.endsWith(".bai.sha512") && !filename.endsWith(".bam.bai.sha512")) ? "${file(file(filename).baseName).baseName}.bam.bai.sha512" : "${filename}"}
 
    input:
       file(input_file)

@@ -7,8 +7,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
 ## [Unreleased]
+### Changed
+- Update `.gitignore` file according to [template] (https://github.com/uclahs-cds/template-NextflowPipeline/blob/main/.gitignore)
+- Standardize output and log directory structure
+- Update index file extension from all processes to .bam.bai 
+
+## [7.3.1] - 2022-01-14
+### Changed
+- Update GATK to 4.2.4.1 to address Log4j vulnerabilities (https://github.com/advisories/GHSA-8489-44mv-ggj8, https://github.com/advisories/GHSA-p6xc-xr62-6r2g)
+- Update Picard version to 2.26.10 to address Log4j vulnerabilities (https://github.com/advisories/GHSA-8489-44mv-ggj8)
+
+### Added
+- Add F32 config file
+
+## [7.3.0] - 2021-12-16
+### Added
+- Add mark_duplicates parameter to enable exclusion or inclusion of MarkDuplicates processes.
+
+### Changed
+- Changed names of midmem.config and execute.config into F72.config and M64.config respectively.
+- Rename bug report to "Issue report" and remove old node names from it
+- Update GATK to 4.2.4.0 to address Log4j critical vulnerability (https://github.com/advisories/GHSA-jfh8-c2jp-5v3q)
+
+## [7.2.1] - 2021-10-28
+### Changed
+- Fix potential Spark temp directory permissions issue
 
 ### Added
 - Benchmarking report with BWA-MEM 2.1 added

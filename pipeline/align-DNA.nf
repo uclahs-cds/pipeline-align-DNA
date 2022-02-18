@@ -25,6 +25,7 @@ log.info """\
       output_dir: ${params.output_dir}
       bam_output_dir: ${params.bam_output_dir}
       bam_output_filename: ${params.bam_output_filename}
+      base_output_dir: ${params.base_output_dir}
       log_output_dir: ${params.log_output_dir}
       
    - options:
@@ -39,6 +40,7 @@ log.info """\
    - Picard Tools: ${params.docker_image_picardtools}
    - sha512sum: ${params.docker_image_sha512sum}
    - validate_params: ${params.docker_image_validate_params}
+   - GATK: ${params.docker_image_gatk}
 
    ------------------------------------
    Starting workflow...
@@ -46,7 +48,6 @@ log.info """\
    """
    .stripIndent()
 
-include { run_validate } from './modules/run_validate.nf'
 include { align_DNA_BWA_MEM2_workflow } from './modules/align_DNA_BWA_MEM2.nf'
 include { align_DNA_HISAT2_workflow } from './modules/align_DNA_HISAT2.nf'
 
