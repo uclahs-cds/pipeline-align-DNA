@@ -14,25 +14,29 @@ Figure 1 showed the alignment and pipeline wallclock using different number of t
 
 .. figure:: ../img/cpus/alignment_wallclock_barplot.png
     :alt: alignment-wallclock-barplot
+    :align: center
 
     **Fig. 1a:** Alignment wallclock barplot
 
 
 .. figure:: ../img/cpus/pipeline_wallclock_barplot.png
     :alt: pipeline-wallclock-barplot
+    :align: center
 
-    **Fig. 2a:** Pipeline wallclock barplot
+    **Fig. 1a:** Pipeline wallclock barplot
 
 Figure 2 showed the linear relationship between number of records in the FASTQ files against the corresponding runtime when using different number of threads. It is clear that the alignment time grows along with the number of records. 56 threads seems to provide the best overall alignment speed across all samples.
 
 .. figure:: ../img/cpus/alignment_wallclock_reads_scatter.png
     :alt: alignment-wallclock-reads-scatterplot
+    :align: center
 
     **Fig. 2a:** Alignment wallclock time vs reads scatterplot
 
 
 .. figure:: ../img/cpus/pipeline_wallclock_nreads_scatter.png
     :alt: pipeline-wallclock-nreads_scatter.png
+    :align: center
 
     **Fig. 2b:** Pipeline wallclock time vs reads scatterplot
 
@@ -41,12 +45,14 @@ threads. It's clear that more threads leads to a higher peak memory.
 
 .. figure:: ../img/cpus/peak_rss_reads_scatterplot.png
     :alt: reads-rss
+    :align: center
 
     **Fig. 3a:** Reads vs peak RSS scatterplot
 
 
 .. figure:: ../img/cpus/peak_vmem_reads_scatterplot.png
     :alt: reads-vmem
+    :align: center
 
     **Fig. 3b:** Reads vs peak vmem scatterplot
 
@@ -58,12 +64,14 @@ We then compared the alignment performence and peak memory usage of BWA-MEM2 2.1
 
 .. figure:: ../img/versions/alignment_wallclock_barplot.png
     :alt: alignement wallclock BWA versions
+    :align: center
 
     **Fig. 4a:** Alignment wallclock time comparison between BWA, BWA-MEM2 2.0 and BWA-MEM2 2.1
 
 
 .. figure:: ../img/versions/pipeline_wallclock_barplot.png
     :alt: pipeline wallclock BWA versions
+    :align: center
 
     **Fig. 4b:** Pipeline wallclock time comparison between BWA, BWA-MEM2 2.0 and BWA-MEM2 2.1
 
@@ -72,12 +80,14 @@ best.
 
 .. figure:: ../img/versions/alignment_wallclock_reads_scatter.png
     :alt: alignment wallclock vs reads BWA versions
+    :align: center
 
     **Fig. 5a:** Alignment wallclock time vs number of reads in BWA, BWA-MEM2 2.0 and BWA-MEM2 2.1
 
 
 .. figure:: ../img/versions/pipeline_wallclock_nreads_scatter.png
     :alt: pipeline wallclock vs reads BWA versions
+    :align: center
 
     **Fig. 5b:** Pipeline wallclock time vs number of reads in BWA, BWA-MEM2 2.0 and BWA-MEM2 2.1
 
@@ -86,12 +96,14 @@ BWA-MEM2 2.0, although still about twice as much as the original BWA.
 
 .. figure:: ../img/versions/peak_rss_reads_scatterplot.png
     :alt: reads vs peak rss in BWA versions
+    :align: center
 
     **Fig. 6a:** Reads vs peak rss in BWA, BWA-MEM2 2.0 and BWA-MEM2 2.1
 
 
 .. figure:: ../img/versions/peak_vmem_reads_scatterplot.png
     :alt: reads vs peak vmem in BWA versions
+    :align: center
 
     **Fig. 6b:** Reads vs peak vmem in BWA, BWA-MEM2 2.0 and BWA-MEM2 2.1
 
