@@ -29,7 +29,7 @@ The pipeline should be run **WITH A SINGLE SAMPLE AT A TIME**. Otherwise resourc
 
 Pipelines should be run **WITH A SINGLE SAMPLE AT TIME**. Otherwise resource allocation and Nextflow errors could cause the pipeline to fail.
 
-1. Make sure the pipeline is already downloaded to your machine. You can either download the stable release or the dev version by cloning the repo.  
+1. Make sure the pipeline is already downloaded to your machine. You can either download the stable release or the dev version by cloning the repo.
 
 2. Create a config file for input, output, and parameters. An example for a config file can be found [here](pipeline/nextflow.example.config). See [Inputs](#Inputs) for the detailed description of each variable in the config file. The config file can be generated using a python script (see below).
 
@@ -188,7 +188,7 @@ After marking dup BAM files, the BAM files are then indexed by utilizing Picard 
 |:-------|:------------|:-------|
 | `.bam` | Aligned, sorted, filtered and if needed, merged, BAM file(s) | align-DNA-*DATE*/*ALIGNER* |
 | `.bam.bai` | Index file for each BAM file | align-DNA-*DATE*/*ALIGNER* |
-| `.bam` files and metrics files | Intermediate outputs for each scientific tool (OPTIONAL) | align-DNA-*DATE*/*ALIGNER* | 
+| `.bam` files and metrics files | Intermediate outputs for each scientific tool (OPTIONAL) | align-DNA-*DATE*/*ALIGNER* |
 | `report.html`, `timeline.html` and `trace.txt` | A Nextflowreport, timeline and trace files | align-DNA-*DATE*/log |
 | `log.command.*` | Process specific logging files created by nextflow. | align-DNA-*DATE* |
 
@@ -198,11 +198,11 @@ After marking dup BAM files, the BAM files are then indexed by utilizing Picard 
 
 ### Test Data Set
 
-This pipeline was tested using the synthesized SMC-HET dataset as well as a multi-lane real sample CPCG0196-B1, using reference genome version GRCh38. Some benchmarking has been done comparing BWA-MEM2 v2.1, v2.0, and the original BWA. BWA-MEM2 is able to reduce approximately half of the runtime comparing to the original BWA, with the output BAM almost identical. See [here](https://uclahs.app.box.com/file/737244561716) for the benchmarking.
+This pipeline was tested using the synthesized SMC-HET dataset as well as a multi-lane real sample CPCG0196-B1, using reference genome version GRCh38. Some benchmarking has been done comparing BWA-MEM2 v2.1, v2.0, and the original BWA. BWA-MEM2 is able to reduce approximately half of the runtime comparing to the original BWA, with the output BAM almost identical. See [here](docs/benchmarking.md) for the benchmarking.
 
 ### Validation <version number\>
 
-| metric | Result | 
+| metric | Result |
 |:-------|:-------|
 | raw total sequences | 1.0000000 |
 | filtered sequences | NaN |
