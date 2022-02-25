@@ -38,8 +38,9 @@ process run_SortSam_Picard  {
    */
    
    output:
-      path "*.bam", emit: bam
+      path "${bam_output_filename}", emit: bam
       path "*.bai", emit: bam_index optional true
+      path input_bam, emit: bam_for_deletion
       path(".command.*")
 
    script:
