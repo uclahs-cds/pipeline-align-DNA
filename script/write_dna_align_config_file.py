@@ -4,13 +4,16 @@ Usage:
     write_dna_align_config_file.py param
     write_dna_align_config_file.py example
     write_dna_align_config_file.py <input_csv> (bwa-mem2 | hisat2) <reference_fasta> \
-<output_dir> <temp_dir>
+<output_dir> <temp_dir> <spark_temp_dir>
         [--save_intermediate_files]
+        [--enable_spark]
+        [--mark_duplicates]
         [--cache_intermediate_pipeline_steps]
         [--HISAT2_fasta_index=<path>]
         [--blcds_registered_dataset_input]
         [--blcds_registered_dataset_output]
         [--save_bam_and_log_to_blcds]
+        [--reference_genome_version=<genome_version>]
         [--blcds_disease_id=<disease_id>]
         [--blcds_dataset_id=<dataset_id>]
         [--blcds_patient_id=<patient_id>]
@@ -41,10 +44,14 @@ def print_params():
         <reference_fasta>: absolute path to the refernce fasta file
         <output_dir>: absolute path to the output directory
         <temp_dir>: absolute path to a temp directory
+        <spark_temp_dir>: Path to temp dir for Spark processes
 
     Options:
         --HISAT2_fasta_index=<path>: Only if hisat2 is chosen, the reference fasta index should be given
-
+        --enable_spark: Enable use of Spark processes. When true, MarkDuplicatesSpark will be used.
+            When false, MarkDuplicates will be used.
+        --mark_duplicates: Enable use of Picard Tool’s MarkDuplicates. Recommended for large
+         inputs with multiple aligners being specified.
         --save_intermediate_files: use to save intermediate files. [default: None]
         --cache_intermediate_pipeline_steps default  : [default: None]
         --blcds_registered_dataset_input: use if the data input fastq files are registered 
@@ -73,18 +80,19 @@ def print_example():
     example = "example command 1: here the bwa-mem2 aligner is chosen:\n\n" \
         + "python3 write_DNA_align_config_file.py " \
         + "path/to/input_csv/name_of_sample_with_no_spaces.csv bwa-mem2 "\
-        + "/path/to/bwa/fasta/genome.fa " \
-        + "where/to/save/outputs/ /local/disk/for/temp/file/dir/\n\n" \
+        + "/path/to/bwa/fasta/genome.fa where/to/save/outputs/ /local/disk/for/temp/file/dir/ " \
+        + "/path/to/spark/temp/dir/ --enable_spark\n\n" \
         + "example command 2: here the hisat2 aligner is chosen and " \
         + "--cache_intermediate_pipeline_steps, and --save_bam_and_log_to_blcds flages are used:" \
         + "\n\npython3 write_dna_align_config_file.py " \
         + "path/to/input_csv/name_of_sample_with_no_spaces.csv hisat2 "\
         + "/path/to/bwa/fasta/genome.fa " \
-        + "where/to/save/outputs/ /local/disk/for/temp/file/dir/ --save_bam_and_log_to_blcds " \
-        + "--cache_intermediate_pipeline_steps --HISAT2_fasta_index=path/to/index " \
-        + "--blcds_disease_id=my_disease_id --blcds_patient_id=my_patient_id " \
-        + "--blcds_sample_id=my_sample_id --blcds_analyte=RNA --blcds_technology=WTS " \
-        + "--blcds_mount_dir=/hot --blcds_dataset_id=my_dataset-i"
+        + "where/to/save/outputs/ /local/disk/for/temp/file/dir/ /path/to/spark/temp/dir/ " \
+        + "--enable_spark --save_bam_and_log_to_blcds --cache_intermediate_pipeline_steps " \
+        + "--HISAT2_fasta_index=path/to/index  --blcds_disease_id=my_disease_id " \
+        + "--blcds_patient_id=my_patient_id  --blcds_sample_id=my_sample_id --blcds_analyte=RNA " \
+        + "--blcds_technology=WTS --blcds_mount_dir=/hot --blcds_dataset_id=my_dataset-i " \
+        + "--reference_genome_version=GRCh38"
     print(example)
 
 def aligner_type_choice(args):
@@ -136,6 +144,26 @@ def is_blcds_registered_dataset_input(args):
         return "blcds_registered_dataset_input = true"
     return "blcds_registered_dataset_input = false"
 
+def is_enable_spark(args):
+    """
+    :param args: docopt arguments
+    :return: if is_enable_spark flag is used, return "the line that should be
+    printed = true", otherwise false
+    """
+    if args["--enable_spark"]:
+        return "enable_spark = true"
+    return "enable_spark = false"
+
+def is_mark_duplicates(args):
+    """
+    :param args: docopt arguments
+    :return: if mark_duplicates flag is used, return "the line that should be
+    printed = true", otherwise false
+    """
+    if args["--mark_duplicates"]:
+        return "mark_duplicates = true"
+    return "mark_duplicates = false"
+
 def blcds_registered_dataset_output(args):
     """
     :param args: docopt arguments
@@ -155,6 +183,7 @@ def is_save_bam_and_log_to_blcds(args):
     if args["--save_bam_and_log_to_blcds"]:
         # test if all required args were used
         required_args =  [
+        "reference_genome_version",
         "blcds_disease_id",
         "blcds_dataset_id",
         "blcds_patient_id",
@@ -166,7 +195,8 @@ def is_save_bam_and_log_to_blcds(args):
         if not all(args[f"--{required_arg}"] for required_arg in required_args):
             raise ValueError(
                     "if save_bam_and_log_to_blcds is used, disease_id, dataset_id, patient_id" \
-                    "sample_id, analyte, technology, and mount_dir must be given"
+                    "sample_id, analyte, technology, reference_genome_version and mount_dir must" \
+                    "be given"
                     )
         string_to_return = "\tblcds_cluster_slurm = true\n"
         for required_arg in required_args:
@@ -191,6 +221,7 @@ if __name__ == "__main__":
     input_csv = os.path.join(os.path.dirname(arguments["<input_csv>"]), "${SAMPLE}.csv")
     output_dir = os.path.join(arguments["<output_dir>"], "${SAMPLE}")
     temp_dir = arguments["<temp_dir>"]
+    spark_temp_dir = arguments["<spark_temp_dir>"]
 
     # create the string for writing to the config file
     string_for_writing = f"final String SAMPLE = '{sample_name}'\n\
@@ -200,8 +231,11 @@ params {{\n\
 \t{aligner_type_choice(arguments)}\n\
 \toutput_dir = \"{output_dir}\"\n\
 \ttemp_dir = \"{temp_dir}\"\n\
+\tspark_temp_dir = \"{spark_temp_dir}\"\n\
 \t{is_save_inter(arguments)}\n\
 \t{is_cache_intermediate_pipeline_steps(arguments)}\n\
+\t{is_enable_spark(arguments)}\n\
+\t{is_mark_duplicates(arguments)}\n\
 \t{is_blcds_registered_dataset_input(arguments)}\n\
 \t{blcds_registered_dataset_output(arguments)}\n\
 {is_save_bam_and_log_to_blcds(arguments)}\
