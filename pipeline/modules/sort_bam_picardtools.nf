@@ -2,7 +2,7 @@
 // sort coordinate or queryname order with picard
 process run_SortSam_Picard  {
    container params.docker_image_picardtools
-   containerOptions "--volume ${params.temp_dir}:/temp_dir"
+   containerOptions "--volume ${params.work_dir}:/temp_dir"
    
    publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       enabled: params.save_intermediate_files && params.mark_duplicates,
