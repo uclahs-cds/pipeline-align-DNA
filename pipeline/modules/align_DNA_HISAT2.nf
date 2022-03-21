@@ -125,7 +125,7 @@ workflow align_DNA_HISAT2_workflow {
       validate_output_file(
          och_bam.mix(
             och_bam_index,
-            Channel.from(params.temp_dir, params.output_dir)
+            Channel.from(params.work_dir, params.output_dir)
             ),
             aligner_log_dir
          )
