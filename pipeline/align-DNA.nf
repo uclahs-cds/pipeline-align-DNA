@@ -21,7 +21,7 @@ log.info """\
       reference_fasta_index_files_hisat2: ${params.aligner.contains("HISAT2") ? params.reference_fasta_index_files_hisat2 : "None"}
 
    - output: 
-      temp_dir: ${params.temp_dir}
+      work_dir: ${params.work_dir}
       output_dir: ${params.output_dir}
       bam_output_dir: ${params.bam_output_dir}
       bam_output_filename: ${params.bam_output_filename}

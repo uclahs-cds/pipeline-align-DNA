@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Update index file extension from all processes to .bam.bai 
 - Standardize config files
 - Remove spark_temp_dir parameter from config template
+- Replace temp_dir parameter with work_dir parameter
 
 ### Added
 - Intermediate file removal

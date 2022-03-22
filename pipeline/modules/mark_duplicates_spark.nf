@@ -9,7 +9,7 @@
 */
 process run_MarkDuplicatesSpark_GATK  {
    container params.docker_image_gatk
-   containerOptions "--volume ${params.temp_dir}:/temp_dir --volume ${params.spark_temp_dir}:/spark_temp_dir -u nobody"
+   containerOptions "--volume ${params.work_dir}:/temp_dir --volume ${params.spark_temp_dir}:/spark_temp_dir -u nobody"
 
    publishDir path: "${bam_output_dir}",
       pattern: "*.bam{,.bai}",
@@ -43,14 +43,14 @@ process run_MarkDuplicatesSpark_GATK  {
 
    //Update tempdir permissions for user 'nobody'
    beforeScript "chmod 777 `pwd`; \
-      if [[ ! -d ${params.temp_dir} ]]; \
+      if [[ ! -d ${params.work_dir} ]]; \
       then \
-         mkdir -p ${params.temp_dir}; \
-         chmod 777 ${params.temp_dir}; \
+         mkdir -p ${params.work_dir}; \
+         chmod 777 ${params.work_dir}; \
       else \
-         if [[ ! `stat -c %a ${params.temp_dir}` == 777 ]]; \
+         if [[ ! `stat -c %a ${params.work_dir}` == 777 ]]; \
          then \
-            chmod 777 ${params.temp_dir}; \
+            chmod 777 ${params.work_dir}; \
          fi; \
       fi; \
       if [[ ! -d ${params.spark_temp_dir} ]]; \
