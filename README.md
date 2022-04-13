@@ -45,7 +45,7 @@ To submit to UCLAHS-CDS's Azure cloud, use the submission script [here](https://
 
 ```bash
 python path/to/submit_nextflow_pipeline.py \
-    --nextflow_script path/to/pipeline-align-DNA.nf \
+    --nextflow_script path/to/main.nf \
     --nextflow_config path/to/sample-specific.config \
     --pipeline_run_name <sample_name> \
     --partition_type F72 \
