@@ -48,8 +48,8 @@ log.info """\
    """
    .stripIndent()
 
-include { align_DNA_BWA_MEM2_workflow } from './modules/align_DNA_BWA_MEM2.nf'
-include { align_DNA_HISAT2_workflow } from './modules/align_DNA_HISAT2.nf'
+include { align_DNA_BWA_MEM2_workflow } from './module/align_DNA_BWA_MEM2.nf'
+include { align_DNA_HISAT2_workflow } from './module/align_DNA_HISAT2.nf'
 
 workflow {
    if (!(params.aligner.contains("BWA-MEM2") || params.aligner.contains("HISAT2"))) {
