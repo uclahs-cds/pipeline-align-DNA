@@ -17,8 +17,9 @@ process run_MarkDuplicatesSpark_GATK  {
 
    publishDir path: "${qc_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: "*.metrics",
-      enabled: params.save_intermediate_files,
-      mode: 'copy'
+      mode: 'copy',
+      enabled: params.spark_metrics,
+      saveAs: { "${file(it).getName()}" }
 
    publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: ".command.*",
@@ -66,7 +67,7 @@ process run_MarkDuplicatesSpark_GATK  {
 
    shell:
    bam_output_filename = "${params.bam_output_filename}"
-   include_metrics = params.spark_metrics ? "--metrics-file !{params.sample_name}.mark_dup.metrics" : ""
+   include_metrics = params.spark_metrics ? "--metrics-file ${params.sample_name}.mark_dup.metrics" : ""
    ''' 
    set -euo pipefail
 
