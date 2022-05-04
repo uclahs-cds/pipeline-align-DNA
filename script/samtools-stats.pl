@@ -24,7 +24,7 @@ use Carp;
 ### COMMAND LINE DEFAULT ARGUMENTS ################################################################
 # list of arguments and default values go here as hash key/value pairs
 our %opts = (
-	path_nf    => '/hot/pipelines/development/slurm/align-DNA/outputs/temp-caden',
+	path_nf    => '/hot/pipelines/development/slurm/align-DNA/output/temp-caden',
 	path_hpci  => '/data/users/shutao/sge_germline_variants/mapping/*/*/output_bwa/*_DNA_alignments/bwa/0.7.15/*/',
 	cluster => 'Slurm'
 	);
