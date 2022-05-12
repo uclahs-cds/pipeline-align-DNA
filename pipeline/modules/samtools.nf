@@ -68,22 +68,18 @@ process run_samtools_sort  {
    """
    }
 
-/** Add code for samtools index*/
-// sort coordinate or queryname order with picard
 process run_index_SAMtools  {
    container params.docker_image_samtools
    
    publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       enabled: params.save_intermediate_files,
       pattern: "*.bai",
-      mode: 'copy' /*
-       saveAs: { filename -> "${file(filename).baseName}.bam.bai" } */
+      mode: 'copy' 
 
     publishDir path: "${bam_output_dir}",
       enabled: !params.mark_duplicates,
       pattern: "*.bai",
-      mode: 'copy' /*,
-      saveAs: { filename -> "${file(filename).baseName}.bai" } */
+      mode: 'copy' 
 
    publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: ".command.*",
