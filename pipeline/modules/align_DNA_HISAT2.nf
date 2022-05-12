@@ -4,7 +4,7 @@
 // samtools due to the large size of the uncompressed SAM files.
 
 include { run_validate; run_validate as validate_output_file } from './run_validate.nf'
-include { run_SortSam_Picard } from './sort_bam_picardtools.nf'
+include { run_samtools_sort ; run_index_SAMtools } from './samtools.nf'
 include { run_MarkDuplicate_Picard } from './mark_duplicate_picardtools.nf'
 include { run_MarkDuplicatesSpark_GATK } from './mark_duplicates_spark.nf'
 include { Generate_Sha512sum } from './check_512sum.nf'
@@ -99,24 +99,26 @@ workflow align_DNA_HISAT2_workflow {
          ich_reference_fasta,
          ich_reference_index_files.collect()
          )
-      run_SortSam_Picard(align_DNA_HISAT2.out.bam, aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
+      run_samtools_sort(align_DNA_HISAT2.out.bam, aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
 
       remove_intermediate_files(
-         run_SortSam_Picard.out.bam_for_deletion,
+         run_samtools_sort.out.bam_for_deletion,
          "decoy_signal"
-         )
+         ) 
       
       if (!params.mark_duplicates) {
-         och_bam_index = run_SortSam_Picard.out.bam_index
-         och_bam = run_SortSam_Picard.out.bam
+         run_index_SAMtools(run_samtools_sort.out.bam, aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
+         och_bam_index = run_index_SAMtools.out.index
+         och_bam = run_samtools_sort.out.bam
+
       } else {
          if (params.enable_spark) {
             //Run MarkduplicatesSpark only after BWA-MEM2 markduplicatesspark completes
-            run_MarkDuplicatesSpark_GATK(complete_signal, run_SortSam_Picard.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir, aligner_qc_dir)
+            run_MarkDuplicatesSpark_GATK(complete_signal, run_samtools_sort.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir, aligner_qc_dir)
             och_bam = run_MarkDuplicatesSpark_GATK.out.bam
             och_bam_index = run_MarkDuplicatesSpark_GATK.out.bam_index
          } else {
-            run_MarkDuplicate_Picard(run_SortSam_Picard.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir, aligner_qc_dir)
+            run_MarkDuplicate_Picard(run_samtools_sort.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir, aligner_qc_dir)
             och_bam = run_MarkDuplicate_Picard.out.bam
             och_bam_index = run_MarkDuplicate_Picard.out.bam_index
          }
