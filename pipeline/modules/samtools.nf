@@ -76,14 +76,14 @@ process run_index_SAMtools  {
    publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       enabled: params.save_intermediate_files,
       pattern: "*.bai",
-      mode: 'copy',
-      saveAs: { filename -> "${file(filename).baseName}.bam.bai" }
+      mode: 'copy' /*
+       saveAs: { filename -> "${file(filename).baseName}.bam.bai" } */
 
     publishDir path: "${bam_output_dir}",
       enabled: !params.mark_duplicates,
       pattern: "*.bai",
-      mode: 'copy',
-      saveAs: { filename -> "${file(filename).baseName}.bam.bai" } 
+      mode: 'copy' /*,
+      saveAs: { filename -> "${file(filename).baseName}.bai" } */
 
    publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: ".command.*",
