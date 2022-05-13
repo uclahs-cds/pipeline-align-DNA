@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Use samtools sort instead of picard sortsam
+
+### Added
+- Use samtools index in the case MarkDuplicates (set by mark_duplicates parameter) is false
 
 ## [8.0.0] - 2022-03-22
 ### Changed
