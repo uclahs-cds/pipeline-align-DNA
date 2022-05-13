@@ -11,7 +11,7 @@ process run_samtools_sort  {
 
    publishDir path: "${bam_output_dir}",
       enabled: !params.mark_duplicates,
-      pattern: "*.bam",
+      pattern: "${bam_output_filename}",
       mode: 'copy',
       saveAs: { filename -> "${filename}" }
 
