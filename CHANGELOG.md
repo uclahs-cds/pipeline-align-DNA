@@ -9,9 +9,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Changed
+- Restructure repo to follow [template](https://github.com/uclahs-cds/template-NextflowPipeline)
+- Rename align-DNA.nf to main.nf
 - Use samtools sort instead of picard sortsam
 
 ### Added
+- Add config file for F16 node
 - Use samtools index in the case MarkDuplicates (set by mark_duplicates parameter) is false
 
 ## [8.0.0] - 2022-03-22
