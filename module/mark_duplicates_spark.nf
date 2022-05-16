@@ -18,8 +18,7 @@ process run_MarkDuplicatesSpark_GATK  {
    publishDir path: "${qc_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: "*.metrics",
       mode: 'copy',
-      enabled: params.spark_metrics,
-      saveAs: { "${file(it).getName()}" }
+      enabled: params.spark_metrics
 
    publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: ".command.*",
