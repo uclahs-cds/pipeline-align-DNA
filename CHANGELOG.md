@@ -8,11 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-###Added
+### Added
 - Add config file for F16 node
 - Add parameter to toggle Spark metric generation. Default is off.
 
-###Changed
+### Changed
 - Restructure repo to follow [template](https://github.com/uclahs-cds/template-NextflowPipeline)
 - Rename align-DNA.nf to main.nf
 - Change output directory of MarkDuplicatesSpark metrics file to '/QC'.
