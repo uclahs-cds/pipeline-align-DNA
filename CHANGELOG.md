@@ -13,7 +13,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Add parameter to toggle Spark metric generation. Default is off.
 
 ### Changed
-- Rename process Generate_Sha512sum to generate_sha512
+- Rename process Generate_Sha512sum to generate_sha512sum
 - Restructure repo to follow [template](https://github.com/uclahs-cds/template-NextflowPipeline)
 - Rename align-DNA.nf to main.nf
 - Change output directory of MarkDuplicatesSpark metrics file to '/QC'.
