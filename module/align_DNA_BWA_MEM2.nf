@@ -7,7 +7,7 @@ include { run_validate; run_validate as validate_output_file } from './validatio
 include { run_SortSam_Picard } from './sort_bam_picardtools.nf'
 include { run_MarkDuplicate_Picard } from './mark_duplicate_picardtools.nf'
 include { run_MarkDuplicatesSpark_GATK } from './mark_duplicates_spark.nf'
-include { Generate_Sha512sum } from './check_512sum.nf'
+include { generate_sha512sum } from './check_512sum.nf'
 include { remove_intermediate_files } from '../external/nextflow-modules/modules/common/intermediate_file_removal/main.nf' addParams(
    options: [
       save_intermediate_files: params.save_intermediate_files,
@@ -120,7 +120,7 @@ workflow align_DNA_BWA_MEM2_workflow {
             och_bam_index = run_MarkDuplicate_Picard.out.bam_index
          }
       }
-      Generate_Sha512sum(och_bam_index.mix(och_bam), aligner_output_dir)
+      generate_sha512sum(och_bam_index.mix(och_bam), aligner_output_dir)
       validate_output_file(
          och_bam.mix(
             och_bam_index,
