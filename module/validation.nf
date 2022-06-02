@@ -1,4 +1,4 @@
-process run_validate {
+process run_validate_PipeVal {
    container params.docker_image_validate_params
 
    publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}/${task.index}",
