@@ -1,13 +1,12 @@
 // sort coordinate or queryname order with picard
-process run_samtools_sort  {
+process run_sort_SAMtools  {
    container params.docker_image_samtools
    /** containerOptions "--volume ${params.work_dir}:/temp_dir" */
    
    publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       enabled: params.save_intermediate_files && params.mark_duplicates,
       pattern: "*.bam",
-      mode: 'copy',
-      saveAs: { filename -> ${filename} }
+      mode: 'copy'
 
    publishDir path: "${bam_output_dir}",
       enabled: !params.mark_duplicates,
