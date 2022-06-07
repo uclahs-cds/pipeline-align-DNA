@@ -104,7 +104,7 @@ workflow align_DNA_HISAT2_workflow {
       remove_intermediate_files(
          run_sort_SAMtools.out.bam_for_deletion,
          "decoy_signal"
-         ) 
+         )
       
       if (!params.mark_duplicates) {
          run_index_SAMtools(run_sort_SAMtools.out.bam, aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
