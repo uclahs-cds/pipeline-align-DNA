@@ -64,25 +64,25 @@ process run_MarkDuplicatesSpark_GATK  {
          fi; \
       fi"
 
-   shell:
+   script:
    bam_output_filename = "${params.bam_output_filename}"
    include_metrics = params.spark_metrics ? "--metrics-file ${params.sample_name}.mark_dup.metrics" : ""
-   ''' 
+   """ 
    set -euo pipefail
 
    # add gatk option prefix, '--input' to each input bam
-   declare -r INPUT=$(echo '!{input_bams}' | sed -e 's/ / --input /g' | sed '1s/^/--input /')
+   declare -r INPUT=\$(echo '${input_bams}' | sed -e 's/ / --input /g' | sed '1s/^/--input /')
 
    gatk --java-options "-Djava.io.tmpdir=/temp_dir" \
       MarkDuplicatesSpark \
       --read-validation-stringency LENIENT \
-      $INPUT \
-      --output !{bam_output_filename} \
-      !{include_metrics} \
+      \$INPUT \
+      --output ${bam_output_filename} \
+      ${include_metrics} \
       --program-name MarkDuplicatesSpark \
       --create-output-bam-index \
       --conf 'spark.executor.cores=${task.cpus}' \
       --conf 'spark.local.dir=/spark_temp_dir' \
       --tmp-dir /temp_dir
-   '''
+   """
    }
