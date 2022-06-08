@@ -1,20 +1,17 @@
-
-// sort coordinate or queryname order with picard
-process run_SortSam_Picard  {
-   container params.docker_image_picardtools
-   containerOptions "--volume ${params.work_dir}:/temp_dir"
+// sort coordinate or queryname order with samtools
+process run_sort_SAMtools  {
+   container params.docker_image_samtools
    
    publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       enabled: params.save_intermediate_files && params.mark_duplicates,
-      pattern: "*.{bam,bai}",
-      mode: 'copy',
-      saveAs: { filename -> (file(filename).getExtension() == "bai") ? "${file(filename).baseName}.bam.bai" : "${filename}" }
+      pattern: "*.bam",
+      mode: 'copy'
 
    publishDir path: "${bam_output_dir}",
       enabled: !params.mark_duplicates,
-      pattern: "*.{bam,bai}",
+      pattern: "${bam_output_filename}",
       mode: 'copy',
-      saveAs: { filename -> (file(filename).getExtension() == "bai") ? "${file(filename).baseName}.bam.bai" : "${filename}" }
+      saveAs: { filename -> "${filename}" }
 
    publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: ".command.*",
@@ -39,7 +36,6 @@ process run_SortSam_Picard  {
    
    output:
       path "${bam_output_filename}", emit: bam
-      path "*.bai", emit: bam_index optional true
       path input_bam, emit: bam_for_deletion
       path(".command.*")
 
@@ -51,25 +47,60 @@ process run_SortSam_Picard  {
    */
 
    if (!params.mark_duplicates) {
-         sort_order = "coordinate"
+         sort_order = "" /** Empty for sorting by coordinate*/
          bam_output_filename = "${params.bam_output_filename}"
-         index = true
-      } else {
-         sort_order = (params.enable_spark) ? "queryname" : "coordinate"
+      } else { 
+         sort_order = (params.enable_spark) ? "-n" : "" /** -n to sort by qname*/
          bam_output_filename = "${library}-${lane}.sorted.bam"
-         index = false
       }
    
    """
    set -euo pipefail
 
-   java -Xmx${task.memory.getMega()}m -Djava.io.tmpdir=/temp_dir \
-      -jar /usr/local/share/picard-slim-2.26.10-0/picard.jar \
-      SortSam \
-      --VALIDATION_STRINGENCY LENIENT \
-      --INPUT ${input_bam} \
-      --OUTPUT ${bam_output_filename} \
-      --SORT_ORDER ${sort_order} \
-      --CREATE_INDEX ${index}
+   samtools sort \
+    -@ ${task.cpus} \
+    -O bam \
+    -o ${bam_output_filename} \
+    ${sort_order} \
+    ${input_bam}
    """
    }
+
+process run_index_SAMtools  {
+   container params.docker_image_samtools
+   
+   publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
+      enabled: params.save_intermediate_files,
+      pattern: "*.bai",
+      mode: 'copy' 
+
+    publishDir path: "${bam_output_dir}",
+      enabled: !params.mark_duplicates,
+      pattern: "*.bai",
+      mode: 'copy' 
+
+   publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
+      pattern: ".command.*",
+      mode: "copy",
+      saveAs: { "log${file(it).getName()}" }
+
+   input:
+      path(bam)
+      val(bam_output_dir)
+      val(intermediate_output_dir)
+      val(log_output_dir)
+   
+   output:
+      path "*.bai", emit: index
+      path(".command.*")
+
+   script:
+   """
+   set -euo pipefail
+
+   samtools index \
+    -@ ${task.cpus} \
+    ${bam}
+   """
+   }
+
