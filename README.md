@@ -31,14 +31,14 @@ Pipelines should be run **WITH A SINGLE SAMPLE AT TIME**. Otherwise resource all
 
 1. Make sure the pipeline is already downloaded to your machine. You can either download the stable release or the dev version by cloning the repo.
 
-2. Create a config file for input, output, and parameters. An example for a config file can be found [here](nextflow.config). See [Inputs](#Inputs) for the detailed description of each variable in the config file. The config file can be generated using a python script (see below).
+2. Create a config file for input, output, and parameters. An example for a config file can be found [here](config/template.config). See [Inputs](#Inputs) for the detailed description of each variable in the config file. The config file can be generated using a python script (see below).
 
-3. Create the input csv using the [template](input/align-DNA.input.csv). The example csv is a single-lane sample, however this pipeline can take multi-lane sample as well, with each record in the csv file representing a lane (a paire of fastq). All records must have the same value in the **sample** column. See [Inputs](#Inputs) for detailed description of each column. All columns must exist in order to run the pipeline successfully.
+3. Create the input csv using the [template](input/align-DNA.input.csv). The example csv is a single-lane sample, however this pipeline can take multi-lane sample as well, with each record in the csv file representing a lane (a pair of fastq). All records must have the same value in the **sample** column. See [Inputs](#Inputs) for detailed description of each column. All columns must exist in order to run the pipeline successfully.
 
 4. The pipeline can be executed locally using the command below:
 
 ```bash
-nextflow run path/to/align-DNA.nf -config path/to/sample-specific.config
+nextflow run path/to/main.nf -config path/to/sample-specific.config
 ```
 
 To submit to UCLAHS-CDS's Azure cloud, use the submission script [here](https://github.com/uclahs-cds/tool-submit-nf) with the command below:
@@ -105,23 +105,23 @@ A directed acyclic graph of your pipeline.
 
 ### 1A. Alignment
 
-The first step of the pipeline utilizes [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) or [HISAT2](http://daehwankimlab.github.io/hisat2/main) to align paired reads, (see Tools and Infrastructure Section for details). BWA-MEM2 is the successor for the well-known aligner BWA. The bwa-mem2 mem command utilizes the -M option for marking shorter splits as secondary. This allows for compatibility with Picard Tools in downstream process and in particular prevents the underlying library of Picard Tools from recognizing these splits as duplicate reads (read names). Additionally, the -t option is utilized toincrease the number of threads used for alignment. The number of threads used in this step is by default to allow at least 2.5Gb memory per CPU, because of the large memory usage by BWA-MEM2. This can be overwritten by setting the bwa_mem_number_of_cpus parameter from the config file. For more details regarding the specific command that was run please refer to the Source Code section.
+The first step of the pipeline utilizes [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) or [HISAT2](http://daehwankimlab.github.io/hisat2/main) to align paired reads, (see Tools and Infrastructure Section for details). BWA-MEM2 is the successor for the well-known aligner BWA. The bwa-mem2 mem command utilizes the `-M` option for marking shorter splits as secondary. This allows for compatibility with Picard Tools in downstream process and in particular prevents the underlying library of Picard Tools from recognizing these splits as duplicate reads (read names). Additionally, the `-t` option is utilized to increase the number of threads used for alignment. The number of threads used in this step is by default to allow at least 2.5Gb memory per CPU, because of the large memory usage by BWA-MEM2. This can be overwritten by setting the `bwa_mem_number_of_cpus` parameter from the config file. For more details regarding the specific command that was run please refer to the Source Code section.
 
 ### 1B. Convert Align SAM File to BAM Format
 
-In the sampe step of the pipeline utilizes Samtool’sview command to convert the aligned SAM files into the compressed BAM format, (see Tools and Infrastructure Section for details). The Samtools view command utilizes the -s option for increasing the speed by removing duplicates and outputs the reads as they are ordered in the file.  Additionally, the -b option ensures the output is in BAM format and the -@ option is utilized to increase the number of threads. For more details regarding the specific command that was run please refer to the Source Code section.
+In the sampe (?) step of the pipeline utilizes Samtool’s `view` command to convert the aligned SAM files into the compressed BAM format, (see Tools and Infrastructure Section for details). The Samtools `view` command utilizes the `-s` option for increasing the speed by removing duplicates and outputs the reads as they are ordered in the file.  Additionally, the `-b` option ensures the output is in BAM format and the `-@` option is utilized to increase the number of threads. For more details regarding the specific command that was run please refer to the Source Code section.
 
 ### 2. Sort BAM Files in Coordinate or Queryname Order
 
 The next step of the pipeline utilizes Picard Tool’s `SortSam` command to sort the aligned BAM files in coordinate order or queryname order that is needed for downstream tools, (see Tools and Infrastructure Section for details). The `SortSam` command utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. Additionally, the `SORT_ORDER` option is utilized to ensure the file is sorted in coordinate order or queryname order depending on the downstream Mark Duplicates tool, since Picard and Spark have different sort-order requirements. For more details regarding the specific command that was run please refer to the Source Code section.
 
-For certain use-cases the pipeline may be configured to stop after this step using the mark_duplicates parameter in the config file. In this case the file is sorted in coordinate order and the `SortSam` command utilizes the `CREATE_INDEX` option to index the sorted BAM file. This option is intended for datasets generated with targeted sequencing panels (like our custom Proseq-G Prostate panel). High coverage target enrichment sequencing (like Illumina's [protocol](https://www.illumina.com/techniques/sequencing/dna-sequencing/targeted-resequencing/target-enrichment.html)) results in a large amount of read duplication that is not an artifact of PCR amplification. Marking these reads as duplicates will severely reduce coverage, and it is recommended that the pipeline be configured to not mark duplicates in this case.
+For certain use-cases the pipeline may be configured to stop after this step using the `mark_duplicates` parameter in the config file. In this case the file is sorted in coordinate order and the `SortSam` command utilizes the `CREATE_INDEX` option to index the sorted BAM file. This option is intended for datasets generated with targeted sequencing panels (like our custom Proseq-G Prostate panel). High coverage target enrichment sequencing (like Illumina's [protocol](https://www.illumina.com/techniques/sequencing/dna-sequencing/targeted-resequencing/target-enrichment.html)) results in a large amount of read duplication that is not an artifact of PCR amplification. Marking these reads as duplicates will severely reduce coverage, and it is recommended that the pipeline be configured to not mark duplicates in this case.
 
 ## 3. Mark Duplicates in BAM Files
 
-The next step of the pipeline utilizes Picard Tool’s `MarkDuplicates` command to mark duplicates in the BAM files, (see Tools and Infrastructure Section for details). The `MarkDuplicates` command utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. Additionally, the Program_Record_Id is set to “MarkDuplicates”. For more details regarding the specific command that was run please refer to the Source Code section.
+The next step of the pipeline utilizes Picard Tool’s `MarkDuplicates` command to mark duplicates in the BAM files, (see Tools and Infrastructure Section for details). The `MarkDuplicates` command utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. Additionally, the `Program_Record_Id` is set to `MarkDuplicates`. For more details regarding the specific command that was run please refer to the Source Code section.
 
-A faster Spark implementation of MarkDuplicates can also be used (MarkDuplicatesSpark from GATK). The process matches the output of Picard's MarkDuplicates with significant runtime improvements. An important note, however, the Spark version requires more disk space and can fail with large inputs with multiple aligners being specified due to insufficient disk space. In such cases, Picard's MarkDuplicates should be used instead.
+A faster Spark implementation of `MarkDuplicates` can also be used (`MarkDuplicatesSpark` from GATK). The process matches the output of Picard's `MarkDuplicates` with significant runtime improvements. An important note, however, the Spark version requires more disk space and can fail with large inputs with multiple aligners being specified due to insufficient disk space. In such cases, Picard's `MarkDuplicates` should be used instead.
 
 ## 4. Index BAM Files
 
@@ -199,7 +199,7 @@ After marking dup BAM files, the BAM files are then indexed by utilizing Picard 
 
 ### Test Data Set
 
-This pipeline was tested using the synthesized SMC-HET dataset as well as a multi-lane real sample CPCG0196-B1, using reference genome version GRCh38. Some benchmarking has been done comparing BWA-MEM2 v2.1, v2.0, and the original BWA. BWA-MEM2 is able to reduce approximately half of the runtime comparing to the original BWA, with the output BAM almost identical. See [here](docs/benchmarking.md) for the benchmarking.
+This pipeline was tested using the synthesized SMC-HET dataset as well as a multi-lane real sample CPCG0196-B1, using reference genome version GRCh38. Some benchmarking has been done comparing BWA-MEM2 v2.1, v2.0, and the original BWA. BWA-MEM2 is able to reduce approximately half of the runtime comparing to the original BWA, with the output BAM almost identical. See [here](docs/benchmarking.rst) for the benchmarking.
 
 ### Validation <version number\>
 
