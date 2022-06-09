@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Add parameter to toggle Spark metric generation. Default is off.
 
 ### Changed
+- Update README.md: fix links, format code, grammar
 - Remove bam_output_dir from main.nf since it is not used, undefined and causes warning
 - Change "shell" to "script" in processes
 - Moved F16.config to config folder
