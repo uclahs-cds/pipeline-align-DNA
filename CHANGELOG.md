@@ -20,6 +20,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Use samtools sort instead of picard sortsam
 
 ### Added
+- `.github/CODEOWNERS`
 - Add config file for F16 node
 - Use samtools index in the case MarkDuplicates (set by mark_duplicates parameter) is false
 - Add parameter to toggle Spark metric generation. Default is off.
