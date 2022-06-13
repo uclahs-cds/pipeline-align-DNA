@@ -23,7 +23,6 @@ log.info """\
    - output: 
       work_dir: ${params.work_dir}
       output_dir: ${params.output_dir}
-      bam_output_dir: ${params.bam_output_dir}
       bam_output_filename: ${params.bam_output_filename}
       base_output_dir: ${params.base_output_dir}
       log_output_dir: ${params.log_output_dir}
