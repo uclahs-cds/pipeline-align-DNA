@@ -8,20 +8,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Update `README.md`: fix links, format code, grammar
+- Remove `bam_output_dir` from `main.nf` since it is not used, undefined and causes warning
+- Change "shell" to "script" in proce
+- Move `F16.config` to config folder
+- Rename process `Generate_Sha512sum` to `generate_sha512sum`
+- Rename process `run_validate` to `run_validate_PipeVal`
+- Restructure repo to follow [template](https://github.com/uclahs-cds/template-NextflowPipeline)
+- Rename `align-DNA.nf` to `main.nf`
+- Change output directory of MarkDuplicatesSpark metrics file to '/QC'.
+- Use samtools `sort` instead of picard `sortsam`
+
 ### Added
 - Add config file for F16 node
+- Use samtools index in the case MarkDuplicates (set by mark_duplicates parameter) is false
 - Add parameter to toggle Spark metric generation. Default is off.
-
-### Changed
-- Update README.md: fix links, format code, grammar
-- Remove bam_output_dir from main.nf since it is not used, undefined and causes warning
-- Change "shell" to "script" in processes
-- Moved F16.config to config folder
-- Rename process Generate_Sha512sum to generate_sha512sum
-- Rename process run_validate to run_validate_PipeVal
-- Restructure repo to follow [template](https://github.com/uclahs-cds/template-NextflowPipeline)
-- Rename align-DNA.nf to main.nf
-- Change output directory of MarkDuplicatesSpark metrics file to '/QC'.
 
 ## [8.0.0] - 2022-03-22
 ### Changed
