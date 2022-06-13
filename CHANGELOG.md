@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Remove `bam_output_dir` from `main.nf` since it is not used, undefined and causes warning
 - Change "shell" to "script" in proce
-- Moved `F16.config` to config folder
+- Move `F16.config` to config folder
 - Rename process `Generate_Sha512sum` to `generate_sha512sum`
 - Rename process `run_validate` to `run_validate_PipeVal`
 - Restructure repo to follow [template](https://github.com/uclahs-cds/template-NextflowPipeline)
