@@ -40,4 +40,4 @@ already, or do not wish to be listed. (*This acknowledgement is optional.*)
 
 - [ ] I have updated the version number in the `metadata.yaml` and `manifest` block of the `nextflow.config` file following [semver](https://semver.org/), or the version number has already been updated. (*Leave it unchecked if you are unsure about new version number and discuss it with the infrastructure team in this PR.*)
 
-- [ ] I have tested the pipeline on at least one A-mini sample with aligner setting to `BWA-MEM2`, `HISAT2`, and both. The paths to the test config files and output directories were attached below.
+- [ ] I have tested the pipeline on at least one A-mini sample with aligner setting to `BWA-MEM2`, `HISAT2`, and both. The paths to the test config files and output directories were attached in the [Testing Results](#testing-results) section.
