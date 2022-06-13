@@ -9,12 +9,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Changed
-- Change "shell" to "script" in processes
-- Move F16.config to config folder
-- Rename process Generate_Sha512sum to generate_sha512sum
-- Rename process run_validate to run_validate_PipeVal
+- Remove `bam_output_dir` from `main.nf` since it is not used, undefined and causes warning
+- Change "shell" to "script" in proce
+- Move `F16.config` to config folder
+- Rename process `Generate_Sha512sum` to `generate_sha512sum`
+- Rename process `run_validate` to `run_validate_PipeVal`
 - Restructure repo to follow [template](https://github.com/uclahs-cds/template-NextflowPipeline)
-- Rename align-DNA.nf to main.nf
+- Rename `align-DNA.nf` to `main.nf`
 - Change output directory of MarkDuplicatesSpark metrics file to '/QC'.
 - Use samtools sort instead of picard sortsam
 
