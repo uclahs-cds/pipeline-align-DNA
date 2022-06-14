@@ -109,9 +109,11 @@ The first step of the pipeline utilizes [BWA-MEM2](https://github.com/bwa-mem2/b
 
 ### 1B. Convert Align SAM File to BAM Format
 
-In the sampe (?) step of the pipeline utilizes Samtool’s `view` command to convert the aligned SAM files into the compressed BAM format. The Samtools `view` command utilizes the `-s` option for increasing the speed by removing duplicates and outputs the reads as they are ordered in the file.  Additionally, the `-b` option ensures the output is in BAM format and the `-@` option is utilized to increase the number of threads.
+Samtools `view` command is used to convert the aligned SAM files into the compressed BAM format. The Samtools `view` command utilizes the `-s` option for increasing the speed by removing duplicates and outputs the reads as they are ordered in the file.  Additionally, the `-b` option ensures the output is in BAM format and the `-@` option is utilized to increase the number of threads.
 
 ### 2. Sort BAM Files in Coordinate or Queryname Order
+
+**Update this section after finish benchmarking Samtools sort vs Picard Tools SortSam**
 
 The next step of the pipeline utilizes Picard Tool’s `SortSam` command to sort the aligned BAM files in coordinate order or queryname order that is needed for downstream tools. The `SortSam` command utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. Additionally, the `SORT_ORDER` option is utilized to ensure the file is sorted in coordinate order or queryname order depending on the downstream Mark Duplicates tool, since Picard and Spark have different sort-order requirements.
 
@@ -125,7 +127,7 @@ A faster Spark implementation of `MarkDuplicates` can also be used (`MarkDuplica
 
 ## 4. Index BAM Files
 
-After marking dup BAM files, the BAM files are then indexed by utilizing Picard Tool’s `BuildBamIndex` command. This utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible.
+After marking up BAM files, the BAM files are then indexed by utilizing Picard Tool’s `BuildBamIndex` command. This utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible.
 
 ---
 
