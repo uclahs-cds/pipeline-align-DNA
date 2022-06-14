@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Changed
+- Remove sample name from `output_dir` in `template.config`
 - Update PR template to follow [here](https://github.com/uclahs-cds/template-NextflowPipeline/blob/main/.github/PULL_REQUEST_TEMPLATE.md)
 - Remove `bam_output_dir` from `main.nf` since it is not used, undefined and causes warning
 - Change "shell" to "script" in proce
