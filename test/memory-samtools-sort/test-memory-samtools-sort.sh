@@ -16,11 +16,11 @@ input_bam=a_mini_n1.bam;
 sort_order="-n";
 bam_output_filename=${input_bam}.sorted;
 
-#docker run \
-#    -v ${path_input_bam}:${path_input_bam} \
-#    -v ${path_out}:${path_out} \
-#    -w ${path_out} \
-#    blcdsdockerregistry/samtools:1.15.1 \
+docker run -u $(id -u):$(id -g) \
+    -v ${path_input_bam}:${path_input_bam} \
+    -v ${path_out}:${path_out} \
+    -w ${path_out} \
+    blcdsdockerregistry/samtools:1.15.1 \
     samtools sort \
         -@ ${task_cpus} \
         -O bam \
