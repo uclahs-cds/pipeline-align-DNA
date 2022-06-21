@@ -27,13 +27,21 @@ The pipeline should be run **WITH A SINGLE SAMPLE AT A TIME**. Otherwise resourc
 
 ## How To Run
 
+Below is a summary of how to run the pipeline.  See [here](https://confluence.mednet.ucla.edu/pages/viewpage.action?spaceKey=BOUTROSLAB&title=How+to+run+a+nextflow+pipeline) for full instructions.
+
 Pipelines should be run **WITH A SINGLE SAMPLE AT TIME**. Otherwise resource allocation and Nextflow errors could cause the pipeline to fail.
 
-1. Make sure the pipeline is already downloaded to your machine. You can either download the stable release or the dev version by cloning the repo.
+1. The recommended way of running the pipeline is to directly use the source code located here: `/hot/software/pipeline/pipeline-align-DNA/Nextflow/release`, rather than cloning a copy of the pipeline.
+
+    * The source code should never be modified when running our pipelines
 
 2. Create a config file for input, output, and parameters. An example for a config file can be found [here](config/template.config). See [Inputs](#Inputs) for the detailed description of each variable in the config file. The config file can be generated using a python script (see below).
 
+    * Do not directly modify the template config, but rather you should copy it from the pipeline release folder to your project-specific folder and modify it there
+
 3. Create the input csv using the [template](input/align-DNA.input.csv). The example csv is a single-lane sample, however this pipeline can take multi-lane sample as well, with each record in the csv file representing a lane (a pair of fastq). All records must have the same value in the **sample** column. See [Inputs](#Inputs) for detailed description of each column. All columns must exist in order to run the pipeline successfully.
+   
+   * Again, do not directly modify the source template csv file.  Instead, copy it from the pipeline release folder to your project-specific folder and modify it there.
 
 4. The pipeline can be executed locally using the command below:
 
