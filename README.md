@@ -109,7 +109,7 @@ The first step of the pipeline utilizes [BWA-MEM2](https://github.com/bwa-mem2/b
 
 ### 1B. Convert Align SAM File to BAM Format
 
-Samtools `view` command is used to convert the aligned SAM files into the compressed BAM format. The Samtools `view` command utilizes the `-s` option for increasing the speed by removing duplicates and outputs the reads as they are ordered in the file.  Additionally, the `-b` option ensures the output is in BAM format and the `-@` option is utilized to increase the number of threads.
+Samtools `view` command is used to convert the aligned SAM files into the compressed BAM format. The Samtools `view` command utilizes the `-S` option for increasing the speed by removing duplicates and outputs the reads as they are ordered in the file.  Additionally, the `-b` option ensures the output is in BAM format and the `-@` option is utilized to increase the number of threads.
 
 ### 2. Sort BAM Files in Coordinate or Queryname Order
 
@@ -127,7 +127,7 @@ A faster Spark implementation of `MarkDuplicates` can also be used (`MarkDuplica
 
 ## 4. Index BAM Files
 
-After marking up BAM files, the BAM files are then indexed by utilizing Picard Tool’s `BuildBamIndex` command. This utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible.
+After marking duplicated reads in BAM files, the BAM files are then indexed by utilizing Picard Tool’s `BuildBamIndex` command. This utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible.
 
 ---
 
