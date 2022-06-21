@@ -83,7 +83,7 @@ See the following command for example:
 python path/to/pipeline-align-DNA/script/write_dna_align_config_file.py \
 	/my/path/to/sample_name.csv \
 	bwa-mem2 \
-	/hot/ref/hg38/bwa-mem2/v2.1/genome.fa \
+	/hot/ref/tool-specific-input/BWA-MEM2-2.2.1/GRCh38-BI-20160721/index/genome.fa \
 	/my/path/to/output_directory \
 	/my/path/to/temp_directory \
 	--save_intermediate_files \
