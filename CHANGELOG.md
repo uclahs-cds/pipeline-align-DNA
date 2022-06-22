@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 ### Changed
 - Update `README.md`: fix links, format code, grammar
+- Remove sample name from `output_dir` in `template.config`
+- Update PR template to follow [here](https://github.com/uclahs-cds/template-NextflowPipeline/blob/main/.github/PULL_REQUEST_TEMPLATE.md)
 - Remove `bam_output_dir` from `main.nf` since it is not used, undefined and causes warning
 - Change "shell" to "script" in proce
 - Move `F16.config` to config folder
@@ -21,6 +23,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Use samtools `sort` instead of picard `sortsam`
 
 ### Added
+- `.github/CODEOWNERS`
 - Add config file for F16 node
 - Use samtools index in the case MarkDuplicates (set by mark_duplicates parameter) is false
 - Add parameter to toggle Spark metric generation. Default is off.
