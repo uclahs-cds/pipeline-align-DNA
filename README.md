@@ -11,7 +11,7 @@
 
 ## Overview
 
-The align-DNA nextflow pipeline, aligns paired-end data utilizing [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) and/or [HISAT2](http://daehwankimlab.github.io/hisat2/main), [Picard](https://github.com/broadinstitute/picard) Tools and [Samtools](https://github.com/samtools/samtools). The pipeline has been engineered to run in a 4 layer stack in a cloud-based scalable environment of CycleCloud, Slurm, Nextflow and Docker. Additionally, it has been validated with the SMC-HET dataset and reference GRCh38, where paired-end fastq’s were created with BAM Surgeon.
+The align-DNA nextflow pipeline, aligns paired-end data utilizing [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) and/or [HISAT2](http://daehwankimlab.github.io/hisat2/main), [Picard](https://github.com/broadinstitute/picard) Tools and [SAMtools](https://github.com/samtools/samtools). The pipeline has been engineered to run in a 4 layer stack in a cloud-based scalable environment of CycleCloud, Slurm, Nextflow and Docker. Additionally, it has been validated with the SMC-HET dataset and reference GRCh38, where paired-end fastq’s were created with BAM Surgeon.
 
 The pipeline should be run **WITH A SINGLE SAMPLE AT A TIME**. Otherwise resource allocation and Nextflow errors could cause the pipeline to fail.
 
@@ -120,11 +120,11 @@ The first step of the pipeline utilizes [BWA-MEM2](https://github.com/bwa-mem2/b
 
 ### 1B. Convert Align SAM File to BAM Format
 
-Samtools `view` command is used to convert the aligned SAM files into the compressed BAM format. The Samtools `view` command utilizes the `-S` option for increasing the speed by removing duplicates and outputs the reads as they are ordered in the file.  Additionally, the `-b` option ensures the output is in BAM format and the `-@` option is utilized to increase the number of threads.
+SAMtools `view` command is used to convert the aligned SAM files into the compressed BAM format. The SAMtools `view` command utilizes the `-S` option for increasing the speed by removing duplicates and outputs the reads as they are ordered in the file.  Additionally, the `-b` option ensures the output is in BAM format and the `-@` option is utilized to increase the number of threads.
 
 ### 2. Sort BAM Files in Coordinate or Queryname Order
 
-**Update this section after finish benchmarking Samtools sort vs Picard Tools SortSam**
+**Update this section after finish benchmarking SAMtools sort vs Picard Tools SortSam**
 
 The next step of the pipeline utilizes Picard Tool’s `SortSam` command to sort the aligned BAM files in coordinate order or queryname order that is needed for downstream tools. The `SortSam` command utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. Additionally, the `SORT_ORDER` option is utilized to ensure the file is sorted in coordinate order or queryname order depending on the downstream Mark Duplicates tool, since Picard and Spark have different sort-order requirements.
 
