@@ -132,7 +132,7 @@ process run_index_SAMtools  {
 
    script:
 
-   merged_bam_output_filename = "${library}-.sorted-merged.bam"
+   merged_bam_output_filename = "${library}-sorted-merged.bam"
 
    """
    set -euo pipefail
