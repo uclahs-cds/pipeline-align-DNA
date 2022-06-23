@@ -124,21 +124,19 @@ SAMtools `view` command is used to convert the aligned SAM files into the compre
 
 ### 2. Sort BAM Files in Coordinate or Queryname Order
 
-**Update this section after finish benchmarking SAMtools sort vs Picard Tools SortSam**
+The next step of the pipeline utilizes SAMtools `sort` command to sort the aligned BAM files in coordinate order or queryname order that is needed for downstream tools. Specifically, the `sort_order` option is utilized to ensure the file is sorted in coordinate order for Picard or queryname order for Spark.
 
-The next step of the pipeline utilizes Picard Tool’s `SortSam` command to sort the aligned BAM files in coordinate order or queryname order that is needed for downstream tools. The `SortSam` command utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. Additionally, the `SORT_ORDER` option is utilized to ensure the file is sorted in coordinate order or queryname order depending on the downstream Mark Duplicates tool, since Picard and Spark have different sort-order requirements.
-
-For certain use-cases the pipeline may be configured to stop after this step using the `mark_duplicates` parameter in the config file. In this case the file is sorted in coordinate order and the `SortSam` command utilizes the `CREATE_INDEX` option to index the sorted BAM file. This option is intended for datasets generated with targeted sequencing panels (like our custom Proseq-G Prostate panel). High coverage target enrichment sequencing (like Illumina's [protocol](https://www.illumina.com/techniques/sequencing/dna-sequencing/targeted-resequencing/target-enrichment.html)) results in a large amount of read duplication that is not an artifact of PCR amplification. Marking these reads as duplicates will severely reduce coverage, and it is recommended that the pipeline be configured to not mark duplicates in this case.
+For certain use-cases the pipeline may be configured to stop after this step using the `mark_duplicates=false` parameter in the config file. This option is intended for datasets generated with targeted sequencing panels (like our custom Proseq-G Prostate panel). High coverage target enrichment sequencing (like Illumina's [protocol](https://www.illumina.com/techniques/sequencing/dna-sequencing/targeted-resequencing/target-enrichment.html)) results in a large amount of read duplication that is not an artifact of PCR amplification. Marking these reads as duplicates will severely reduce coverage, and it is recommended that the pipeline be configured to not mark duplicates in this case.
 
 ## 3. Mark Duplicates in BAM Files
 
-The next step of the pipeline utilizes Picard Tool’s `MarkDuplicates` command to mark duplicates in the BAM files. The `MarkDuplicates` command utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. Additionally, the `Program_Record_Id` is set to `MarkDuplicates`.
+If `mark_duplicates=true` then the next step of the pipeline utilizes Picard Tool’s `MarkDuplicates` command to mark duplicates in the BAM files. The `MarkDuplicates` command utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. Additionally, the `Program_Record_Id` is set to `MarkDuplicates`.
 
 A faster Spark implementation of `MarkDuplicates` can also be used (`MarkDuplicatesSpark` from GATK). The process matches the output of Picard's `MarkDuplicates` with significant runtime improvements. An important note, however, the Spark version requires more disk space and can fail with large inputs with multiple aligners being specified due to insufficient disk space. In such cases, Picard's `MarkDuplicates` should be used instead.
 
 ## 4. Index BAM Files
 
-After marking duplicated reads in BAM files, the BAM files are then indexed by utilizing Picard Tool’s `BuildBamIndex` command. This utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible.
+After marking duplicated reads in BAM files, the BAM files are then indexed by using `--CREATE_INDEX true` for Picard's `MarkDuplicates`, or `--create-output-bam-index` for `MarkDuplicatesSpark`. This utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible.
 
 ---
 
