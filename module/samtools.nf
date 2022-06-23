@@ -127,7 +127,7 @@ process run_index_SAMtools  {
       val(log_output_dir)
    
    output:
-      path "${bam_output_filename}", emit: merged_bam
+      path "*.bam", emit: merged_bam
       path(".command.*")
 
    script:
@@ -138,7 +138,6 @@ process run_index_SAMtools  {
 
    samtools merge \
     --threads ${task.cpus} \
-    -o ${bam_output_filename} \
     ${bam}
    """
    }
