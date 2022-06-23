@@ -107,9 +107,12 @@ workflow align_DNA_HISAT2_workflow {
          )
       
       if (!params.mark_duplicates) {
-         run_index_SAMtools(run_sort_SAMtools.out.bam, aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
+                  // It's possible that run_sort_SAMtools may output multiple BAM files which need to be merged
+         // only need to merge when !params.mark_duplicates, since  run_MarkDuplicatesSpark_GATK and run_MarkDuplicate_Picard automatically handle multiple BAMs
+         run_merge_SAMtools(run_sort_SAMtools.out.bam.collect(), aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
+         run_index_SAMtools(run_merge_SAMtools.out.merged_bam, aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
          och_bam_index = run_index_SAMtools.out.index
-         och_bam = run_sort_SAMtools.out.bam
+         och_bam = run_merge_SAMtools.out.merged_bam
 
       } else {
          if (params.enable_spark) {
