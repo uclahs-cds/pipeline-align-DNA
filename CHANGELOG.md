@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Use SAMtools `sort` instead of Picard `SortSam`
 
 ### Added
+- Add process `run_merge_SAMtools`, use when `params.mark_duplicates=false`
 - `.github/CODEOWNERS`
 - Add config file for F16 node
 - Use SAMtools index in the case MarkDuplicates (set by mark_duplicates parameter) is false
