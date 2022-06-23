@@ -139,7 +139,7 @@ process run_index_SAMtools  {
 
    samtools merge \
     --threads ${task.cpus} \
-    -o ${merged_bam_output_filename} \ 
+    -o ${merged_bam_output_filename} \
     ${bam}
    """
    }
