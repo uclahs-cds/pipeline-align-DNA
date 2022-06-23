@@ -124,7 +124,7 @@ SAMtools `view` command is used to convert the aligned SAM files into the compre
 
 ### 2. Sort BAM Files in Coordinate or Queryname Order
 
-The next step of the pipeline utilizes SAMtools `sort` command to sort the aligned BAM files in coordinate order or queryname order that is needed for downstream tools. Specifically, the `sort_order` option is utilized to ensure the file is sorted in coordinate order for Picard or queryname order for Spark.
+The next step of the pipeline utilizes SAMtools `sort` command to sort the aligned BAM files in coordinate order or queryname order that is needed for downstream duplicate marking tools. Specifically, the `sort_order` option is utilized to ensure the file is sorted in coordinate order for Picard or queryname order for Spark.
 
 For certain use-cases the pipeline may be configured to stop after this step using the `mark_duplicates=false` parameter in the config file. This option is intended for datasets generated with targeted sequencing panels (like our custom Proseq-G Prostate panel). High coverage target enrichment sequencing (like Illumina's [protocol](https://www.illumina.com/techniques/sequencing/dna-sequencing/targeted-resequencing/target-enrichment.html)) results in a large amount of read duplication that is not an artifact of PCR amplification. Marking these reads as duplicates will severely reduce coverage, and it is recommended that the pipeline be configured to not mark duplicates in this case.
 
