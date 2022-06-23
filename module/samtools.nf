@@ -48,7 +48,7 @@ process run_sort_SAMtools  {
 
    if (!params.mark_duplicates) {
          sort_order = "" /** Empty for sorting by coordinate*/
-         bam_output_filename = "${params.bam_output_filename}"
+         bam_output_filename = "${library}-${lane}.sorted.bam"
       } else { 
          sort_order = (params.enable_spark) ? "-n" : "" /** -n to sort by qname*/
          bam_output_filename = "${library}-${lane}.sorted.bam"
@@ -100,6 +100,45 @@ process run_index_SAMtools  {
 
    samtools index \
     -@ ${task.cpus} \
+    ${bam}
+   """
+   }
+
+
+   process run_merge_SAMtools  {
+   container params.docker_image_samtools
+   
+   publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
+      // do we need `&& params.mark_duplicates` ?
+      enabled: params.save_intermediate_files && params.mark_duplicates,
+      pattern: "*.bam",
+      mode: 'copy'
+
+   publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
+      pattern: ".command.*",
+      mode: "copy",
+      saveAs: { "${library}/${lane}/log${file(it).getName()}" }
+
+   input:
+      // outputs from run_sort_SAMtools
+      path(bam) // bam file(s)
+      val(bam_output_dir) //directory of bam
+      val(intermediate_output_dir)
+      val(log_output_dir)
+   
+   output:
+      path "${bam_output_filename}", emit: merged_bam
+      path(".command.*")
+
+   script:
+
+   // Is -o ${bam_output_filename} correct?  or should the merged bam be named something else?
+   """
+   set -euo pipefail
+
+   samtools merge \
+    --threads ${task.cpus} \
+    -o ${bam_output_filename} \
     ${bam}
    """
    }
