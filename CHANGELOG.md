@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Changed
+- Update `README.md`: fix links, format code, grammar
 - Remove sample name from `output_dir` in `template.config`
 - Update PR template to follow [here](https://github.com/uclahs-cds/template-NextflowPipeline/blob/main/.github/PULL_REQUEST_TEMPLATE.md)
 - Remove `bam_output_dir` from `main.nf` since it is not used, undefined and causes warning
@@ -19,12 +20,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Restructure repo to follow [template](https://github.com/uclahs-cds/template-NextflowPipeline)
 - Rename `align-DNA.nf` to `main.nf`
 - Change output directory of MarkDuplicatesSpark metrics file to '/QC'.
-- Use samtools sort instead of picard sortsam
+- Use SAMtools `sort` instead of Picard `SortSam`
 
 ### Added
 - `.github/CODEOWNERS`
 - Add config file for F16 node
-- Use samtools index in the case MarkDuplicates (set by mark_duplicates parameter) is false
+- Use SAMtools index in the case MarkDuplicates (set by mark_duplicates parameter) is false
 - Add parameter to toggle Spark metric generation. Default is off.
 
 ## [8.0.0] - 2022-03-22
@@ -158,7 +159,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Dynamic resource allocation
 
 ### Changed
-- Version tool updates (BWA 0.7.17, Samtools 1.10, Picard Tools 2.23.3)
+- Version tool updates (BWA 0.7.17, SAMtools 1.10, Picard Tools 2.23.3)
 
 
 ## [0.0.1] - 2020-10-08

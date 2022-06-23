@@ -11,7 +11,7 @@
 
 ## Overview
 
-The align-DNA nextflow pipeline, aligns paired-end data utilizing [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) and/or [HISAT2](http://daehwankimlab.github.io/hisat2/main), [Picard](https://github.com/broadinstitute/picard) Tools and [Samtools](https://github.com/samtools/samtools). The pipeline has been engineered to run in a 4 layer stack in a cloud-based scalable environment of CycleCloud, Slurm, Nextflow and Docker. Additionally, it has been validated with the SMC-HET dataset and reference GRCh38, where paired-end fastq’s were created with BAM Surgeon.
+The align-DNA nextflow pipeline, aligns paired-end data utilizing [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) and/or [HISAT2](http://daehwankimlab.github.io/hisat2/main), [Picard](https://github.com/broadinstitute/picard) Tools and [SAMtools](https://github.com/samtools/samtools). The pipeline has been engineered to run in a 4 layer stack in a cloud-based scalable environment of CycleCloud, Slurm, Nextflow and Docker. Additionally, it has been validated with the SMC-HET dataset and reference GRCh38, where paired-end fastq’s were created with BAM Surgeon.
 
 The pipeline should be run **WITH A SINGLE SAMPLE AT A TIME**. Otherwise resource allocation and Nextflow errors could cause the pipeline to fail.
 
@@ -27,19 +27,30 @@ The pipeline should be run **WITH A SINGLE SAMPLE AT A TIME**. Otherwise resourc
 
 ## How To Run
 
+Below is a summary of how to run the pipeline.  See [here](https://confluence.mednet.ucla.edu/pages/viewpage.action?spaceKey=BOUTROSLAB&title=How+to+run+a+nextflow+pipeline) for full instructions.
+
 Pipelines should be run **WITH A SINGLE SAMPLE AT TIME**. Otherwise resource allocation and Nextflow errors could cause the pipeline to fail.
 
-1. Make sure the pipeline is already downloaded to your machine. You can either download the stable release or the dev version by cloning the repo.
+1. The recommended way of running the pipeline is to directly use the source code located here: `/hot/software/pipeline/pipeline-align-DNA/Nextflow/release`, rather than cloning a copy of the pipeline.
 
-2. Create a config file for input, output, and parameters. An example for a config file can be found [here](nextflow.config). See [Inputs](#Inputs) for the detailed description of each variable in the config file. The config file can be generated using a python script (see below).
+    * The source code should never be modified when running our pipelines
 
-3. Create the input csv using the [template](input/align-DNA.input.csv). The example csv is a single-lane sample, however this pipeline can take multi-lane sample as well, with each record in the csv file representing a lane (a paire of fastq). All records must have the same value in the **sample** column. See [Inputs](#Inputs) for detailed description of each column. All columns must exist in order to run the pipeline successfully.
+2. Create a config file for input, output, and parameters. An example for a config file can be found [here](config/template.config). See [Inputs](#Inputs) for the detailed description of each variable in the config file. The config file can be generated using a python script (see below).
+
+    * Do not directly modify the source `template.config`, but rather you should copy it from the pipeline release folder to your project-specific folder and modify it there
+
+3. Create the input csv using the [template](input/align-DNA.input.csv). The example csv is a single-lane sample, however this pipeline can take multi-lane sample as well, with each record in the csv file representing a lane (a pair of fastq). All records must have the same value in the **sample** column. See [Inputs](#Inputs) for detailed description of each column. All columns must exist in order to run the pipeline successfully.
+   
+   * Again, do not directly modify the source template csv file.  Instead, copy it from the pipeline release folder to your project-specific folder and modify it there.
 
 4. The pipeline can be executed locally using the command below:
 
 ```bash
-nextflow run path/to/align-DNA.nf -config path/to/sample-specific.config
+nextflow run path/to/main.nf -config path/to/sample-specific.config
 ```
+
+* For example, `path/to/main.nf` could be: `/hot/software/pipeline/pipeline-align-DNA/Nextflow/release/8.0.0/pipeline/align-DNA.nf`
+* `path/to/sample-specific.config` is the path to where you saved your project-specific copy of [template.config](config/template.config) 
 
 To submit to UCLAHS-CDS's Azure cloud, use the submission script [here](https://github.com/uclahs-cds/tool-submit-nf) with the command below:
 
@@ -83,7 +94,7 @@ See the following command for example:
 python path/to/pipeline-align-DNA/script/write_dna_align_config_file.py \
 	/my/path/to/sample_name.csv \
 	bwa-mem2 \
-	/hot/ref/hg38/bwa-mem2/v2.1/genome.fa \
+	/hot/ref/tool-specific-input/BWA-MEM2-2.2.1/GRCh38-BI-20160721/index/genome.fa \
 	/my/path/to/output_directory \
 	/my/path/to/temp_directory \
 	--save_intermediate_files \
@@ -105,27 +116,27 @@ A directed acyclic graph of your pipeline.
 
 ### 1A. Alignment
 
-The first step of the pipeline utilizes [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) or [HISAT2](http://daehwankimlab.github.io/hisat2/main) to align paired reads, (see Tools and Infrastructure Section for details). BWA-MEM2 is the successor for the well-known aligner BWA. The bwa-mem2 mem command utilizes the -M option for marking shorter splits as secondary. This allows for compatibility with Picard Tools in downstream process and in particular prevents the underlying library of Picard Tools from recognizing these splits as duplicate reads (read names). Additionally, the -t option is utilized toincrease the number of threads used for alignment. The number of threads used in this step is by default to allow at least 2.5Gb memory per CPU, because of the large memory usage by BWA-MEM2. This can be overwritten by setting the bwa_mem_number_of_cpus parameter from the config file. For more details regarding the specific command that was run please refer to the Source Code section.
+The first step of the pipeline utilizes [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) or [HISAT2](http://daehwankimlab.github.io/hisat2/main) to align paired reads. BWA-MEM2 is the successor for the well-known aligner BWA. The bwa-mem2 mem command utilizes the `-M` option for marking shorter splits as secondary. This allows for compatibility with Picard Tools in downstream process and in particular prevents the underlying library of Picard Tools from recognizing these splits as duplicate reads (read names). Additionally, the `-t` option is utilized to increase the number of threads used for alignment. The number of threads used in this step is by default to allow at least 2.5Gb memory per CPU, because of the large memory usage by BWA-MEM2. This can be overwritten by setting the `bwa_mem_number_of_cpus` parameter from the config file.
 
 ### 1B. Convert Align SAM File to BAM Format
 
-In the sampe step of the pipeline utilizes Samtool’sview command to convert the aligned SAM files into the compressed BAM format, (see Tools and Infrastructure Section for details). The Samtools view command utilizes the -s option for increasing the speed by removing duplicates and outputs the reads as they are ordered in the file.  Additionally, the -b option ensures the output is in BAM format and the -@ option is utilized to increase the number of threads. For more details regarding the specific command that was run please refer to the Source Code section.
+SAMtools `view` command is used to convert the aligned SAM files into the compressed BAM format. The SAMtools `view` command utilizes the `-S` option for increasing the speed by removing duplicates and outputs the reads as they are ordered in the file.  Additionally, the `-b` option ensures the output is in BAM format and the `-@` option is utilized to increase the number of threads.
 
 ### 2. Sort BAM Files in Coordinate or Queryname Order
 
-The next step of the pipeline utilizes Picard Tool’s `SortSam` command to sort the aligned BAM files in coordinate order or queryname order that is needed for downstream tools, (see Tools and Infrastructure Section for details). The `SortSam` command utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. Additionally, the `SORT_ORDER` option is utilized to ensure the file is sorted in coordinate order or queryname order depending on the downstream Mark Duplicates tool, since Picard and Spark have different sort-order requirements. For more details regarding the specific command that was run please refer to the Source Code section.
+The next step of the pipeline utilizes SAMtools `sort` command to sort the aligned BAM files in coordinate order or queryname order that is needed for downstream duplicate marking tools. Specifically, the `sort_order` option is utilized to ensure the file is sorted in coordinate order for Picard or queryname order for Spark.
 
-For certain use-cases the pipeline may be configured to stop after this step using the mark_duplicates parameter in the config file. In this case the file is sorted in coordinate order and the `SortSam` command utilizes the `CREATE_INDEX` option to index the sorted BAM file. This option is intended for datasets generated with targeted sequencing panels (like our custom Proseq-G Prostate panel). High coverage target enrichment sequencing (like Illumina's [protocol](https://www.illumina.com/techniques/sequencing/dna-sequencing/targeted-resequencing/target-enrichment.html)) results in a large amount of read duplication that is not an artifact of PCR amplification. Marking these reads as duplicates will severely reduce coverage, and it is recommended that the pipeline be configured to not mark duplicates in this case.
+For certain use-cases the pipeline may be configured to stop after this step using the `mark_duplicates=false` parameter in the config file. This option is intended for datasets generated with targeted sequencing panels (like our custom Proseq-G Prostate panel). High coverage target enrichment sequencing (like Illumina's [protocol](https://www.illumina.com/techniques/sequencing/dna-sequencing/targeted-resequencing/target-enrichment.html)) results in a large amount of read duplication that is not an artifact of PCR amplification. Marking these reads as duplicates will severely reduce coverage, and it is recommended that the pipeline be configured to not mark duplicates in this case.
 
 ## 3. Mark Duplicates in BAM Files
 
-The next step of the pipeline utilizes Picard Tool’s `MarkDuplicates` command to mark duplicates in the BAM files, (see Tools and Infrastructure Section for details). The `MarkDuplicates` command utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. Additionally, the Program_Record_Id is set to “MarkDuplicates”. For more details regarding the specific command that was run please refer to the Source Code section.
+If `mark_duplicates=true` then the next step of the pipeline utilizes Picard Tool’s `MarkDuplicates` command to mark duplicates in the BAM files. The `MarkDuplicates` command utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. Additionally, the `Program_Record_Id` is set to `MarkDuplicates`.
 
-A faster Spark implementation of MarkDuplicates can also be used (MarkDuplicatesSpark from GATK). The process matches the output of Picard's MarkDuplicates with significant runtime improvements. An important note, however, the Spark version requires more disk space and can fail with large inputs with multiple aligners being specified due to insufficient disk space. In such cases, Picard's MarkDuplicates should be used instead.
+A faster Spark implementation of `MarkDuplicates` can also be used (`MarkDuplicatesSpark` from GATK). The process matches the output of Picard's `MarkDuplicates` with significant runtime improvements. An important note, however, the Spark version requires more disk space and can fail with large inputs with multiple aligners being specified due to insufficient disk space. In such cases, Picard's `MarkDuplicates` should be used instead.
 
 ## 4. Index BAM Files
 
-After marking dup BAM files, the BAM files are then indexed by utilizing Picard Tool’s `BuildBamIndex` command, (see Tools and Infrastructure Section for details). This utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. For more details regarding the specific command that was run please refer to the Source Code section.
+After marking duplicated reads in BAM files, the BAM files are then indexed by using `--CREATE_INDEX true` for Picard's `MarkDuplicates`, or `--create-output-bam-index` for `MarkDuplicatesSpark`. This utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible.
 
 ---
 
@@ -199,7 +210,7 @@ After marking dup BAM files, the BAM files are then indexed by utilizing Picard 
 
 ### Test Data Set
 
-This pipeline was tested using the synthesized SMC-HET dataset as well as a multi-lane real sample CPCG0196-B1, using reference genome version GRCh38. Some benchmarking has been done comparing BWA-MEM2 v2.1, v2.0, and the original BWA. BWA-MEM2 is able to reduce approximately half of the runtime comparing to the original BWA, with the output BAM almost identical. See [here](docs/benchmarking.md) for the benchmarking.
+This pipeline was tested using the synthesized SMC-HET dataset as well as a multi-lane real sample CPCG0196-B1, using reference genome version GRCh38. Some benchmarking has been done comparing BWA-MEM2 v2.1, v2.0, and the original BWA. BWA-MEM2 is able to reduce approximately half of the runtime comparing to the original BWA, with the output BAM almost identical. See [here](docs/benchmarking.rst) for the benchmarking.
 
 ### Validation <version number\>
 
@@ -255,7 +266,7 @@ Align-DNA is licensed under the GNU General Public License version 2. See the fi
 
 Align-DNA aligned paired-end reads using the BWA-MEM2 and/or HISAT2 aligners.
 
-Copyright (C) 2021 University of California Los Angeles ("Boutros Lab") All rights reserved.
+Copyright (C) 2020-2022 University of California Los Angeles ("Boutros Lab") All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
