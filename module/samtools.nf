@@ -132,12 +132,14 @@ process run_index_SAMtools  {
 
    script:
 
-   // Is -o ${bam_output_filename} correct?  or should the merged bam be named something else?
+   merged_bam_output_filename = "${library}-.sorted-merged.bam"
+
    """
    set -euo pipefail
 
    samtools merge \
     --threads ${task.cpus} \
+    -o ${merged_bam_output_filename} \ 
     ${bam}
    """
    }
