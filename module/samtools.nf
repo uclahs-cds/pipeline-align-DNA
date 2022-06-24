@@ -102,7 +102,7 @@ process run_index_SAMtools  {
    process run_merge_SAMtools  {
    container params.docker_image_samtools
    
-   publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
+   publishDir path: "${bam_output_dir}",
       pattern: "${merged_bam_output_filename}",
       mode: 'copy'
 
