@@ -111,13 +111,13 @@ process run_index_SAMtools  {
    publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       // do we need `&& params.mark_duplicates` ?
       enabled: params.save_intermediate_files && params.mark_duplicates,
-      pattern: "*.bam",
+      pattern: "${merged_bam_output_filename}",
       mode: 'copy'
 
    publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
-      saveAs: { "${library}/${lane}/log${file(it).getName()}" }
+      saveAs: { "log${file(it).getName()}" }
 
    input:
       // outputs from run_sort_SAMtools
@@ -127,7 +127,7 @@ process run_index_SAMtools  {
       val(log_output_dir)
    
    output:
-      path "*.bam", emit: merged_bam
+      path "${merged_bam_output_filename}", emit: merged_bam
       path(".command.*")
 
    script:
