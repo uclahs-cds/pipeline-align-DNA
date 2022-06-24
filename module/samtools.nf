@@ -7,12 +7,6 @@ process run_sort_SAMtools  {
       pattern: "*.bam",
       mode: 'copy'
 
-   publishDir path: "${bam_output_dir}",
-      enabled: !params.mark_duplicates,
-      pattern: "${bam_output_filename}",
-      mode: 'copy',
-      saveAs: { filename -> "${filename}" }
-
    publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
