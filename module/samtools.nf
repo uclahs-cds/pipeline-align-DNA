@@ -103,8 +103,6 @@ process run_index_SAMtools  {
    container params.docker_image_samtools
    
    publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
-      // do we need `&& params.mark_duplicates` ?
-      enabled: params.save_intermediate_files && params.mark_duplicates,
       pattern: "${merged_bam_output_filename}",
       mode: 'copy'
 
