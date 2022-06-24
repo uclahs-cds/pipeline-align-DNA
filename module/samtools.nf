@@ -46,12 +46,12 @@ process run_sort_SAMtools  {
    * Index output file if sorting is the final step in the pipeline (if markduplicates disabled)
    */
 
+   bam_output_filename = "${library}-${lane}.sorted.bam"
+
    if (!params.mark_duplicates) {
          sort_order = "" /** Empty for sorting by coordinate*/
-         bam_output_filename = "${library}-${lane}.sorted.bam"
       } else { 
          sort_order = (params.enable_spark) ? "-n" : "" /** -n to sort by qname*/
-         bam_output_filename = "${library}-${lane}.sorted.bam"
       }
    
    """
