@@ -41,12 +41,7 @@ process run_sort_SAMtools  {
    */
 
    bam_output_filename = "${library}-${lane}.sorted.bam"
-
-   if (!params.mark_duplicates) {
-         sort_order = "" /** Empty for sorting by coordinate*/
-      } else { 
-         sort_order = (params.enable_spark) ? "-n" : "" /** -n to sort by qname*/
-      }
+   sort_order = (params.mark_duplicates && params.enable_spark) ? "-n" : ""
    
    """
    set -euo pipefail
