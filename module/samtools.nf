@@ -7,7 +7,7 @@ process run_sort_SAMtools  {
       pattern: "*.bam",
       mode: 'copy'
 
-   publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
+   publishDir path: "${log_output_dir}/${task.process.split(':')[-1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "${library}/${lane}/log${file(it).getName()}" }
@@ -68,7 +68,7 @@ process run_index_SAMtools  {
       pattern: "*.bai",
       mode: 'copy' 
 
-   publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
+   publishDir path: "${log_output_dir}/${task.process.split(':')[-1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "log${file(it).getName()}" }
@@ -101,7 +101,7 @@ process run_merge_SAMtools  {
       pattern: "${merged_bam_output_filename}",
       mode: 'copy'
 
-   publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
+   publishDir path: "${log_output_dir}/${task.process.split(':')[-1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "log${file(it).getName()}" }
