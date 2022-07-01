@@ -94,7 +94,7 @@ process run_index_SAMtools  {
    }
 
 
-   process run_merge_SAMtools  {
+process run_merge_SAMtools  {
    container params.docker_image_samtools
    
    publishDir path: "${bam_output_dir}",
