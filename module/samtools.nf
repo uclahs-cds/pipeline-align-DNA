@@ -34,14 +34,24 @@ process run_sort_SAMtools  {
       path(".command.*")
 
    script:
-   /** 
-   * Determine sort order based on markduplicates process: queryname for spark and coordinate for Picard
-   * Determine filename based on whether markduplicates processes are enabled.
-   * Index output file if sorting is the final step in the pipeline (if markduplicates disabled)
-   */
 
    bam_output_filename = "${library}-${lane}.sorted.bam"
+
+   /** 
+   Determine sort order based on markduplicates process: queryname for spark and coordinate for Picard
+
+   If params.mark_duplicates=false, then sort_order="", thus samtools sort will sort by coordinates
+   If params.mark_duplicates=true, then sort by queryname if params.enable_spark=true, since this is what MarkDuplicatesSpark expects.
+      otherwise sort by coordinates since this is what Picard MarkDuplicates expects.
+   */
+
    sort_order = (params.mark_duplicates && params.enable_spark) ? "-n" : ""
+
+   if (sort_order="-n") {
+      println("Sorting by queryname for MarkDuplicatesSpark (sort_order=${sort_order})")
+   } else {
+      println("Sorting by coordinates (sort_order=${sort_order})")
+   }
    
    """
    set -euo pipefail
@@ -55,6 +65,9 @@ process run_sort_SAMtools  {
    """
    }
 
+/* 
+Index output file if sorting is the final step in the pipeline (if params.mark_duplicates=false) 
+*/
 process run_index_SAMtools  {
    container params.docker_image_samtools
    
@@ -93,7 +106,10 @@ process run_index_SAMtools  {
    """
    }
 
-
+/* When params.mark_duplicates=false, it's possible that run_sort_SAMtools may output multiple BAM files which 
+need to be merged.  When params.mark_duplicates=true, merging is not needed because run_MarkDuplicatesSpark_GATK 
+and run_MarkDuplicate_Picard automatically handle multiple BAMs.
+*/
 process run_merge_SAMtools  {
    container params.docker_image_samtools
    
