@@ -7,13 +7,7 @@ process run_sort_SAMtools  {
       pattern: "*.bam",
       mode: 'copy'
 
-   publishDir path: "${bam_output_dir}",
-      enabled: !params.mark_duplicates,
-      pattern: "${bam_output_filename}",
-      mode: 'copy',
-      saveAs: { filename -> "${filename}" }
-
-   publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
+   publishDir path: "${log_output_dir}/${task.process.split(':')[-1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "${library}/${lane}/log${file(it).getName()}" }
@@ -40,19 +34,24 @@ process run_sort_SAMtools  {
       path(".command.*")
 
    script:
+
+   bam_output_filename = "${library}-${lane}.sorted.bam"
+
    /** 
-   * Determine sort order based on markduplicates process: queryname for spark and coordinate for Picard
-   * Determine filename based on whether markduplicates processes are enabled.
-   * Index output file if sorting is the final step in the pipeline (if markduplicates disabled)
+   Determine sort order based on markduplicates process: queryname for spark and coordinate for Picard
+
+   If params.mark_duplicates=false, then sort_order="", thus samtools sort will sort by coordinates
+   If params.mark_duplicates=true, then sort by queryname if params.enable_spark=true, since this is what MarkDuplicatesSpark expects.
+      otherwise sort by coordinates since this is what Picard MarkDuplicates expects.
    */
 
-   if (!params.mark_duplicates) {
-         sort_order = "" /** Empty for sorting by coordinate*/
-         bam_output_filename = "${params.bam_output_filename}"
-      } else { 
-         sort_order = (params.enable_spark) ? "-n" : "" /** -n to sort by qname*/
-         bam_output_filename = "${library}-${lane}.sorted.bam"
-      }
+   sort_order = (params.mark_duplicates && params.enable_spark) ? "-n" : ""
+
+   if (sort_order="-n") {
+      println("Sorting by queryname for MarkDuplicatesSpark (sort_order=${sort_order})")
+   } else {
+      println("Sorting by coordinates (sort_order=${sort_order})")
+   }
    
    """
    set -euo pipefail
@@ -66,6 +65,9 @@ process run_sort_SAMtools  {
    """
    }
 
+/* 
+Index output file if sorting is the final step in the pipeline (if params.mark_duplicates=false) 
+*/
 process run_index_SAMtools  {
    container params.docker_image_samtools
    
@@ -79,7 +81,7 @@ process run_index_SAMtools  {
       pattern: "*.bai",
       mode: 'copy' 
 
-   publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
+   publishDir path: "${log_output_dir}/${task.process.split(':')[-1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "log${file(it).getName()}" }
@@ -100,6 +102,47 @@ process run_index_SAMtools  {
 
    samtools index \
     -@ ${task.cpus} \
+    ${bam}
+   """
+   }
+
+/* When params.mark_duplicates=false, it's possible that run_sort_SAMtools may output multiple BAM files which 
+need to be merged.  When params.mark_duplicates=true, merging is not needed because run_MarkDuplicatesSpark_GATK 
+and run_MarkDuplicate_Picard automatically handle multiple BAMs.
+*/
+process run_merge_SAMtools  {
+   container params.docker_image_samtools
+   
+   publishDir path: "${bam_output_dir}",
+      pattern: "${merged_bam_output_filename}",
+      mode: 'copy'
+
+   publishDir path: "${log_output_dir}/${task.process.split(':')[-1].replace('_', '-')}",
+      pattern: ".command.*",
+      mode: "copy",
+      saveAs: { "log${file(it).getName()}" }
+
+   input:
+      // outputs from run_sort_SAMtools
+      path(bam) // bam file(s)
+      val(bam_output_dir) //directory of bam
+      val(intermediate_output_dir)
+      val(log_output_dir)
+   
+   output:
+      path "${merged_bam_output_filename}", emit: merged_bam
+      path(".command.*")
+
+   script:
+
+   merged_bam_output_filename = "${params.bam_output_filename}"
+
+   """
+   set -euo pipefail
+
+   samtools merge \
+    --threads ${task.cpus} \
+    -o ${merged_bam_output_filename} \
     ${bam}
    """
    }

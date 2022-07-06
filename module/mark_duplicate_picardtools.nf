@@ -14,7 +14,7 @@ process run_MarkDuplicate_Picard {
       enabled: params.save_intermediate_files,
       mode: 'copy'
 
-   publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
+   publishDir path: "${log_output_dir}/${task.process.split(':')[-1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "log${file(it).getName()}" }

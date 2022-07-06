@@ -20,7 +20,7 @@ process run_MarkDuplicatesSpark_GATK  {
       mode: 'copy',
       enabled: params.spark_metrics
 
-   publishDir path: "${log_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
+   publishDir path: "${log_output_dir}/${task.process.split(':')[-1].replace('_', '-')}",
       pattern: ".command.*",
       mode: "copy",
       saveAs: { "log${file(it).getName()}" }
