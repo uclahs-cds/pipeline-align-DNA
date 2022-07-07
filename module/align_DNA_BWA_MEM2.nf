@@ -2,7 +2,7 @@
 // While this is normally considered to go against the best practices for processes,
 // here it actually saves cost, time, and memory to directly pipe the output into 
 // samtools due to the large size of the uncompressed SAM files.
-include { run_sort_SAMtools ; run_index_SAMtools ; run_merge_SAMtools } from './samtools.nf'
+include { run_sort_SAMtools ; run_merge_SAMtools } from './samtools.nf'
 include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from './validation.nf'
 include { run_MarkDuplicate_Picard } from './mark_duplicate_picardtools.nf'
 include { run_MarkDuplicatesSpark_GATK } from './mark_duplicates_spark.nf'
