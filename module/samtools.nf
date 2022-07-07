@@ -47,7 +47,7 @@ process run_sort_SAMtools  {
 
    sort_order = (params.mark_duplicates && params.enable_spark) ? "-n" : ""
 
-   if (sort_order="-n") {
+   if ("-n" == sort_order) {
       println("Sorting by queryname for MarkDuplicatesSpark (sort_order=${sort_order})")
    } else {
       println("Sorting by coordinates (sort_order=${sort_order})")
@@ -73,7 +73,7 @@ process run_merge_SAMtools  {
    container params.docker_image_samtools
    
    publishDir path: "${bam_output_dir}",
-      pattern: "${merged_bam_output_filename}",
+      pattern: "${merged_bam_output_filename}{,.bai}",
       mode: 'copy'
 
    publishDir path: "${log_output_dir}/${task.process.split(':')[-1].replace('_', '-')}",
