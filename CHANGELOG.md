@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Changed
+- Fix `sort_order` definition
 - Update `README.md`: fix links, format code, grammar
 - Remove sample name from `output_dir` in `template.config`
 - Update PR template to follow [here](https://github.com/uclahs-cds/template-NextflowPipeline/blob/main/.github/PULL_REQUEST_TEMPLATE.md)
