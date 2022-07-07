@@ -47,7 +47,7 @@ process run_sort_SAMtools  {
 
    sort_order = (params.mark_duplicates && params.enable_spark) ? "-n" : ""
 
-   if (sort_order="-n") {
+   if ("-n" == sort_order) {
       println("Sorting by queryname for MarkDuplicatesSpark (sort_order=${sort_order})")
    } else {
       println("Sorting by coordinates (sort_order=${sort_order})")
