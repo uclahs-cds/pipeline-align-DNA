@@ -9,11 +9,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Changed
+- Remove `run_index_SAMtools`, output index during `run_merge_SAMtools` instead
 - Update `README.md`: fix links, format code, grammar
 - Remove sample name from `output_dir` in `template.config`
 - Update PR template to follow [here](https://github.com/uclahs-cds/template-NextflowPipeline/blob/main/.github/PULL_REQUEST_TEMPLATE.md)
 - Remove `bam_output_dir` from `main.nf` since it is not used, undefined and causes warning
-- Change "shell" to "script" in proce
+- Change "shell" to "script" in processes
 - Move `F16.config` to config folder
 - Rename process `Generate_Sha512sum` to `generate_sha512sum`
 - Rename process `run_validate` to `run_validate_PipeVal`
