@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 ### Changed
+- Fix `sort_order` definition
 - Remove `run_index_SAMtools`, output index during `run_merge_SAMtools` instead
 - Update `README.md`: fix links, format code, grammar
 - Remove sample name from `output_dir` in `template.config`
