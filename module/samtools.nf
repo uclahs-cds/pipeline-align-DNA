@@ -65,47 +65,6 @@ process run_sort_SAMtools  {
    """
    }
 
-/* 
-Index output file if sorting is the final step in the pipeline (if params.mark_duplicates=false) 
-*/
-process run_index_SAMtools  {
-   container params.docker_image_samtools
-   
-   publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
-      enabled: params.save_intermediate_files,
-      pattern: "*.bai",
-      mode: 'copy' 
-
-    publishDir path: "${bam_output_dir}",
-      enabled: !params.mark_duplicates,
-      pattern: "*.bai",
-      mode: 'copy' 
-
-   publishDir path: "${log_output_dir}/${task.process.split(':')[-1].replace('_', '-')}",
-      pattern: ".command.*",
-      mode: "copy",
-      saveAs: { "log${file(it).getName()}" }
-
-   input:
-      path(bam)
-      val(bam_output_dir)
-      val(intermediate_output_dir)
-      val(log_output_dir)
-   
-   output:
-      path "*.bai", emit: index
-      path(".command.*")
-
-   script:
-   """
-   set -euo pipefail
-
-   samtools index \
-    -@ ${task.cpus} \
-    ${bam}
-   """
-   }
-
 /* When params.mark_duplicates=false, it's possible that run_sort_SAMtools may output multiple BAM files which 
 need to be merged.  When params.mark_duplicates=true, merging is not needed because run_MarkDuplicatesSpark_GATK 
 and run_MarkDuplicate_Picard automatically handle multiple BAMs.
@@ -114,7 +73,7 @@ process run_merge_SAMtools  {
    container params.docker_image_samtools
    
    publishDir path: "${bam_output_dir}",
-      pattern: "${merged_bam_output_filename}",
+      pattern: "${merged_bam_output_filename}{,.bai}",
       mode: 'copy'
 
    publishDir path: "${log_output_dir}/${task.process.split(':')[-1].replace('_', '-')}",
@@ -131,6 +90,7 @@ process run_merge_SAMtools  {
    
    output:
       path "${merged_bam_output_filename}", emit: merged_bam
+      path "${merged_bam_output_filename}.bai", emit: merged_bam_index
       path(".command.*")
 
    script:
@@ -142,7 +102,8 @@ process run_merge_SAMtools  {
 
    samtools merge \
     --threads ${task.cpus} \
-    -o ${merged_bam_output_filename} \
+    --write-index \
+    -o ${merged_bam_output_filename}##idx##${merged_bam_output_filename}.bai \
     ${bam}
    """
    }
