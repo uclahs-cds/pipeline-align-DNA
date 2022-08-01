@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Changed
+
+### Added
+
+## [8.1.0] - 2022-08-01
 ### Changed
 - Fix `sort_order` definition
 - Remove `run_index_SAMtools`, output index during `run_merge_SAMtools` instead
