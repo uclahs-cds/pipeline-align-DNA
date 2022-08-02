@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Changed
+
+### Added
+
+## [8.1.0] - 2022-08-01
 ### Changed
 - Fix `sort_order` definition
 - Remove `run_index_SAMtools`, output index during `run_merge_SAMtools` instead
@@ -25,6 +31,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Use SAMtools `sort` instead of Picard `SortSam`
 
 ### Added
+- Add `retry` method to `run_sort_SAMtools` and `run_MarkDuplicatesSpark_GATK` (if run out of RAM then retry with more memory)
 - Add process `run_merge_SAMtools`: use when `params.mark_duplicates=false` to ensure multiple BAM outputs are merged
 - `.github/CODEOWNERS`
 - Add config file for F16 node
