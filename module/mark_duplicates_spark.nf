@@ -38,7 +38,7 @@ process run_MarkDuplicatesSpark_GATK  {
    output:
       path bam_output_filename, emit: bam
       path "*.bai", emit: bam_index
-      path "${params.sample_name}.mark_dup.metrics" optional true
+      path "${bam_output_filename.substring(0, bam_output_filename.length()-4)}.mark_dup.metrics" optional true
       path(".command.*")
 
    //Update tempdir permissions for user 'nobody'
@@ -66,7 +66,7 @@ process run_MarkDuplicatesSpark_GATK  {
 
    script:
    bam_output_filename = "${params.bam_output_filename}"
-   include_metrics = params.spark_metrics ? "--metrics-file ${params.sample_name}.mark_dup.metrics" : ""
+   include_metrics = params.spark_metrics ? "--metrics-file ${bam_output_filename.substring(0, bam_output_filename.length()-4)}.mark_dup.metrics" : ""
    """ 
    set -euo pipefail
 
