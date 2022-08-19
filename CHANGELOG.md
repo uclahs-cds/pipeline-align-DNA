@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 - Update input csv according to [here](https://confluence.mednet.ucla.edu/pages/viewpage.action?spaceKey=BOUTROSLAB&title=2022-07-27+Nextflow+Working+Group+Meeting+Notes) (Section "Input structures for alignment pipelines")
+- Update registered output function
 
 ### Added
 
