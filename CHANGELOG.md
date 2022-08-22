@@ -10,7 +10,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Changed
+- `run_MarkDuplicatesSpark_GATK` now retries once with 130GB on F72, and 140GB on M64
 - Update registered output function
+
 ### Added
 
 ## [8.1.0] - 2022-08-01
