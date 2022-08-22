@@ -13,3 +13,5 @@ jobs:
     steps:
       - id: release-asset
         uses: uclahs-cds/tool-Nextflow-action/add-source-with-submodules@v1.0.0-rc.1
+        with:
+          my-token: ${{ secrets.MYPAT }}
