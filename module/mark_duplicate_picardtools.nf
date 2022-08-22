@@ -31,7 +31,7 @@ process run_MarkDuplicate_Picard {
    output:
       path bam_output_filename, emit: bam
       path "*.bai", emit: bam_index
-      path "${params.sample_name}.mark_dup.metrics"
+      path "${bam_output_filename.substring(0, bam_output_filename.length()-4)}.mark_dup.metrics"
       path(".command.*")
 
    script:
@@ -49,7 +49,7 @@ process run_MarkDuplicate_Picard {
       --VALIDATION_STRINGENCY LENIENT \
       \$INPUT \
       --OUTPUT ${bam_output_filename} \
-      --METRICS_FILE ${params.sample_name}.mark_dup.metrics \
+      --METRICS_FILE ${bam_output_filename.substring(0, bam_output_filename.length()-4)}.mark_dup.metrics \
       --ASSUME_SORT_ORDER coordinate \
       --PROGRAM_RECORD_ID MarkDuplicates \
       --CREATE_INDEX true
