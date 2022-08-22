@@ -1,0 +1,14 @@
+---
+on:
+  push:
+    tags: "v*"
+  release:
+    types: [published]
+
+jobs:
+  add_release_asset:
+    runs-on: ubuntu-latest
+    name: A job to add a release asset with submodules
+    steps:
+      - id: release-asset
+        uses: ucla-cds/tool-Nextflow-action/add-source-with-submodules@v1.0.0-rc.1
