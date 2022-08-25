@@ -1,2 +1,2 @@
-﻿index,read_group_identifier,sequencing_center,library_identifier,platform_technology,platform_unit,sample,lane,read1_fastq,read2_fastq
-1,ID,CN,LB,PL,PU,SM,1,/path/to/fastq/pair/r1.fastq.gz,/path/to/fastq/pair/r2.fastq.gz
+﻿read_group_identifier,sequencing_center,library_identifier,platform_technology,platform_unit,lane,sample,read1_fastq,read2_fastq
+ID: unique RG identifier,CN,LB,PL:ILLUMINA (usually ILLUMINA),PU,LN,SM (sample name),/path/to/fastq/pair/r1.fastq.gz,/path/to/fastq/pair/r2.fastq.gz
