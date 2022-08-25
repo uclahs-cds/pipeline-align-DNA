@@ -50,12 +50,12 @@ log.info """\
 
 include { generate_standard_filename } from './external/nextflow-modules/modules/common/generate_standardized_filename/main.nf'
 include { align_DNA_BWA_MEM2_workflow } from './module/align_DNA_BWA_MEM2.nf' addParams(
-    bam_output_filename: (params.ucla_cds_registered_dataset_output) ? "${generate_standard_filename(params.bwa_version, params.dataset_id, params.sample_id, [:])}.bam" : "${params.sample_id}.bam",
+    bam_output_filename: generate_standard_filename(params.bwa_version, params.dataset_id, params.sample_id, [:]),
     base_output_dir: (params.ucla_cds_registered_dataset_output) ? params["base_output_dir_bwa-mem2"] : params["base_output_dir"],
     log_output_dir: (params.ucla_cds_registered_dataset_output) ? params["log_output_dir_bwa-mem2"] : params["log_output_dir"]
 )
 include { align_DNA_HISAT2_workflow } from './module/align_DNA_HISAT2.nf' addParams(
-    bam_output_filename: (params.ucla_cds_registered_dataset_output) ? "${generate_standard_filename(params.hisat2_version, params.dataset_id, params.sample_id, [:])}.bam" : "${params.sample_id}.bam",
+    bam_output_filename: generate_standard_filename(params.hisat2_version, params.dataset_id, params.sample_id, [:]),
     base_output_dir: (params.ucla_cds_registered_dataset_output) ? params["base_output_dir_hisat2"] : params["base_output_dir"],
     log_output_dir: (params.ucla_cds_registered_dataset_output) ? params["log_output_dir_hisat2"] : params["log_output_dir"]
 )
