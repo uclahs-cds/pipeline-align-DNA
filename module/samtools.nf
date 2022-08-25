@@ -35,7 +35,7 @@ process run_sort_SAMtools  {
 
    script:
 
-   bam_output_filename = generate_standard_filename(params.bwa_version, params.dataset_id, params.sample_id, ['additional_information': "${library}-${lane}.sorted.bam"])
+   bam_output_filename = generate_standard_filename(params.bwa_version, params.dataset_id, params.sample_id, [additional_information: "${library}-${lane}.sorted.bam"])
 
    /** 
    Determine sort order based on markduplicates process: queryname for spark and coordinate for Picard
