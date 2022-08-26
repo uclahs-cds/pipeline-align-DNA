@@ -1,4 +1,4 @@
-include { generate_standard_filename } from './external/nextflow-modules/modules/common/generate_standardized_filename/main.nf'
+include { generate_standard_filename } from '../external/nextflow-modules/modules/common/generate_standardized_filename/main.nf'
 
 // sort coordinate or queryname order with samtools
 process run_sort_SAMtools  {
