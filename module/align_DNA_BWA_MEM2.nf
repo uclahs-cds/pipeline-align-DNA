@@ -10,6 +10,14 @@ include { run_validate_PipeVal } from '../external/nextflow-modules/modules/Pipe
         main_process: "BWA-MEM2-${params.bwa_version}"
         ]
     )
+// calling run_validate_PipeVal twice causes an error.  The error message says to either rename it (which I'm trying now) or to 'reuse within a different workflow context' (?)
+include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from '../external/nextflow-modules/modules/PipeVal/validate/main.nf' addParams(
+    options: [
+        docker_image_version: params.pipeval_version,
+        process_label: 'process_low',
+        main_process: "BWA-MEM2-${params.bwa_version}"
+        ]
+    )
 include { run_MarkDuplicate_Picard } from './mark_duplicate_picardtools.nf'
 include { run_MarkDuplicatesSpark_GATK } from './mark_duplicates_spark.nf'
 include { generate_sha512sum } from './check_512sum.nf'
@@ -129,13 +137,13 @@ workflow align_DNA_BWA_MEM2_workflow {
          }
       }
       generate_sha512sum(och_bam_index.mix(och_bam), aligner_output_dir)
-      run_validate_PipeVal(
+      validate_output_file(
          och_bam.mix(
             och_bam_index,
             Channel.from(params.work_dir, params.output_dir)
             )
          )
-      run_validate_PipeVal.out.validation_result.collectFile(
+      validate_output_file.out.validation_result.collectFile(
          name: 'output_validation.txt',
          storeDir: "${aligner_validation_dir}"
          )
