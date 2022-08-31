@@ -3,7 +3,7 @@
 // here it actually saves cost, time, and memory to directly pipe the output into 
 // samtools due to the large size of the uncompressed SAM files.
 include { run_sort_SAMtools ; run_merge_SAMtools } from './samtools.nf'
-include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from '../external/nextflow-modules/modules/PipeVal/validate/main.nf' addParams(
+include { run_validate_PipeVal } from '../external/nextflow-modules/modules/PipeVal/validate/main.nf' addParams(
     options: [
         docker_image_version: params.pipeval_version,
         process_label: 'process_low',
@@ -89,8 +89,7 @@ workflow align_DNA_BWA_MEM2_workflow {
       run_validate_PipeVal(ich_samples_validate.mix(
          ich_reference_fasta,
          ich_reference_index_files
-         ),
-         aligner_log_dir
+         )
          )
 
       // change validation file name depending on whether inputs or outputs are being validated
@@ -130,13 +129,13 @@ workflow align_DNA_BWA_MEM2_workflow {
          }
       }
       generate_sha512sum(och_bam_index.mix(och_bam), aligner_output_dir)
-      validate_output_file(
+      run_validate_PipeVal(
          och_bam.mix(
             och_bam_index,
             Channel.from(params.work_dir, params.output_dir)
             )
          )
-      validate_output_file.out.val_file.collectFile(
+      run_validate_PipeVal.out.val_file.collectFile(
          name: 'output_validation.txt',
          storeDir: "${aligner_validation_dir}"
          )
