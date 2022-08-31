@@ -39,7 +39,6 @@ log.info """\
    - HISAT2:  ${params.aligner.contains("HISAT2") ? params.docker_image_hisat2_and_samtools : "None"}
    - Picard Tools: ${params.docker_image_picardtools}
    - sha512sum: ${params.docker_image_sha512sum}
-   - validate_params: ${params.docker_image_validate_params}
    - GATK: ${params.docker_image_gatk}
 
    ------------------------------------
