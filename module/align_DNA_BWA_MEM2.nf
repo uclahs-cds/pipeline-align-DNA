@@ -3,13 +3,7 @@
 // here it actually saves cost, time, and memory to directly pipe the output into 
 // samtools due to the large size of the uncompressed SAM files.
 include { run_sort_SAMtools ; run_merge_SAMtools } from './samtools.nf'
-include { run_validate_PipeVal } from '../external/nextflow-modules/modules/PipeVal/validate/main.nf' addParams(
-    options: [
-        docker_image_version: params.pipeval_version,
-        process_label: 'process_low',
-        main_process: "BWA-MEM2-${params.bwa_version}"
-        ]
-    )
+
 // calling run_validate_PipeVal twice causes an error.  The error message says to either rename it (which I'm trying now) or to 'reuse within a different workflow context' (?)
 include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from '../external/nextflow-modules/modules/PipeVal/validate/main.nf' addParams(
     options: [
