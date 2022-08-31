@@ -94,7 +94,7 @@ workflow align_DNA_BWA_MEM2_workflow {
 
       // change validation file name depending on whether inputs or outputs are being validated
       //val_filename = ${task.process.split(':')[1].replace('_', '-')} == run-validate ? "input_validation.txt" : "output_validation.txt"
-      run_validate_PipeVal.out.val_file.collectFile(
+      run_validate_PipeVal.out.validation_result.collectFile(
          name: 'input_validation.txt',
          storeDir: "${aligner_validation_dir}"
          )
@@ -135,7 +135,7 @@ workflow align_DNA_BWA_MEM2_workflow {
             Channel.from(params.work_dir, params.output_dir)
             )
          )
-      run_validate_PipeVal.out.val_file.collectFile(
+      run_validate_PipeVal.out.validation_result.collectFile(
          name: 'output_validation.txt',
          storeDir: "${aligner_validation_dir}"
          )
