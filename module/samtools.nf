@@ -6,7 +6,7 @@ process run_sort_SAMtools  {
    
    publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       enabled: params.save_intermediate_files && params.mark_duplicates,
-      pattern: "*.bam",
+      pattern: "*sorted.bam",
       mode: 'copy'
 
    publishDir path: "${log_output_dir}/${task.process.split(':')[-1].replace('_', '-')}",
