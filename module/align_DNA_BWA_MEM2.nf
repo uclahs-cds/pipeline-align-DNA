@@ -44,12 +44,12 @@ process align_DNA_BWA_MEM2 {
    output:
       tuple val(library), 
          val(lane),
-         path("${intermediate_bam_filename}"), emit: bam
+         path("${lane_level_bam}"), emit: bam
       path(".command.*")
 
    script:
 
-   intermediate_bam_filename = generate_standard_filename(params.bwa_version, params.dataset_id, params.sample_id, [additional_information: "${library}-${lane}.bam"])
+   lane_level_bam = generate_standard_filename(params.bwa_version, params.dataset_id, params.sample_id, [additional_information: "${library}-${lane}.bam"])
 
    """
    set -euo pipefail
@@ -67,7 +67,7 @@ process align_DNA_BWA_MEM2 {
       -@ ${task.cpus} \
       -S \
       -b > \
-      ${intermediate_bam_filename}
+      ${lane_level_bam}
    """
    }
 
