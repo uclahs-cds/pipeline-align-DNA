@@ -88,7 +88,8 @@ workflow align_DNA_BWA_MEM2_workflow {
       ich_reference_fasta
       ich_reference_index_files
    main:
-      run_validate_PipeVal(ich_samples_validate.mix(
+      run_validate_PipeVal(
+         ich_samples_validate.mix( //
          ich_reference_fasta,
          ich_reference_index_files
          )
