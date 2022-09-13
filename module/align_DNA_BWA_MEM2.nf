@@ -2,6 +2,7 @@
 // While this is normally considered to go against the best practices for processes,
 // here it actually saves cost, time, and memory to directly pipe the output into 
 // samtools due to the large size of the uncompressed SAM files.
+include { generate_standard_filename } from '../external/nextflow-modules/modules/common/generate_standardized_filename/main.nf'
 include { run_sort_SAMtools ; run_merge_SAMtools } from './samtools.nf'
 include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from './validation.nf'
 include { run_MarkDuplicate_Picard } from './mark_duplicate_picardtools.nf'
@@ -43,10 +44,13 @@ process align_DNA_BWA_MEM2 {
    output:
       tuple val(library), 
          val(lane),
-         path("${library}-${lane}.bam"), emit: bam
+         path("${lane_level_bam}"), emit: bam
       path(".command.*")
 
    script:
+
+   lane_level_bam = generate_standard_filename(params.bwa_version, params.dataset_id, params.sample_id, [additional_information: "${library}-${lane}.bam"])
+
    """
    set -euo pipefail
 
@@ -63,7 +67,7 @@ process align_DNA_BWA_MEM2 {
       -@ ${task.cpus} \
       -S \
       -b > \
-      ${library}-${lane}.bam
+      ${lane_level_bam}
    """
    }
 

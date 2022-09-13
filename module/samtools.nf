@@ -1,10 +1,12 @@
+include { generate_standard_filename } from '../external/nextflow-modules/modules/common/generate_standardized_filename/main.nf'
+
 // sort coordinate or queryname order with samtools
 process run_sort_SAMtools  {
    container params.docker_image_samtools
    
    publishDir path: "${intermediate_output_dir}/${task.process.split(':')[1].replace('_', '-')}",
       enabled: params.save_intermediate_files && params.mark_duplicates,
-      pattern: "*.bam",
+      pattern: "*sorted.bam",
       mode: 'copy'
 
    publishDir path: "${log_output_dir}/${task.process.split(':')[-1].replace('_', '-')}",
@@ -35,8 +37,8 @@ process run_sort_SAMtools  {
 
    script:
 
-   bam_output_filename = "${library}-${lane}.sorted.bam"
-
+   bam_output_filename = params.bam_output_filename.replaceAll('.bam$', "_${library}-${lane}-sorted.bam")
+   
    /** 
    Determine sort order based on markduplicates process: queryname for spark and coordinate for Picard
 
