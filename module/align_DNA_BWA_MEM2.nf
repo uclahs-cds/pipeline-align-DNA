@@ -4,7 +4,7 @@
 // samtools due to the large size of the uncompressed SAM files.
 include { run_sort_SAMtools ; run_merge_SAMtools } from './samtools.nf'
 
-// calling run_validate_PipeVal twice causes an error.  The error message says to either rename it (which I'm trying now) or to 'reuse within a different workflow context' (?)
+// need to rename run_validate_PipeVal since using twice.  Use run_validate_PipeVal for input validation; validate_output_file for output validation
 include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from '../external/nextflow-modules/modules/PipeVal/validate/main.nf' addParams(
     options: [
         docker_image_version: params.pipeval_version,
@@ -88,13 +88,17 @@ workflow align_DNA_BWA_MEM2_workflow {
       ich_reference_fasta
       ich_reference_index_files
    main:
-      run_validate_PipeVal(
-         ich_samples_validate.mix( //
+
+      run_validate_PipeVal_inputs = ich_samples_validate.mix( //
          ich_reference_fasta,
          ich_reference_index_files
          )
-         )
+         .map { it -> ["file-input", it] }
 
+      run_validate_PipeVal(
+         run_validate_PipeVal_inputs
+         )
+         
       // change validation file name depending on whether inputs or outputs are being validated
       //val_filename = ${task.process.split(':')[1].replace('_', '-')} == run-validate ? "input_validation.txt" : "output_validation.txt"
       run_validate_PipeVal.out.validation_result.collectFile(
