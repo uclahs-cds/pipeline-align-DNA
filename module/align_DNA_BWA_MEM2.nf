@@ -136,11 +136,14 @@ workflow align_DNA_BWA_MEM2_workflow {
          }
       }
       generate_sha512sum(och_bam_index.mix(och_bam), aligner_output_dir)
+
+      validate_output_file_inputs = och_bam.mix(
+         och_bam_index,
+         Channel.from(params.work_dir, params.output_dir)
+         )
+         .map { it -> ["file-input", it] }
       validate_output_file(
-         och_bam.mix(
-            och_bam_index,
-            Channel.from(params.work_dir, params.output_dir)
-            )
+         validate_output_file_inputs
          )
       validate_output_file.out.validation_result.collectFile(
          name: 'output_validation.txt',
