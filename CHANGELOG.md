@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Changed
+- Change to github packages instead of dockerhub
 - Standardize intermediate and output filenames using [generate_standardized_filename](https://github.com/uclahs-cds/pipeline-Nextflow-module/tree/main/modules/common/generate_standardized_filename)
 - Update input csv according to [here](https://confluence.mednet.ucla.edu/pages/viewpage.action?spaceKey=BOUTROSLAB&title=2022-07-27+Nextflow+Working+Group+Meeting+Notes) (Section "Input structures for alignment pipelines")
 - `run_MarkDuplicatesSpark_GATK` now retries once with 130GB on F72, and 140GB on M64
