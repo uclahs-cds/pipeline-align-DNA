@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Update registered output function
 
 ### Added
+- Parameter `docker_container_registry` to `default.config`
 - Release workflow
 
 ## [8.1.0] - 2022-08-01
