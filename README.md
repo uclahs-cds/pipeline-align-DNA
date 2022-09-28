@@ -31,19 +31,20 @@ Below is a summary of how to run the pipeline.  See [here](https://confluence.me
 
 Pipelines should be run **WITH A SINGLE SAMPLE AT TIME**. Otherwise resource allocation and Nextflow errors could cause the pipeline to fail.
 
-1. The recommended way of running the pipeline is to directly use the source code located here: `/hot/software/pipeline/pipeline-align-DNA/Nextflow/release`, rather than cloning a copy of the pipeline.
+1. Because this pipeline uses images stored in the [GitHub Container Registry](https://github.com/orgs/uclahs-cds/packages), you must [setup a personal access token](https://confluence.mednet.ucla.edu/pages/viewpage.action?spaceKey=BOUTROSLAB&title=Docker+Introduction#DockerIntroduction-GitHubContainerRegistryGitHubContainerRegistry|Setup) (PAT) for your GitHub account and log into the registry on the cluster before running this pipeline.
+2. The recommended way of running the pipeline is to directly use the source code located here: `/hot/software/pipeline/pipeline-align-DNA/Nextflow/release`, rather than cloning a copy of the pipeline.
 
     * The source code should never be modified when running our pipelines
 
-2. Create a config file for input, output, and parameters. An example for a config file can be found [here](config/template.config). See [Inputs](#Inputs) for the detailed description of each variable in the config file. The config file can be generated using a python script (see below).
+3. Create a config file for input, output, and parameters. An example for a config file can be found [here](config/template.config). See [Inputs](#Inputs) for the detailed description of each variable in the config file. The config file can be generated using a python script (see below).
 
     * Do not directly modify the source `template.config`, but rather you should copy it from the pipeline release folder to your project-specific folder and modify it there
 
-3. Create the input csv using the [template](input/align-DNA.input.csv). The example csv is a single-lane sample, however this pipeline can take multi-lane sample as well, with each record in the csv file representing a lane (a pair of fastq). All records must have the same value in the **sample** column. See [Inputs](#Inputs) for detailed description of each column. All columns must exist in order to run the pipeline successfully.
+4. Create the input csv using the [template](input/align-DNA.input.csv). The example csv is a single-lane sample, however this pipeline can take multi-lane sample as well, with each record in the csv file representing a lane (a pair of fastq). All records must have the same value in the **sample** column. See [Inputs](#Inputs) for detailed description of each column. All columns must exist in order to run the pipeline successfully.
    
    * Again, do not directly modify the source template csv file.  Instead, copy it from the pipeline release folder to your project-specific folder and modify it there.
 
-4. The pipeline can be executed locally using the command below:
+5. The pipeline can be executed locally using the command below:
 
 ```bash
 nextflow run path/to/main.nf -config path/to/sample-specific.config
