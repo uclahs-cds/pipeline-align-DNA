@@ -31,6 +31,8 @@ Below is a summary of how to run the pipeline.  See [here](https://confluence.me
 
 Pipelines should be run **WITH A SINGLE SAMPLE AT TIME**. Otherwise resource allocation and Nextflow errors could cause the pipeline to fail.
 
+> **Note**: Because this pipeline uses images stored in the [GitHub Container Registry](https://github.com/orgs/uclahs-cds/packages), you must [setup a personal access token](https://confluence.mednet.ucla.edu/display/BOUTROSLAB/Docker+Introduction#DockerIntroduction-GitHubContainerRegistryGitHubContainerRegistry|Setup) (PAT) for your GitHub account and log into the registry on the cluster before running this pipeline.
+
 1. The recommended way of running the pipeline is to directly use the source code located here: `/hot/software/pipeline/pipeline-align-DNA/Nextflow/release`, rather than cloning a copy of the pipeline.
 
     * The source code should never be modified when running our pipelines
@@ -186,6 +188,8 @@ After marking duplicated reads in BAM files, the BAM files are then indexed by u
 | `ucla_cds_data_dir` | no | string | The directory where registered data is located. Default: `/hot/data` |
 | `ucla_cds_reference_genome_version` | no | string | Identifier for the version of the reference genome version |
 | `check_node_config` | no | boolean | Whether to check pre-configured node settings used to set CPU and memory constraints. The default behavior, whether `true` or undefined is to check the pre-configured node settings. Set to `false` to skip this check. |
+| `docker_container_registry` | no | string | Registry containing tool Docker images. Default: `ghcr.io/uclahs-cds` |
+
 
 ---
 
