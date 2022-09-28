@@ -188,6 +188,8 @@ After marking duplicated reads in BAM files, the BAM files are then indexed by u
 | `ucla_cds_data_dir` | no | string | The directory where registered data is located. Default: `/hot/data` |
 | `ucla_cds_reference_genome_version` | no | string | Identifier for the version of the reference genome version |
 | `check_node_config` | no | boolean | Whether to check pre-configured node settings used to set CPU and memory constraints. The default behavior, whether `true` or undefined is to check the pre-configured node settings. Set to `false` to skip this check. |
+| `docker_container_registry` | no | string | Registry containing tool Docker images. Default: `ghcr.io/uclahs-cds` |
+
 
 ---
 
