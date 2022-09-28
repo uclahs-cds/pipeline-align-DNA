@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Update registered output function
 
 ### Added
+- Instructions in README for setting up github PAT
 - Parameter `docker_container_registry` in `default.config`
 - Release workflow
 
