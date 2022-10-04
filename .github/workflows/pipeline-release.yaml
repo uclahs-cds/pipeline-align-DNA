@@ -12,6 +12,6 @@ jobs:
     name: A job to add a release asset with submodules
     steps:
       - id: release-asset
-        uses: uclahs-cds/tool-Nextflow-action/add-source-with-submodules@v1.0.0-rc.1
+        uses: uclahs-cds/tool-Nextflow-action/add-source-with-submodules@latest
         with:
           my-token: ${{ secrets.MYPAT }}
