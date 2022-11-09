@@ -23,8 +23,8 @@ log.info """\
    - output: 
       work_dir: ${params.work_dir}
       output_dir: ${params.output_dir}
-      base_output_dir_bwa: ${(params.ucla_cds_registered_dataset_output) ? params["base_output_dir_bwa-mem2"] : params["base_output_dir"]}
-      base_output_dir_hisat2: ${(params.ucla_cds_registered_dataset_output) ? params["base_output_dir_hisat2"] : params["base_output_dir"]}
+      output_dir_base_bwa: ${(params.ucla_cds_registered_dataset_output) ? params["output_dir_base_bwa-mem2"] : params["output_dir_base"]}
+      output_dir_base_hisat2: ${(params.ucla_cds_registered_dataset_output) ? params["output_dir_base_hisat2"] : params["output_dir_base"]}
       log_output_dir_bwa: ${(params.ucla_cds_registered_dataset_output) ? params["log_output_dir_bwa-mem2"] : params["log_output_dir"]}
       log_output_dir_hisat2: ${(params.ucla_cds_registered_dataset_output) ? params["log_output_dir_hisat2"] : params["log_output_dir"]}
 
@@ -51,12 +51,12 @@ log.info """\
 include { generate_standard_filename } from './external/nextflow-modules/modules/common/generate_standardized_filename/main.nf'
 include { align_DNA_BWA_MEM2_workflow } from './module/align_DNA_BWA_MEM2.nf' addParams(
     bam_output_filename: "${generate_standard_filename(params.bwa_version, params.dataset_id, params.sample_id, [:])}.bam",
-    base_output_dir: (params.ucla_cds_registered_dataset_output) ? params["base_output_dir_bwa-mem2"] : params["base_output_dir"],
+    output_dir_base: (params.ucla_cds_registered_dataset_output) ? params["output_dir_base_bwa-mem2"] : params["output_dir_base"],
     log_output_dir: (params.ucla_cds_registered_dataset_output) ? params["log_output_dir_bwa-mem2"] : params["log_output_dir"]
 )
 include { align_DNA_HISAT2_workflow } from './module/align_DNA_HISAT2.nf' addParams(
     bam_output_filename: "${generate_standard_filename(params.hisat2_version, params.dataset_id, params.sample_id, [:])}.bam",
-    base_output_dir: (params.ucla_cds_registered_dataset_output) ? params["base_output_dir_hisat2"] : params["base_output_dir"],
+    output_dir_base: (params.ucla_cds_registered_dataset_output) ? params["output_dir_base_hisat2"] : params["output_dir_base"],
     log_output_dir: (params.ucla_cds_registered_dataset_output) ? params["log_output_dir_hisat2"] : params["log_output_dir"]
 )
 workflow {
