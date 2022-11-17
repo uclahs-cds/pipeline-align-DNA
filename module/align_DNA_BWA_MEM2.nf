@@ -11,14 +11,14 @@ include { generate_sha512sum } from './check_512sum.nf'
 include { remove_intermediate_files } from '../external/nextflow-modules/modules/common/intermediate_file_removal/main.nf' addParams(
    options: [
       save_intermediate_files: params.save_intermediate_files,
-      output_dir: params.base_output_dir,
+      output_dir: params.output_dir_base,
       log_output_dir: "${params.log_output_dir}/process-log/${params.bwa_version}"
       ]
    )
 
 process align_DNA_BWA_MEM2 {
    container params.docker_image_bwa_and_samtools
-   publishDir path: "${params.base_output_dir}/${params.bwa_version}/intermediate/${task.process.split(':')[1].replace('_', '-')}",
+   publishDir path: "${params.output_dir_base}/${params.bwa_version}/intermediate/${task.process.split(':')[1].replace('_', '-')}",
       enabled: params.save_intermediate_files,
       pattern: "*.bam",
       mode: 'copy'
@@ -72,11 +72,11 @@ process align_DNA_BWA_MEM2 {
    }
 
 workflow align_DNA_BWA_MEM2_workflow {
-   aligner_output_dir = (params.ucla_cds_registered_dataset_output) ? "${params.base_output_dir}/${params.bwa_version}/BAM-${params.bwa_mem2_uuid}" : "${params.base_output_dir}/${params.bwa_version}/output"
-   aligner_intermediate_dir = (params.ucla_cds_registered_dataset_output) ? "${params.base_output_dir}/${params.bwa_version}/BAM-${params.bwa_mem2_uuid}/intermediate" : "${params.base_output_dir}/${params.bwa_version}/intermediate"
-   aligner_validation_dir = (params.ucla_cds_registered_dataset_output) ? "${params.base_output_dir}/${params.bwa_version}/BAM-${params.bwa_mem2_uuid}/validation" : "${params.base_output_dir}/${params.bwa_version}/validation"
+   aligner_output_dir = (params.ucla_cds_registered_dataset_output) ? "${params.output_dir_base}/${params.bwa_version}/BAM-${params.bwa_mem2_uuid}" : "${params.output_dir_base}/${params.bwa_version}/output"
+   aligner_intermediate_dir = (params.ucla_cds_registered_dataset_output) ? "${params.output_dir_base}/${params.bwa_version}/BAM-${params.bwa_mem2_uuid}/intermediate" : "${params.output_dir_base}/${params.bwa_version}/intermediate"
+   aligner_validation_dir = (params.ucla_cds_registered_dataset_output) ? "${params.output_dir_base}/${params.bwa_version}/BAM-${params.bwa_mem2_uuid}/validation" : "${params.output_dir_base}/${params.bwa_version}/validation"
    aligner_log_dir = "${params.log_output_dir}/process-log/${params.bwa_version}"
-   aligner_qc_dir = (params.ucla_cds_registered_dataset_output) ? "${params.base_output_dir}/${params.bwa_version}/BAM-${params.bwa_mem2_uuid}/QC" : "${params.base_output_dir}/${params.bwa_version}/QC"
+   aligner_qc_dir = (params.ucla_cds_registered_dataset_output) ? "${params.output_dir_base}/${params.bwa_version}/BAM-${params.bwa_mem2_uuid}/QC" : "${params.output_dir_base}/${params.bwa_version}/QC"
   
    take:
       ich_samples
