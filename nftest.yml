@@ -1,0 +1,14 @@
+---
+global:
+  temp_dir: ./test/work
+  nf_config: test/global.config
+  remove_temp: false
+  clean_logs: true
+
+cases:
+  - name: a_mini_n1-spark
+    message: test align-DNA development branch with a-mini-n1
+    nf_script: ./main.nf
+    nf_config: ./test/a_mini_n1-spark.config
+    skip: false
+    verbose: true
