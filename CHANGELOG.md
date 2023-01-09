@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 
+- Setup nftest with a-mini-n2
+
 ## [9.0.0] - 2022-10-28
 ### Changed
 - Change to github packages instead of dockerhub

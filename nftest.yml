@@ -1,0 +1,20 @@
+---
+global:
+  temp_dir: ./test/work
+  nf_config: test/global.config
+  remove_temp: false
+  clean_logs: true
+
+cases:
+  - name: a_mini_n2-spark
+    message: test development branch with a-mini-n2 and Spark's mark duplicates
+    nf_script: ./main.nf
+    nf_config: ./test/a_mini_n2-spark.config
+    skip: false
+    verbose: true
+  - name: a_mini_n2-picard
+    message: test development branch with a-mini-n2 and Picard's mark duplicates
+    nf_script: ./main.nf
+    nf_config: ./test/a_mini_n2-picard.config
+    skip: false
+    verbose: true
