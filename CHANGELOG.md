@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 - Changed name `base_output_dir` to `output_dir_base`
+- Updated Picard version to 3.0.0 after the most recent Broad release that updated the underlying Java version 
 
 ### Added
 
