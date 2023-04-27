@@ -209,5 +209,5 @@ params {{\n\
 includeConfig \"${{projectDir}}/config/methods.config\"\n\
 methods.setup()"
     # writing to the file
-    with open(sample_name + "_DNA_align.config", "w") as config:
+    with open(sample_name + "_DNA_align.config", "w", encoding='utf-8') as config:
         config.write(string_for_writing)
