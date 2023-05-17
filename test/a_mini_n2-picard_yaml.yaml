@@ -1,0 +1,12 @@
+---
+sample: HG002.N
+input:
+  FASTQ:
+    - read_group_identifier: HG002.N.seq1
+      sequencing_center: BS
+      library_identifier: bamsurgeon
+      platform_technology: ILLUMINA
+      platform_unit: NA
+      lane: 1
+      read1_fastq: /hot/data/TEST/TEST0000000/TWGSAMIN000001/TWGSAMIN000001-N001-S01-F/DNA/WGS/raw/FASTQ/HG002-N-A-mini-n2/HG002.N-n2_R1.fq.gz
+      read2_fastq: /hot/data/TEST/TEST0000000/TWGSAMIN000001/TWGSAMIN000001-N001-S01-F/DNA/WGS/raw/FASTQ/HG002-N-A-mini-n2/HG002.N-n2_R2.fq.gz
