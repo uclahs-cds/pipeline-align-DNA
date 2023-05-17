@@ -1,10 +1,24 @@
 // The follwing process runs both alignment and SAM conversion in the same process.
 // While this is normally considered to go against the best practices for processes,
-// here it actually saves cost, time, and memory to directly pipe the output into 
+// here it actually saves cost, time, and memory to directly pipe the output into
 // samtools due to the large size of the uncompressed SAM files.
 include { generate_standard_filename } from '../external/nextflow-modules/modules/common/generate_standardized_filename/main.nf'
 include { run_sort_SAMtools ; run_merge_SAMtools } from './samtools.nf'
-include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from './validation.nf'
+// include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from './validation.nf'
+include { run_validate_PipeVal } from './external/pipeline-Nextflow-module/modules/PipeVal/validate/main.nf' addParams(
+    options: [
+        log_output_dir: "${params.log_output_dir}/process-log/${params.bwa_version}"
+        docker_image_version: params.pipeval_version,
+        main_process: "./"
+        ]
+    )
+include { run_validate_PipeVal as validate_output_file } from './external/pipeline-Nextflow-module/modules/PipeVal/validate/main.nf' addParams(
+    options: [
+        log_output_dir: "${params.log_output_dir}/process-log/${params.bwa_version}"
+        docker_image_version: params.pipeval_version,
+        main_process: "./"
+        ]
+    )
 include { run_MarkDuplicate_Picard } from './mark_duplicate_picardtools.nf'
 include { run_MarkDuplicatesSpark_GATK } from './mark_duplicates_spark.nf'
 include { generate_sha512sum } from './check_512sum.nf'
@@ -28,13 +42,13 @@ process align_DNA_BWA_MEM2 {
       mode: "copy",
       saveAs: { "${library}/${lane}/log${file(it).getName()}" }
 
-   // use "each" so the the reference files are passed through for each fastq pair alignment 
+   // use "each" so the the reference files are passed through for each fastq pair alignment
    input:
       tuple(val(library),
-         val(header), 
-         val(lane), 
+         val(header),
+         val(lane),
          path(read1_fastq),
-         path(read2_fastq) 
+         path(read2_fastq)
          )
       each path(ref_fasta)
       path(ich_reference_index_files)
@@ -42,7 +56,7 @@ process align_DNA_BWA_MEM2 {
    // output the lane information in the file name to differentiate bewteen aligments of the same
    // sample but different lanes
    output:
-      tuple val(library), 
+      tuple val(library),
          val(lane),
          path("${lane_level_bam}"), emit: bam
       path(".command.*")
@@ -79,7 +93,7 @@ workflow align_DNA_BWA_MEM2_workflow {
    aligner_validation_dir = (params.ucla_cds_registered_dataset_output) ? "${params.output_dir_base}/${params.bwa_version}/BAM-${params.bwa_mem2_uuid}/validation" : "${params.output_dir_base}/${params.bwa_version}/validation"
    aligner_log_dir = "${params.log_output_dir}/process-log/${params.bwa_version}"
    aligner_qc_dir = (params.ucla_cds_registered_dataset_output) ? "${params.output_dir_base}/${params.bwa_version}/BAM-${params.bwa_mem2_uuid}/QC" : "${params.output_dir_base}/${params.bwa_version}/QC"
-  
+
    take:
       ich_samples
       ich_samples_validate
@@ -89,13 +103,12 @@ workflow align_DNA_BWA_MEM2_workflow {
       run_validate_PipeVal(ich_samples_validate.mix(
          ich_reference_fasta,
          ich_reference_index_files
-         ),
-         aligner_log_dir
+         )
          )
 
       // change validation file name depending on whether inputs or outputs are being validated
       //val_filename = ${task.process.split(':')[1].replace('_', '-')} == run-validate ? "input_validation.txt" : "output_validation.txt"
-      run_validate_PipeVal.out.val_file.collectFile(
+      run_validate_PipeVal.out.validation_result.collectFile(
          name: 'input_validation.txt',
          storeDir: "${aligner_validation_dir}"
          )
@@ -104,14 +117,14 @@ workflow align_DNA_BWA_MEM2_workflow {
          ich_reference_fasta,
          ich_reference_index_files.collect()
          )
-         
+
       run_sort_SAMtools(align_DNA_BWA_MEM2.out.bam, aligner_output_dir, aligner_intermediate_dir, aligner_log_dir)
 
       remove_intermediate_files(
          run_sort_SAMtools.out.bam_for_deletion,
          "decoy_signal"
          )
-      
+
       if (!params.mark_duplicates) {
          // It's possible that run_sort_SAMtools may output multiple BAM files which need to be merged
          // only need to merge when !params.mark_duplicates, since  run_MarkDuplicatesSpark_GATK and run_MarkDuplicate_Picard automatically handle multiple BAMs
@@ -134,14 +147,13 @@ workflow align_DNA_BWA_MEM2_workflow {
          och_bam.mix(
             och_bam_index,
             Channel.from(params.work_dir, params.output_dir)
-            ),
-            aligner_log_dir
+            )
          )
-      validate_output_file.out.val_file.collectFile(
+      validate_output_file.out.validation_result.collectFile(
          name: 'output_validation.txt',
          storeDir: "${aligner_validation_dir}"
          )
-      
+
       emit:
       complete_signal = och_bam.collect()
    }
