@@ -18,3 +18,10 @@ cases:
     nf_config: ./test/a_mini_n2-picard.config
     skip: false
     verbose: true
+  - name: a_mini_n2-picard_yaml
+    message: test development branch with a-mini-n2 and Picard's mark duplicates with a YAML config file
+    nf_script: ./main.nf
+    nf_config: ./test/a_mini_n2-picard_yaml.config
+    params_file: ./test/a_mini_n2-picard_yaml.yaml
+    skip: false
+    verbose: true
