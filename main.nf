@@ -66,8 +66,6 @@ workflow {
 
    // get the input fastq pairs
    Channel
-      // .fromPath(params.input_csv, checkIfExists: true)
-      // .splitCsv(header:true)
       .from(params.input.FASTQ)
       .map { row ->
 
