@@ -50,6 +50,7 @@ process align_DNA_BWA_MEM2 {
    script:
 
    lane_level_bam = generate_standard_filename(params.bwa_version, params.dataset_id, params.sample_id, [additional_information: "${library}-${lane}.bam"])
+   alt_aware_option = (params.disable_alt_aware) ? '-j' : ''
 
    """
    set -euo pipefail
@@ -58,6 +59,7 @@ process align_DNA_BWA_MEM2 {
       mem \
       -t ${task.cpus} \
       -M \
+      ${alt_aware_option} \
       -R \"@RG\\tID:${header.read_group_identifier}.Seq${header.lane}\\tCN:${header.sequencing_center}\\tLB:${header.library_identifier}\\tPL:${header.platform_technology}\\tPU:${header.platform_unit}\\tSM:${header.sample}\" \
       ${ref_fasta} \
       ${read1_fastq} \

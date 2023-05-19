@@ -185,6 +185,7 @@ After marking duplicated reads in BAM files, the BAM files are then indexed by u
 | `dataset_id` | no | string | The registered dataset ID of this dataset from the Boutros Lab data registry. Ignored if `ucla_cds_registered_data_input = true` or `ucla_cds_registered_output = false` |
 | `patient_id` | no | string | The registered patient ID of this sample from the Boutros Lab data registry. Ignored if `ucla_cds_registered_data_input = true` or `ucla_cds_registered_output = false` |
 | `sample_id` | no | string | The registered sample ID from the Boutros Lab data registry. Ignored if `ucla_cds_registered_data_input = true` or `ucla_cds_registered_output = false` |
+| `disable_alt_aware` | yes | boolean | Whether to disable the default alt-aware mode for BWA-MEM2. The default behavior of alt-aware mode is to consider the `.alt` file if it exists in the directory with the reference file. |
 | `ucla_cds_data_dir` | no | string | The directory where registered data is located. Default: `/hot/data` |
 | `ucla_cds_reference_genome_version` | no | string | Identifier for the version of the reference genome version |
 | `check_node_config` | no | boolean | Whether to check pre-configured node settings used to set CPU and memory constraints. The default behavior, whether `true` or undefined is to check the pre-configured node settings. Set to `false` to skip this check. |
