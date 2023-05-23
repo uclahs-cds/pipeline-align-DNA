@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Setup nftest with a-mini-n2
 - Add retry with lower CPUs for alignment processes
 - Add retry with increased memory for `MarkDuplicates` with `Picard`
+- Explicit parameter to control BWA-MEM2 alt-aware mode
 
 ## [9.0.0] - 2022-10-28
 ### Changed
