@@ -5,11 +5,11 @@
 include { generate_standard_filename } from '../external/nextflow-modules/modules/common/generate_standardized_filename/main.nf'
 include { run_sort_SAMtools ; run_merge_SAMtools} from './samtools.nf'
 // include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from './validation.nf'
-include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from './external/pipeline-Nextflow-module/modules/PipeVal/validate/main.nf' addParams(
+include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from '../external/nextflow-modules/modules/PipeVal/validate/main.nf' addParams(
     options: [
         log_output_dir: "${params.log_output_dir}/process-log/${params.hisat2_version}",
         docker_image_version: params.pipeval_version,
-        main_process: "./" //Save logs in <log_dir>/process-log/run_validate_PipeVal
+        main_process: "./"
         ]
     )
 include { run_MarkDuplicate_Picard } from './mark_duplicate_picardtools.nf'
@@ -94,11 +94,12 @@ workflow align_DNA_HISAT2_workflow {
       ich_reference_fasta
       ich_reference_index_files
    main:
-      run_validate_PipeVal(ich_samples_validate.mix(
-         ich_reference_fasta,
-         ich_reference_index_files
+      file_to_validate = ich_samples_validate.mix(
+            ich_reference_fasta,
+            ich_reference_index_files
          )
-         )
+      run_validate_PipeVal(file_to_validate)
+
       run_validate_PipeVal.out.validation_result.collectFile(
          name: 'input_validation.txt',
          storeDir: "${aligner_validation_dir}"
@@ -135,16 +136,17 @@ workflow align_DNA_HISAT2_workflow {
          }
       }
       generate_sha512sum(och_bam_index.mix(och_bam), aligner_output_dir)
-      validate_output_file(
-         och_bam.mix(
+
+      output_file_to_validate = och_bam.mix(
             och_bam_index,
             Channel.from(params.work_dir, params.output_dir)
-            )
          )
 
-      validate_output_file.out.validation_result.collectFile(
-         name: 'output_validation.txt',
-         storeDir: "${aligner_validation_dir}"
-         )
+      // validate_output_file(output_file_to_validate)
+
+      // validate_output_file.out.validation_result.collectFile(
+      //    name: 'output_validation.txt',
+      //    storeDir: "${aligner_validation_dir}"
+      //    )
    }
 

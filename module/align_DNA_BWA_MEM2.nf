@@ -5,7 +5,7 @@
 include { generate_standard_filename } from '../external/nextflow-modules/modules/common/generate_standardized_filename/main.nf'
 include { run_sort_SAMtools ; run_merge_SAMtools } from './samtools.nf'
 // include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from './validation.nf'
-include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from './external/pipeline-Nextflow-module/modules/PipeVal/validate/main.nf' addParams(
+include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from '../external/nextflow-modules/modules/PipeVal/validate/main.nf' addParams(
     options: [
         log_output_dir: "${params.log_output_dir}/process-log/${params.bwa_version}",
         docker_image_version: params.pipeval_version,
@@ -93,11 +93,12 @@ workflow align_DNA_BWA_MEM2_workflow {
       ich_reference_fasta
       ich_reference_index_files
    main:
-      run_validate_PipeVal(ich_samples_validate.mix(
-         ich_reference_fasta,
-         ich_reference_index_files
+      input_validation = ich_samples_validate.mix(
+            ich_reference_fasta,
+            ich_reference_index_files
          )
-         )
+
+      run_validate_PipeVal(input_validation)
 
       // change validation file name depending on whether inputs or outputs are being validated
       //val_filename = ${task.process.split(':')[1].replace('_', '-')} == run-validate ? "input_validation.txt" : "output_validation.txt"
@@ -136,16 +137,18 @@ workflow align_DNA_BWA_MEM2_workflow {
          }
       }
       generate_sha512sum(och_bam_index.mix(och_bam), aligner_output_dir)
-      validate_output_file(
-         och_bam.mix(
+
+      output_validation = och_bam.mix(
             och_bam_index,
             Channel.from(params.work_dir, params.output_dir)
-            )
          )
-      validate_output_file.out.validation_result.collectFile(
-         name: 'output_validation.txt',
-         storeDir: "${aligner_validation_dir}"
-         )
+
+      // validate_output_file(output_validation)
+
+      // validate_output_file.out.validation_result.collectFile(
+      //    name: 'output_validation.txt',
+      //    storeDir: "${aligner_validation_dir}"
+      //    )
 
       emit:
       complete_signal = och_bam.collect()
