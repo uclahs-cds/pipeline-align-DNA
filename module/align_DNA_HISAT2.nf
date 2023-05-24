@@ -5,16 +5,9 @@
 include { generate_standard_filename } from '../external/nextflow-modules/modules/common/generate_standardized_filename/main.nf'
 include { run_sort_SAMtools ; run_merge_SAMtools} from './samtools.nf'
 // include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from './validation.nf'
-include { run_validate_PipeVal } from './external/pipeline-Nextflow-module/modules/PipeVal/validate/main.nf' addParams(
+include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from './external/pipeline-Nextflow-module/modules/PipeVal/validate/main.nf' addParams(
     options: [
-        log_output_dir: "${params.log_output_dir}/process-log/${params.hisat2_version}"
-        docker_image_version: params.pipeval_version,
-        main_process: "./" //Save logs in <log_dir>/process-log/run_validate_PipeVal
-        ]
-    )
-include { run_validate_PipeVal as validate_output_file } from './external/pipeline-Nextflow-module/modules/PipeVal/validate/main.nf' addParams(
-    options: [
-        log_output_dir: "${params.log_output_dir}/process-log/${params.hisat2_version}"
+        log_output_dir: "${params.log_output_dir}/process-log/${params.hisat2_version}",
         docker_image_version: params.pipeval_version,
         main_process: "./" //Save logs in <log_dir>/process-log/run_validate_PipeVal
         ]
