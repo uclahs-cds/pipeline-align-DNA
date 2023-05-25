@@ -145,6 +145,9 @@ workflow align_DNA_HISAT2_workflow {
             Channel.from(params.work_dir, params.output_dir)
          )
 
+      // filter out the directories to prevent error with the validator
+      output_validation = output_validation.filter { !file(it).isDirectory() }
+
       validate_output_HISAT2(output_validation)
 
       validate_output_HISAT2.out.validation_result.collectFile(
