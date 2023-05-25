@@ -4,7 +4,6 @@
 // samtools due to the large size of the uncompressed SAM files.
 include { generate_standard_filename } from '../external/nextflow-modules/modules/common/generate_standardized_filename/main.nf'
 include { run_sort_SAMtools ; run_merge_SAMtools} from './samtools.nf'
-// include { run_validate_PipeVal; run_validate_PipeVal as validate_output_file } from './validation.nf'
 include {
    run_validate_PipeVal as validate_input_HISAT2
    run_validate_PipeVal as validate_output_HISAT2
