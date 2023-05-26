@@ -11,7 +11,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 - Changed name `base_output_dir` to `output_dir_base`
-- Updated Picard version to 3.0.0 after the most recent Broad release that updated the underlying Java version 
+- Updated Picard version to 3.0.0 after the most recent Broad release that updated the underlying Java version
+- Using the PipeVal module from pipeline-Nextflow-module
 
 ### Added
 - Setup nftest with a-mini-n2
@@ -61,7 +62,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Update `.gitignore` file according to [template](https://github.com/uclahs-cds/template-NextflowPipeline/blob/main/.gitignore)
 - Standardize output and log directory structure
-- Update index file extension from all processes to .bam.bai 
+- Update index file extension from all processes to .bam.bai
 - Standardize config files
 - Remove spark_temp_dir parameter from config template
 - Replace temp_dir parameter with work_dir parameter
