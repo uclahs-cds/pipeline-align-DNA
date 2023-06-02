@@ -1,4 +1,4 @@
-﻿---
+---
 input:
   FASTQ:
     - read_group_identifier: unique RG identifier
