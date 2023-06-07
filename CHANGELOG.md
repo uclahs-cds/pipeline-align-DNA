@@ -19,6 +19,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Add retry with lower CPUs for alignment processes
 - Add retry with increased memory for `MarkDuplicates` with `Picard`
 - Explicit parameter to control BWA-MEM2 alt-aware mode
+- Support for YAML input files through `-params-file` option
+- Additional test case for YAML files
 
 ## [9.0.0] - 2022-10-28
 ### Changed
@@ -62,7 +64,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Update `.gitignore` file according to [template](https://github.com/uclahs-cds/template-NextflowPipeline/blob/main/.gitignore)
 - Standardize output and log directory structure
-- Update index file extension from all processes to .bam.bai 
+- Update index file extension from all processes to .bam.bai
 - Standardize config files
 - Remove spark_temp_dir parameter from config template
 - Replace temp_dir parameter with work_dir parameter

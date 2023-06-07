@@ -12,15 +12,15 @@ log.info """\
       name: ${workflow.manifest.name}
       version: ${workflow.manifest.version}
 
-   - input: 
+   - input:
       sample_id: ${params.sample_id}
-      input_csv: ${params.input_csv}
+      input_csv: ${(params.containsKey("input_csv") && params.input_csv) ? params.input_csv : "YAML input used"}
       reference_fasta_bwa: ${params.aligner.contains("BWA-MEM2") ? params.reference_fasta_bwa : "None"}
       reference_fasta_index_files_bwa: ${params.aligner.contains("BWA-MEM2") ? params.reference_fasta_index_files_bwa : "None"}
       reference_fasta_hisat2: ${params.aligner.contains("HISAT2") ? params.reference_fasta_hisat2 : "None"}
       reference_fasta_index_files_hisat2: ${params.aligner.contains("HISAT2") ? params.reference_fasta_index_files_hisat2 : "None"}
 
-   - output: 
+   - output:
       work_dir: ${params.work_dir}
       output_dir: ${params.output_dir}
       output_dir_base_bwa: ${(params.ucla_cds_registered_dataset_output) ? params["output_dir_base_bwa-mem2"] : params["output_dir_base"]}
@@ -66,11 +66,10 @@ workflow {
 
    // get the input fastq pairs
    Channel
-      .fromPath(params.input_csv, checkIfExists: true)
-      .splitCsv(header:true)
-      .map { row -> 
+      .from(params.input.FASTQ)
+      .map { row ->
 
-         // the library, sample and lane are used as keys downstream to group into 
+         // the library, sample and lane are used as keys downstream to group into
          // sets of the same key for downstream merging
          return tuple(row.library_identifier,
             row,
@@ -80,7 +79,7 @@ workflow {
             )
          }
       .set{ ich_samples }
-  
+
    ich_samples
       .flatMap { library, header, lane, read1_fastq, read2_fastq ->
          [read1_fastq, read2_fastq]
@@ -102,10 +101,10 @@ workflow {
          ich_bwa_reference_index_files
          )
       bwa_mem2_complete_signal = align_DNA_BWA_MEM2_workflow.out.complete_signal
-      } 
+      }
    else {// If only running HISAT2, generate dummy signal
       bwa_mem2_complete_signal = "bwa_mem2_complete"
-      }  
+      }
    if (params.aligner.contains("HISAT2")) {
       Channel
          .fromPath(params.reference_fasta_hisat2, checkIfExists: true)
@@ -120,5 +119,5 @@ workflow {
          ich_reference_fasta_hisat2,
          ich_hisat2_reference_index_files
          )
-      } 
+      }
    }
