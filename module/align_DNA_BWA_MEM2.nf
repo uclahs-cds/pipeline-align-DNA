@@ -140,19 +140,9 @@ workflow align_DNA_BWA_MEM2_workflow {
       }
       generate_sha512sum(och_bam_index.mix(och_bam), aligner_output_dir)
 
-      output_validation = och_bam.mix(
-            och_bam_index,
-            Channel.from(params.work_dir, params.output_dir)
-         )
-
-      // filter out the directories to prevent error with the validator
-      output_validation = output_validation.filter { !file(it).isDirectory() }
+      output_validation = och_bam_index
 
       validate_output_BWA(output_validation)
-
-      println "och bam index: ${och_bam_index}"
-      println "params.work_dir: ${params.work_dir}"
-      println "params.output_dir: ${params.output_dir}"
 
       validate_output_BWA.out.validation_result.collectFile(
          name: 'output_validation.txt',
