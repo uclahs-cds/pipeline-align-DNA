@@ -13,12 +13,15 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Changed name `base_output_dir` to `output_dir_base`
 - Updated Picard version to 3.0.0 after the most recent Broad release that updated the underlying Java version
 - Using the PipeVal module from pipeline-Nextflow-module
+- Updated SAMTools version to 1.17
 
 ### Added
 - Setup nftest with a-mini-n2
 - Add retry with lower CPUs for alignment processes
 - Add retry with increased memory for `MarkDuplicates` with `Picard`
 - Explicit parameter to control BWA-MEM2 alt-aware mode
+- Support for YAML input files through `-params-file` option
+- Additional test case for YAML files
 
 ## [9.0.0] - 2022-10-28
 ### Changed

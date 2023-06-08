@@ -1,0 +1,12 @@
+---
+input:
+  FASTQ:
+    - read_group_identifier: unique RG identifier
+      sequencing_center: CN
+      library_identifier: LB
+      platform_technology: PL:ILLUMINA (usually ILLUMINA)
+      platform_unit: PU
+      lane: LN
+      sample: SM (sample name)
+      read1_fastq: /path/to/fastq/pair/r1.fastq.gz
+      read2_fastq: /path/to/fastq/pair/r2.fastq.gz

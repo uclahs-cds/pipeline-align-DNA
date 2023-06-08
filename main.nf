@@ -14,7 +14,7 @@ log.info """\
 
    - input:
       sample_id: ${params.sample_id}
-      input_csv: ${params.input_csv}
+      input_csv: ${(params.containsKey("input_csv") && params.input_csv) ? params.input_csv : "YAML input used"}
       reference_fasta_bwa: ${params.aligner.contains("BWA-MEM2") ? params.reference_fasta_bwa : "None"}
       reference_fasta_index_files_bwa: ${params.aligner.contains("BWA-MEM2") ? params.reference_fasta_index_files_bwa : "None"}
       reference_fasta_hisat2: ${params.aligner.contains("HISAT2") ? params.reference_fasta_hisat2 : "None"}
@@ -66,8 +66,7 @@ workflow {
 
    // get the input fastq pairs
    Channel
-      .fromPath(params.input_csv, checkIfExists: true)
-      .splitCsv(header:true)
+      .from(params.input.FASTQ)
       .map { row ->
 
          // the library, sample and lane are used as keys downstream to group into
