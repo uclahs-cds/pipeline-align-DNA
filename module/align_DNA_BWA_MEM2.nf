@@ -5,8 +5,8 @@
 include { generate_standard_filename } from '../external/nextflow-modules/modules/common/generate_standardized_filename/main.nf'
 include { run_sort_SAMtools ; run_merge_SAMtools } from './samtools.nf'
 include {
-   run_validate_PipeVal as validate_input_BWA
-   run_validate_PipeVal as validate_output_BWA
+   run_validate_PipeVal as validate_input_BWA_MEM2
+   run_validate_PipeVal as validate_output_BWA_MEM2
    } from '../external/nextflow-modules/modules/PipeVal/validate/main.nf' addParams(
          options: [
             log_output_dir: "${params.log_output_dir}/process-log/${params.bwa_version}",
@@ -100,11 +100,11 @@ workflow align_DNA_BWA_MEM2_workflow {
             ich_reference_index_files
          )
 
-      validate_input_BWA(input_validation)
+      validate_input_BWA_MEM2(input_validation)
 
       // change validation file name depending on whether inputs or outputs are being validated
       //val_filename = ${task.process.split(':')[1].replace('_', '-')} == run-validate ? "input_validation.txt" : "output_validation.txt"
-      validate_input_BWA.out.validation_result.collectFile(
+      validate_input_BWA_MEM2.out.validation_result.collectFile(
          name: 'input_validation.txt',
          storeDir: "${aligner_validation_dir}"
          )
@@ -140,11 +140,11 @@ workflow align_DNA_BWA_MEM2_workflow {
       }
       generate_sha512sum(och_bam_index.mix(och_bam), aligner_output_dir)
 
-      output_validation = och_bam_index
+      output_validation = och_bam.mix(och_bam_index)
 
-      validate_output_BWA(output_validation)
+      validate_output_BWA_MEM2(output_validation)
 
-      validate_output_BWA.out.validation_result.collectFile(
+      validate_output_BWA_MEM2.out.validation_result.collectFile(
          name: 'output_validation.txt',
          storeDir: "${aligner_validation_dir}"
          )

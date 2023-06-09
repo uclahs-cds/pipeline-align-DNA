@@ -139,7 +139,7 @@ workflow align_DNA_HISAT2_workflow {
       }
       generate_sha512sum(och_bam_index.mix(och_bam), aligner_output_dir)
 
-      output_validation = och_bam_index
+      output_validation = och_bam.mix(och_bam_index)
 
       validate_output_HISAT2(output_validation)
 
