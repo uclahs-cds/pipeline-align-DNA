@@ -27,11 +27,11 @@ The pipeline should be run **WITH A SINGLE SAMPLE AT A TIME**. Otherwise resourc
 
 ## How To Run
 
-Below is a summary of how to run the pipeline.  See [here](https://confluence.mednet.ucla.edu/pages/viewpage.action?spaceKey=BOUTROSLAB&title=How+to+run+a+nextflow+pipeline) for full instructions.
+Below is a summary of how to run the pipeline.  See [here](https://uclahs-cds.atlassian.net/wiki/spaces/BOUTROSLAB/pages/3197004/How+to+run+a+nextflow+pipeline) for full instructions.
 
 Pipelines should be run **WITH A SINGLE SAMPLE AT TIME**. Otherwise resource allocation and Nextflow errors could cause the pipeline to fail.
 
-> **Note**: Because this pipeline uses images stored in the [GitHub Container Registry](https://github.com/orgs/uclahs-cds/packages), you must [setup a personal access token](https://confluence.mednet.ucla.edu/display/BOUTROSLAB/Docker+Introduction#DockerIntroduction-GitHubContainerRegistryGitHubContainerRegistry|Setup) (PAT) for your GitHub account and log into the registry on the cluster before running this pipeline.
+> **Note**: Because this pipeline uses images stored in the [GitHub Container Registry](https://github.com/orgs/uclahs-cds/packages), you must [setup a personal access token](https://uclahs-cds.atlassian.net/wiki/spaces/BOUTROSLAB/pages/3223396/Container+Registry+-+GitHub+Packages) (PAT) for your GitHub account and log into the registry on the cluster before running this pipeline.
 
 1. The recommended way of running the pipeline is to directly use the source code located here: `/hot/software/pipeline/pipeline-align-DNA/Nextflow/release`, rather than cloning a copy of the pipeline.
 
