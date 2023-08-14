@@ -1,0 +1,129 @@
+---
+sample_id:  
+  type:  'String' 
+  required:  true
+  help:  'Sample ID'
+input_csv:
+  type:  'Path'
+  mode:  'r'
+  required:  true
+  help:  'Absolute path to input CSV containing sample information'
+dataset_id:
+  type:  'String'
+  required:  true
+  help:  'Dataset ID'
+reference_fasta_bwa:
+  type:  'Path'
+  mode:  'r'
+  required:  false
+  help:  'BWA-MEM2 files'
+reference_fasta_hisat2:
+  type:  'Path'
+  mode:  'r'
+  required:  false
+  help:  'HISAT2 reference files'
+hisat_index_prefix:
+  type:  'Path'
+  mode:  'r'
+  required:  false
+  help:  'HISAT2 index base name'
+aligner:
+  type:  'List'
+  required:  true
+  help:  'Aligner to be used (Current Options: BWA-MEM2, HISAT2)'
+  choices:  
+    - 'BWA-MEM2'
+    - 'HISAT2'
+output_dir:
+  type: 'Path'
+  mode: 'w'
+  required: true
+  help: 'Absolute path to output directory'
+save_intermediate_files:
+  type: 'Bool'
+  required: true
+  default: false
+  help: 'Whether to save intermediate files'
+cache_intermediate_pipeline_steps:
+  type: 'Bool'
+  required: true
+  default: false
+  help: 'Whether to cache intermediate steps'
+make_duplicates:
+  type: 'Bool'
+  required: true
+  default: true
+  help: 'Whether to mark duplicates'
+enable_spark:
+  type: 'Bool'
+  required: true
+  default: true
+  help: 'If the Spark process MarkDuplicatesSpark will be used, else, Picard will be used'
+spark_metrics:
+  type: 'Bool'
+  required: true
+  default: false
+  help: 'option for metrics generation in MarkDuplicatesSpark'
+disable_alt_aware:
+  type: 'Bool'
+  required: true
+  default: false
+  help: 'BWA-MEM2 defaults to alt-aware mode, set to true to explicitly disable it'
+ucla_cds_registered_dataset_input:
+  type: 'Bool'
+  required: true
+  default: false
+  help: 'If data input fastq files are registered in Boutros Lab'
+ucla_cds_registed_dataset_output:
+  type: 'Bool'
+  required: true
+  default: false
+  help: 'to redirect output files to Boutros Lab data storage'
+patient_id: 
+  type: 'String'
+  required: false
+  help: 'Patient ID for saving output bam and log directly to UCLA CDS data storage'
+ucla_cds_technology: 
+  type: 'String'
+  required: false
+  help: 'Ex: WGS, WXS'
+input:
+  FASTQ:
+    read_group_identifier:
+      type: 'String'
+      required: true
+      help: 'Unique RG identifier'
+    sequencing_center:
+      type: 'String'
+      required: true
+      help: 'Where the sequencing was performed'
+    library_identifier:
+      type: 'String'
+      required: true
+      help: 'library identifier'
+    platform_technology:
+      type: 'String'
+      required: true
+      help: 'Technology used for sequencing'
+    platform_unit:
+      type: 'String'
+      required: true
+      help: 'platform unit'
+    lane: 
+      type: 'String'
+      required: true
+      help: 'lane'
+    sample: 
+      type: 'String'
+      required: true
+      help: 'sample name'
+    read1_fastq:
+      type: 'Path'
+      mode: 'r'
+      required: true
+      help: 'path to first fastq file'
+    read2_fastq:
+      type: 'Path'
+      mode: 'r'
+      required: true
+      help: 'path to second fastq file'
