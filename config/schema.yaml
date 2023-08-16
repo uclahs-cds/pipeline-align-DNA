@@ -1,37 +1,37 @@
 ---
-sample_id:  
-  type:  'String' 
-  required:  true
-  help:  'Sample ID'
+sample_id:
+  type: 'String'
+  required: true
+  help: 'Sample ID'
 input_csv:
-  type:  'Path'
-  mode:  'r'
-  required:  true
-  help:  'Absolute path to input CSV containing sample information'
+  type: 'Path'
+  mode: 'r'
+  required: true
+  help: 'Absolute path to input CSV containing sample information'
 dataset_id:
-  type:  'String'
-  required:  true
-  help:  'Dataset ID'
+  type: 'String'
+  required: true
+  help: 'Dataset ID'
 reference_fasta_bwa:
-  type:  'Path'
-  mode:  'r'
-  required:  false
-  help:  'BWA-MEM2 files'
+  type: 'Path'
+  mode: 'r'
+  required: false
+  help: 'BWA-MEM2 files'
 reference_fasta_hisat2:
-  type:  'Path'
-  mode:  'r'
-  required:  false
-  help:  'HISAT2 reference files'
+  type: 'Path'
+  mode: 'r'
+  required: false
+  help: 'HISAT2 reference files'
 hisat_index_prefix:
-  type:  'Path'
-  mode:  'r'
-  required:  false
-  help:  'HISAT2 index base name'
+  type: 'Path'
+  mode: 'r'
+  required: false
+  help: 'HISAT2 index base name'
 aligner:
-  type:  'List'
-  required:  true
-  help:  'Aligner to be used (Current Options: BWA-MEM2, HISAT2)'
-  choices:  
+  type: 'List'
+  required: true
+  help: 'Aligner to be used (Current Options: BWA-MEM2, HISAT2)'
+  choices:
     - 'BWA-MEM2'
     - 'HISAT2'
 output_dir:
@@ -79,11 +79,11 @@ ucla_cds_registed_dataset_output:
   required: true
   default: false
   help: 'to redirect output files to Boutros Lab data storage'
-patient_id: 
+patient_id:
   type: 'String'
   required: false
   help: 'Patient ID for saving output bam and log directly to UCLA CDS data storage'
-ucla_cds_technology: 
+ucla_cds_technology:
   type: 'String'
   required: false
   help: 'Ex: WGS, WXS'
@@ -117,11 +117,11 @@ input:
           type: 'String'
           required: true
           help: 'platform unit'
-        lane: 
+        lane:
           type: 'String'
           required: true
           help: 'lane'
-        sample: 
+        sample:
           type: 'String'
           required: true
           help: 'sample name'
