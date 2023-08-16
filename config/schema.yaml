@@ -88,42 +88,50 @@ ucla_cds_technology:
   required: false
   help: 'Ex: WGS, WXS'
 input:
-  FASTQ:
-    read_group_identifier:
-      type: 'String'
+  type: 'InputNamespace'
+  required: true
+  help: 'Input names'
+  elements:
+    FASTQ:
+      type: 'ListFASTQPairs'
       required: true
-      help: 'Unique RG identifier'
-    sequencing_center:
-      type: 'String'
-      required: true
-      help: 'Where the sequencing was performed'
-    library_identifier:
-      type: 'String'
-      required: true
-      help: 'library identifier'
-    platform_technology:
-      type: 'String'
-      required: true
-      help: 'Technology used for sequencing'
-    platform_unit:
-      type: 'String'
-      required: true
-      help: 'platform unit'
-    lane: 
-      type: 'String'
-      required: true
-      help: 'lane'
-    sample: 
-      type: 'String'
-      required: true
-      help: 'sample name'
-    read1_fastq:
-      type: 'Path'
-      mode: 'r'
-      required: true
-      help: 'path to first fastq file'
-    read2_fastq:
-      type: 'Path'
-      mode: 'r'
-      required: true
-      help: 'path to second fastq file'
+      help: 'FASTQ and metadata'
+      elements:
+        read_group_identifier:
+          type: 'String'
+          required: true
+          help: 'Unique RG identifier'
+        sequencing_center:
+          type: 'String'
+          required: true
+          help: 'Where the sequencing was performed'
+        library_identifier:
+          type: 'String'
+          required: true
+          help: 'library identifier'
+        platform_technology:
+          type: 'String'
+          required: true
+          help: 'Technology used for sequencing'
+        platform_unit:
+          type: 'String'
+          required: true
+          help: 'platform unit'
+        lane: 
+          type: 'String'
+          required: true
+          help: 'lane'
+        sample: 
+          type: 'String'
+          required: true
+          help: 'sample name'
+        read1_fastq:
+          type: 'Path'
+          mode: 'r'
+          required: true
+          help: 'path to first fastq file'
+        read2_fastq:
+          type: 'Path'
+          mode: 'r'
+          required: true
+          help: 'path to second fastq file'
