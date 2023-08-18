@@ -6,7 +6,7 @@ sample_id:
 input_csv:
   type: 'Path'
   mode: 'r'
-  required: true
+  required: false
   help: 'Absolute path to input CSV containing sample information'
 dataset_id:
   type: 'String'
