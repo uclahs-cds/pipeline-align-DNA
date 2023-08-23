@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Support for YAML input files through `-params-file` option
 - Additional test case for YAML files
 - Add github action to build PlantUML diagram
+- Validate input parameters
 
 ## [9.0.0] - 2022-10-28
 ### Changed
