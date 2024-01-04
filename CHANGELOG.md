@@ -10,10 +10,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Changed
-- Changed name `base_output_dir` to `output_dir_base`
-- Updated Picard version to 3.0.0 after the most recent Broad release that updated the underlying Java version
-- Using the PipeVal module from pipeline-Nextflow-module
-- Updated SAMTools version to 1.17
+- Change name `base_output_dir` to `output_dir_base`
+- Update Picard version to 3.0.0 after the most recent Broad release that updated the underlying Java version
+- Use the PipeVal module from pipeline-Nextflow-module
+- Update SAMTools version to 1.17
+- Use modularized methods and schema functions for directory handling
 
 ### Added
 - Setup nftest with a-mini-n2
