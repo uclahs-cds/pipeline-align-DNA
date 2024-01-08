@@ -1,0 +1,44 @@
+@startuml
+<style>
+activityDiagram {
+    BackgroundColor #FFFFFF
+    BorderColor #000000
+    FontColor #000
+    }
+</style>
+start
+if (Is either BWA-MEM2 or HISAT2 listed as an aligner?) then (no)
+    #pink :Show error message;
+    detach 
+endif
+:Load Paired FASTQ(s) single sample;
+:Validate Inputs;
+if (using BWA-MEM2?) then (yes)
+    group BWA-MEM2 Aligner
+    :Sort;
+    :Merge and mark duplicates if necessary;
+    :Index bam;
+    :Create SHA512;
+    :Validate outputs;
+    #lightgreen :Create bam and bam index file;
+    end group
+endif
+
+if (using HISAT2?) then (yes)
+    group HISAT2 Aligner
+    :Sort;
+    :Merge and mark duplicates if necessary;
+    :Index bam;
+    :Create SHA512;
+    :Validate outputs;
+    #lightgreen :Create bam and bam index file;
+    end group
+endif
+legend
+    | Color | Process Type |
+    | <#White> | Intermediate Step |
+    | <#LightGreen> | Output |
+    | <#pink> | Error |
+endlegend
+stop
+@enduml
