@@ -10,10 +10,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [Unreleased]
 
 ### Changed
-- Changed name `base_output_dir` to `output_dir_base`
-- Updated Picard version to 3.0.0 after the most recent Broad release that updated the underlying Java version
-- Using the PipeVal module from pipeline-Nextflow-module
-- Updated SAMTools version to 1.17
+- Change name `base_output_dir` to `output_dir_base`
+- Update Picard version to 3.0.0 after the most recent Broad release that updated the underlying Java version
+- Use the PipeVal module from pipeline-Nextflow-module
+- Update SAMTools version to 1.17
+- Use modularized methods and schema functions for directory handling
 
 ### Added
 - Setup nftest with a-mini-n2
@@ -34,7 +35,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Change to github packages instead of dockerhub
 - Standardize intermediate and output filenames using [generate_standardized_filename](https://github.com/uclahs-cds/pipeline-Nextflow-module/tree/main/modules/common/generate_standardized_filename)
-- Update input csv according to [here](https://confluence.mednet.ucla.edu/pages/viewpage.action?spaceKey=BOUTROSLAB&title=2022-07-27+Nextflow+Working+Group+Meeting+Notes) (Section "Input structures for alignment pipelines")
+- Update input csv according to [here](https://uclahs-cds.atlassian.net/wiki/spaces/BOUTROSLAB/pages/3220374/2022-07-27+Nextflow+Working+Group+Meeting+Notes) (Section "Input structures for alignment pipelines")
 - `run_MarkDuplicatesSpark_GATK` now retries once with 130GB on F72, and 140GB on M64
 - Update registered output function
 
