@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Use the PipeVal module from pipeline-Nextflow-module
 - Update SAMTools version to 1.17
 - Use modularized methods and schema functions for directory handling
+- Use modularized methods for resource limits and allocations
 
 ### Added
 - Setup nftest with a-mini-n2
