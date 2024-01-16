@@ -110,7 +110,7 @@ A directed acyclic graph of your pipeline.
 
 >Following alignment, processes are run separately for each aligner used.
 
-![align-DNA flow diagram](flowchart-diagram.drawio.svg?raw=true)
+![align-DNA flow diagram](docs/dna-align-flow.svg?raw=true)
 
 ---
 
