@@ -15,23 +15,25 @@ endif
 :Validate Inputs;
 if (using BWA-MEM2?) then (yes)
     group BWA-MEM2 Aligner
+    :Align;
     :Sort;
     :Merge and mark duplicates if necessary;
-    :Index bam;
+    :Index BAM;
     :Create SHA512;
     :Validate outputs;
-    #lightgreen :Create bam and bam index file;
+    #lightgreen :Create BAM and BAM index file;
     end group
 endif
 
 if (using HISAT2?) then (yes)
     group HISAT2 Aligner
+    :Align;
     :Sort;
     :Merge and mark duplicates if necessary;
-    :Index bam;
+    :Index BAM;
     :Create SHA512;
     :Validate outputs;
-    #lightgreen :Create bam and bam index file;
+    #lightgreen :Create BAM and BAM index file;
     end group
 endif
 legend
