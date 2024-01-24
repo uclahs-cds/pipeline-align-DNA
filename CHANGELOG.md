@@ -19,7 +19,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Use modularized methods for resource limits and allocations
 
 ### Added
-- Setup nftest with a-mini-n2
+- Setup `NFTest` with a-mini-n2
 - Add retry with lower CPUs for alignment processes
 - Add retry with increased memory for `MarkDuplicates` with `Picard`
 - Explicit parameter to control BWA-MEM2 alt-aware mode
