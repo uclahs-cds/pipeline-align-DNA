@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>How To Run - pipeline-align-DNA</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "How To Run";
+        var mkdocs_page_input_path = "how-to-run.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> pipeline-align-DNA
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../overview/">Overview</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">How To Run</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../flow-diagram/">Flow Diagram</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../pipeline-steps/">Pipeline Steps</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../3-mark-duplicates-in-bam-files/">3. Mark Duplicates in BAM Files</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../4-index-bam-files/">4. Index BAM Files</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../inputs/">Inputs</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../outputs/">Outputs</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../testing-and-validation/">Testing and Validation</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../references/">References</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../license/">License</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">pipeline-align-DNA</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">How To Run</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/023fdba7e1a875e6893e40d5fc7609c51ef12118/README.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="how-to-run">How To Run</h2>
+<p>Below is a summary of how to run the pipeline.  See <a href="https://uclahs-cds.atlassian.net/wiki/spaces/BOUTROSLAB/pages/3197004/How+to+run+a+nextflow+pipeline">here</a> for full instructions.</p>
+<p>Pipelines should be run <strong>WITH A SINGLE SAMPLE AT TIME</strong>. Otherwise resource allocation and Nextflow errors could cause the pipeline to fail.</p>
+<blockquote>
+<p><strong>Note</strong>: Because this pipeline uses images stored in the <a href="https://github.com/orgs/uclahs-cds/packages">GitHub Container Registry</a>, you must <a href="https://uclahs-cds.atlassian.net/wiki/spaces/BOUTROSLAB/pages/3223396/Container+Registry+-+GitHub+Packages">setup a personal access token</a> (PAT) for your GitHub account and log into the registry on the cluster before running this pipeline.</p>
+</blockquote>
+<ol>
+<li>
+<p>The recommended way of running the pipeline is to directly use the source code located here: <code>/hot/software/pipeline/pipeline-align-DNA/Nextflow/release</code>, rather than cloning a copy of the pipeline.</p>
+</li>
+<li>
+<p>The source code should never be modified when running our pipelines</p>
+</li>
+<li>
+<p>Create a config file for input, output, and parameters. An example for a config file can be found <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/023fdba7e1a875e6893e40d5fc7609c51ef12118/config/template.config">here</a>. See <a href="../inputs/#Inputs">Inputs</a> for the detailed description of each variable in the config file. The config file can be generated using a python script (see below).</p>
+</li>
+<li>
+<p>Do not directly modify the source <code>template.config</code>, but rather you should copy it from the pipeline release folder to your project-specific folder and modify it there</p>
+</li>
+<li>
+<p>Create the input csv using the <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/023fdba7e1a875e6893e40d5fc7609c51ef12118/input/align-DNA.input.csv">template</a>. The example csv is a single-lane sample, however this pipeline can take multi-lane sample as well, with each record in the csv file representing a lane (a pair of fastq). All records must have the same value in the <strong>sample</strong> column. See <a href="../inputs/#Inputs">Inputs</a> for detailed description of each column. All columns must exist in order to run the pipeline successfully.</p>
+</li>
+<li>
+<p>Again, do not directly modify the source template csv file.  Instead, copy it from the pipeline release folder to your project-specific folder and modify it there.</p>
+</li>
+<li>
+<p>The pipeline can be executed locally using the command below:</p>
+</li>
+</ol>
+<pre><code class="language-bash">nextflow run path/to/main.nf -config path/to/sample-specific.config
+</code></pre>
+<ul>
+<li>For example, <code>path/to/main.nf</code> could be: <code>/hot/software/pipeline/pipeline-align-DNA/Nextflow/release/8.0.0/pipeline/align-DNA.nf</code></li>
+<li><code>path/to/sample-specific.config</code> is the path to where you saved your project-specific copy of <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/023fdba7e1a875e6893e40d5fc7609c51ef12118/config/template.config">template.config</a></li>
+</ul>
+<p>To submit to UCLAHS-CDS's Azure cloud, use the submission script <a href="https://github.com/uclahs-cds/tool-submit-nf">here</a> with the command below:</p>
+<pre><code class="language-bash">python path/to/submit_nextflow_pipeline.py \
+    --nextflow_script path/to/main.nf \
+    --nextflow_config path/to/sample-specific.config \
+    --pipeline_run_name &lt;sample_name&gt; \
+    --partition_type F72 \
+    --email jdoe@ucla.edu
+</code></pre>
+<p><b><i> BWA-MEM2 Genome Index </i></b>
+The reference genome index must be generated by BWA-MEM2 with the correct version. Genome index generated by old BWA-MEM2 versions or the original BWA is not accepted. The reference genome index can be generated using the <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/023fdba7e1a875e6893e40d5fc7609c51ef12118/module/generate-genome-index.nf"><code>generate-genme-index.nf</code></a> nextflow pipeline. To run this pipeline, you need to create a config file using this <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/023fdba7e1a875e6893e40d5fc7609c51ef12118/config/index.config">template</a> to specify the path of <code>reference_fasta</code> and the <code>temp_dir</code>. The <code>temp_dir</code> is used to store intermediate files of nextflow. The genome index files are saved to the same directory of the input reference FASTA by the pipeline. Use the command below to run this generate genome index pipeline:</p>
+<pre><code class="language-bash">nextflow run path/to/generate-genome-index.nf -config path/to/genome-specific.config
+</code></pre>
+<p>This can also be submitted using the <a href="https://github.com/uclahs-cds/tool-submit-nf">submission script</a> to the UCLAHS-CDS's Azure cloud as mentioned above.</p>
+<blockquote>
+<p>The BWA-MEM2 expects the reference genome index to be at the same directory as the reference genome FASTA, so it's important to keep them together.</p>
+</blockquote>
+<p><b><i> HISAT2 Genome Index </i></b>
+The reference genome index must be generated from HISAT2 using <a href="http://daehwankimlab.github.io/hisat2/howto/">hisat2-build</a>. When passing the hisat2 index to the config, only the path up to the prefix(basename) must be specified:</p>
+<blockquote>
+<p>The basename is the name of any of the index files up to but not including the final .1.ht2 / etc. hisat2 looks for the specified index first in the current directory, then in the directory specified in the HISAT2_INDEXES environment variable.</p>
+</blockquote>
+<p><b><i> Generating the config file using a script </i></b></p>
+<p>To learn how to run the script, use one of the following commands:</p>
+<pre><code class="language-bash">python path/to/pipeline-align-DNA/script/write_dna_align_config_file.py -h
+python path/to/pipeline-align-DNA/script/write_dna_align_config_file.py param
+python path/to/pipeline-align-DNA/script/write_dna_align_config_file.py example
+
+</code></pre>
+<p>See the following command for example:</p>
+<pre><code class="language-bash">python path/to/pipeline-align-DNA/script/write_dna_align_config_file.py \
+    /my/path/to/sample_name.csv \
+    bwa-mem2 \
+    /hot/ref/tool-specific-input/BWA-MEM2-2.2.1/GRCh38-BI-20160721/index/genome.fa \
+    /my/path/to/output_directory \
+    /my/path/to/temp_directory \
+    --save_intermediate_files \
+    --cache_intermediate_pipeline_steps
+</code></pre>
+<hr />
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../overview/" class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../flow-diagram/" class="btn btn-neutral float-right" title="Flow Diagram">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/uclahs-cds/pipeline-align-DNA" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../overview/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../flow-diagram/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
