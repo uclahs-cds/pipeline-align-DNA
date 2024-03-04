@@ -9,12 +9,21 @@
     }
   },
   {
+    "version": "v7.1.0",
+    "title": "v7.1.0",
+    "aliases": [
+      "release-candidate",
+      "latest"
+    ],
+    "properties": {
+      "commit": "e4696b62d07d2ce2867de5b7662f6fb71585f010",
+      "date": "2021-07-29T16:49:56-07:00"
+    }
+  },
+  {
     "version": "v7.0.3",
     "title": "v7.0.3",
-    "aliases": [
-      "latest",
-      "release-candidate"
-    ],
+    "aliases": [],
     "properties": {
       "commit": "1937ac3a51db46f6eea27ba6b902dd7bce844cf4",
       "date": "2021-04-15T14:48:30-07:00"
