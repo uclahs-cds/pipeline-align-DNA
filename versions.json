@@ -2,12 +2,22 @@
   {
     "version": "development",
     "title": "development",
-    "aliases": [
-      "latest"
-    ],
+    "aliases": [],
     "properties": {
       "commit": "023fdba7e1a875e6893e40d5fc7609c51ef12118",
       "date": "2024-02-28T11:39:00-08:00"
+    }
+  },
+  {
+    "version": "v3.0.0",
+    "title": "v3.0.0",
+    "aliases": [
+      "release-candidate",
+      "latest"
+    ],
+    "properties": {
+      "commit": "f028d3eab3c1f693727393dd1914718c43271496",
+      "date": "2020-09-23T15:51:18-07:00"
     }
   }
 ]
