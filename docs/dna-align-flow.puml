@@ -11,7 +11,7 @@ if (Is either BWA-MEM2 or HISAT2 listed as an aligner?) then (no)
     #pink :Show error message;
     detach 
 endif
-:Load Paired FASTQ(s) single sample;
+:Load FASTQ(s) single sample;
 :Validate Inputs;
 if (using BWA-MEM2?) then (yes)
     group BWA-MEM2 Aligner
