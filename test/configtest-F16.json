@@ -1,0 +1,633 @@
+{
+  "nextflow_version": "23.10.0",
+  "config": [
+    "test/global.config",
+    "test/a_mini_n2-picard_yaml.config"
+  ],
+  "params_file": "test/a_mini_n2-picard_yaml.yaml",
+  "cpus": 16,
+  "memory_gb": 31,
+  "nf_params": {
+    "output_dir": "/tmp/outputs"
+  },
+  "envvars": {
+    "SLURM_JOB_ID": "8543"
+  },
+  "mocks": {
+    "check_path": ""
+  },
+  "dated_fields": [
+    "params.log_output_dir",
+    "report.file",
+    "timeline.file",
+    "trace.file",
+    "params.date"
+  ],
+  "expected_result": {
+    "docker": {
+      "all_group_ids": "$(for i in `id --real --groups`; do echo -n \"--group-add=$i \"; done)",
+      "enabled": true,
+      "runOptions": "-u $(id -u):$(id -g) $(for i in `id --real --groups`; do echo -n \"--group-add=$i \"; done)",
+      "uid_and_gid": "-u $(id -u):$(id -g)"
+    },
+    "manifest": {
+      "author": "Benjamin Carlin; Chenghao Zhu; Aaron Holmes; Yash Patel; Nicole Zeltser; Jieun Oh; Jaron Arbet",
+      "description": "alignment pipeline for paired fastqs DNA samples",
+      "name": "align-DNA",
+      "version": "10.0.0-rc.1"
+    },
+    "params": {
+      "aligner": [
+        "BWA-MEM2",
+        "HISAT2"
+      ],
+      "bwa_version": "BWA-MEM2-2.2.1",
+      "cache_intermediate_pipeline_steps": false,
+      "dataset_id": "0000000",
+      "disable_alt_aware": false,
+      "docker_container_registry": "ghcr.io/uclahs-cds",
+      "docker_image_bwa_and_samtools": "ghcr.io/uclahs-cds/bwa-mem2_samtools-1.12:2.2.1",
+      "docker_image_gatk": "broadinstitute/gatk:4.2.4.1",
+      "docker_image_hisat2_and_samtools": "ghcr.io/uclahs-cds/hisat2_samtools-1.12:2.2.1",
+      "docker_image_picardtools": "ghcr.io/uclahs-cds/picard:3.0.0",
+      "docker_image_samtools": "ghcr.io/uclahs-cds/samtools:1.17",
+      "docker_image_sha512sum": "ghcr.io/uclahs-cds/bl-base:1.1.0",
+      "docker_image_validate": "ghcr.io/uclahs-cds/pipeval:4.0.0-rc.2",
+      "enable_spark": false,
+      "gatk_command_mem_diff": "5 GB",
+      "hisat2_index_prefix": "/hot/ref/tool-specific-input/HISAT2-2.2.1/GRCh38-BI-20160721/index/Homo_sapiens_assembly38",
+      "hisat2_version": "HISAT2-2.2.1",
+      "input": {
+        "FASTQ": [
+          {
+            "lane": "1",
+            "library_identifier": "bamsurgeon",
+            "platform_technology": "ILLUMINA",
+            "platform_unit": "NA",
+            "read1_fastq": "/hot/data/TEST/TEST0000000/TWGSAMIN000001/TWGSAMIN000001-N001-S01-F/DNA/WGS/raw/FASTQ/HG002-N-A-mini-n2/HG002.N-n2_R1.fq.gz",
+            "read2_fastq": "/hot/data/TEST/TEST0000000/TWGSAMIN000001/TWGSAMIN000001-N001-S01-F/DNA/WGS/raw/FASTQ/HG002-N-A-mini-n2/HG002.N-n2_R2.fq.gz",
+            "read_group_identifier": "HG002.N.seq1",
+            "sample": "HG002.N",
+            "sequencing_center": "BS"
+          }
+        ]
+      },
+      "log_output_dir": "/tmp/outputs/align-DNA-10.0.0-rc.1/a_mini_n2_picard/log-align-DNA-10.0.0-rc.1-19970704T165655Z/",
+      "make_duplicates": true,
+      "mark_duplicates": true,
+      "max_cpus": "16",
+      "max_memory": "31 GB",
+      "min_cpus": "1",
+      "min_memory": "1 MB",
+      "output_dir": "/tmp/outputs",
+      "output_dir_base": "/tmp/outputs/align-DNA-10.0.0-rc.1/a_mini_n2_picard",
+      "pipeval_version": "4.0.0-rc.2",
+      "proc_resource_params": {
+        "align_DNA_BWA_MEM2": {
+          "cpus": "16",
+          "errorStrategy": "retry",
+          "retry_strategy": {
+            "cpus": {
+              "operand": "8",
+              "strategy": "subtract"
+            }
+          }
+        },
+        "align_DNA_HISAT2": {
+          "cpus": "16",
+          "errorStrategy": "retry",
+          "retry_strategy": {
+            "cpus": {
+              "operand": "8",
+              "strategy": "subtract"
+            }
+          }
+        },
+        "generate_sha512sum": {
+          "cpus": "1",
+          "memory": "1 GB"
+        },
+        "run_MarkDuplicate_Picard": {
+          "cpus": "1",
+          "memory": "14 GB",
+          "retry_strategy": {
+            "memory": {
+              "operand": "2",
+              "strategy": "exponential"
+            }
+          }
+        },
+        "run_MarkDuplicatesSpark_GATK": {
+          "cpus": "16",
+          "ext": {
+            "retry_codes": [
+              "52"
+            ]
+          },
+          "memory": "29 GB"
+        },
+        "run_merge_SAMtools": {
+          "cpus": "8",
+          "memory": "2 GB"
+        },
+        "run_sort_SAMtools": {
+          "cpus": "12",
+          "memory": "15 GB"
+        },
+        "run_validate_PipeVal": {
+          "cpus": "1",
+          "memory": "1 GB"
+        }
+      },
+      "reference_fasta_bwa": "/hot/ref/tool-specific-input/BWA-MEM2-2.2.1/GRCh38-BI-20160721/index/genome.fa",
+      "reference_fasta_hisat2": "/hot/ref/reference/GRCh38-BI-20160721/Homo_sapiens_assembly38.fasta",
+      "reference_fasta_index_files_bwa": "/hot/ref/tool-specific-input/BWA-MEM2-2.2.1/GRCh38-BI-20160721/index/genome.fa.*",
+      "reference_fasta_index_files_hisat2": "/hot/ref/tool-specific-input/HISAT2-2.2.1/GRCh38-BI-20160721/index/Homo_sapiens_assembly38.*.ht2",
+      "sample_id": "a_mini_n2_picard",
+      "save_intermediate_files": false,
+      "spark_metrics": false,
+      "spark_temp_dir": "/scratch/8543",
+      "ucla_cds": true,
+      "ucla_cds_analyte": "DNA",
+      "ucla_cds_registed_dataset_output": false,
+      "ucla_cds_registered_dataset_input": false,
+      "ucla_cds_registered_dataset_output": false,
+      "work_dir": "/scratch/8543"
+    },
+    "params_schema": {
+      "aligner": {
+        "choices": [
+          "BWA-MEM2",
+          "HISAT2"
+        ],
+        "help": "Aligner to be used (Current Options: BWA-MEM2, HISAT2)",
+        "required": true,
+        "type": "List"
+      },
+      "cache_intermediate_pipeline_steps": {
+        "default": false,
+        "help": "Whether to cache intermediate steps",
+        "required": true,
+        "type": "Bool"
+      },
+      "dataset_id": {
+        "help": "Dataset ID",
+        "required": true,
+        "type": "String"
+      },
+      "disable_alt_aware": {
+        "default": false,
+        "help": "BWA-MEM2 defaults to alt-aware mode, set to true to explicitly disable it",
+        "required": true,
+        "type": "Bool"
+      },
+      "enable_spark": {
+        "default": true,
+        "help": "If the Spark process MarkDuplicatesSpark will be used, else, Picard will be used",
+        "required": true,
+        "type": "Bool"
+      },
+      "hisat_index_prefix": {
+        "help": "HISAT2 index base name",
+        "mode": "r",
+        "required": false,
+        "type": "Path"
+      },
+      "input": {
+        "elements": {
+          "FASTQ": {
+            "elements": {
+              "lane": {
+                "help": "lane",
+                "required": true,
+                "type": "String"
+              },
+              "library_identifier": {
+                "help": "library identifier",
+                "required": true,
+                "type": "String"
+              },
+              "platform_technology": {
+                "help": "Technology used for sequencing",
+                "required": true,
+                "type": "String"
+              },
+              "platform_unit": {
+                "help": "platform unit",
+                "required": true,
+                "type": "String"
+              },
+              "read1_fastq": {
+                "help": "path to first fastq file",
+                "mode": "r",
+                "required": true,
+                "type": "Path"
+              },
+              "read2_fastq": {
+                "help": "path to second fastq file",
+                "mode": "r",
+                "required": true,
+                "type": "Path"
+              },
+              "read_group_identifier": {
+                "help": "Unique RG identifier",
+                "required": true,
+                "type": "String"
+              },
+              "sample": {
+                "help": "sample name",
+                "required": true,
+                "type": "String"
+              },
+              "sequencing_center": {
+                "help": "Where the sequencing was performed",
+                "required": true,
+                "type": "String"
+              }
+            },
+            "help": "FASTQ and metadata",
+            "required": true,
+            "type": "ListFASTQPairs"
+          }
+        },
+        "help": "Input names",
+        "required": true,
+        "type": "InputNamespace"
+      },
+      "input_csv": {
+        "help": "Absolute path to input CSV containing sample information",
+        "mode": "r",
+        "required": false,
+        "type": "Path"
+      },
+      "make_duplicates": {
+        "default": true,
+        "help": "Whether to mark duplicates",
+        "required": true,
+        "type": "Bool"
+      },
+      "output_dir": {
+        "help": "Absolute path to output directory",
+        "mode": "w",
+        "required": true,
+        "type": "Path"
+      },
+      "patient_id": {
+        "help": "Patient ID for saving output bam and log directly to UCLA CDS data storage",
+        "required": false,
+        "type": "String"
+      },
+      "reference_fasta_bwa": {
+        "help": "BWA-MEM2 files",
+        "mode": "r",
+        "required": false,
+        "type": "Path"
+      },
+      "reference_fasta_hisat2": {
+        "help": "HISAT2 reference files",
+        "mode": "r",
+        "required": false,
+        "type": "Path"
+      },
+      "sample_id": {
+        "help": "Sample ID",
+        "required": true,
+        "type": "String"
+      },
+      "save_intermediate_files": {
+        "default": false,
+        "help": "Whether to save intermediate files",
+        "required": true,
+        "type": "Bool"
+      },
+      "spark_metrics": {
+        "default": false,
+        "help": "option for metrics generation in MarkDuplicatesSpark",
+        "required": true,
+        "type": "Bool"
+      },
+      "ucla_cds_registed_dataset_output": {
+        "default": false,
+        "help": "to redirect output files to Boutros Lab data storage",
+        "required": true,
+        "type": "Bool"
+      },
+      "ucla_cds_registered_dataset_input": {
+        "default": false,
+        "help": "If data input fastq files are registered in Boutros Lab",
+        "required": true,
+        "type": "Bool"
+      },
+      "ucla_cds_technology": {
+        "help": "Ex: WGS, WXS",
+        "required": false,
+        "type": "String"
+      }
+    },
+    "proc_names": "[Ljava.lang.String;@dec0ded",
+    "process": {
+      "cache": true,
+      "commonRetryCodes": [
+        "104",
+        "134",
+        "137",
+        "139",
+        "143",
+        "247"
+      ],
+      "cpus": {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "closure": "closure()"
+      },
+      "echo": true,
+      "errorStrategy": {
+        "1": "terminate",
+        "2": "terminate",
+        "3": "terminate",
+        "closure": "terminate"
+      },
+      "executor": "local",
+      "maxRetries": "1",
+      "memory": "31 GB",
+      "withLabel:process_high": {
+        "cpus": {
+          "1": "12",
+          "2": "16",
+          "3": "16",
+          "closure": "closure()"
+        },
+        "memory": {
+          "1": "31 GB",
+          "2": "31 GB",
+          "3": "31 GB",
+          "closure": "closure()"
+        }
+      },
+      "withLabel:process_low": {
+        "cpus": {
+          "1": "2",
+          "2": "4",
+          "3": "6",
+          "closure": "closure()"
+        },
+        "memory": {
+          "1": "3 GB",
+          "2": "6 GB",
+          "3": "9 GB",
+          "closure": "closure()"
+        }
+      },
+      "withLabel:process_medium": {
+        "cpus": {
+          "1": "6",
+          "2": "12",
+          "3": "16",
+          "closure": "closure()"
+        },
+        "memory": {
+          "1": "31 GB",
+          "2": "31 GB",
+          "3": "31 GB",
+          "closure": "closure()"
+        }
+      },
+      "withName:align_DNA_BWA_MEM2": {
+        "cpus": {
+          "1": "16",
+          "2": "8",
+          "3": "1",
+          "closure": "retry_updater(16, subtract, 8, $task.attempt, cpus)"
+        },
+        "errorStrategy": "retry"
+      },
+      "withName:align_DNA_HISAT2": {
+        "cpus": {
+          "1": "16",
+          "2": "8",
+          "3": "1",
+          "closure": "retry_updater(16, subtract, 8, $task.attempt, cpus)"
+        },
+        "errorStrategy": "retry"
+      },
+      "withName:generate_sha512sum": {
+        "cpus": "1",
+        "memory": "1 GB"
+      },
+      "withName:run_MarkDuplicate_Picard": {
+        "cpus": "1",
+        "memory": {
+          "1": "14 GB",
+          "2": "28 GB",
+          "3": "31 GB",
+          "closure": "retry_updater(14 GB, exponential, 2, $task.attempt, memory)"
+        }
+      },
+      "withName:run_MarkDuplicatesSpark_GATK": {
+        "cpus": "16",
+        "ext": {
+          "retry_codes": [
+            "52"
+          ]
+        },
+        "memory": "29 GB"
+      },
+      "withName:run_merge_SAMtools": {
+        "cpus": "8",
+        "memory": "2 GB"
+      },
+      "withName:run_sort_SAMtools": {
+        "cpus": "12",
+        "memory": "15 GB"
+      },
+      "withName:run_validate_PipeVal": {
+        "cpus": "1",
+        "memory": "1 GB"
+      }
+    },
+    "report": {
+      "enabled": true,
+      "file": "/tmp/outputs/align-DNA-10.0.0-rc.1/a_mini_n2_picard/log-align-DNA-10.0.0-rc.1-19970704T165655Z//nextflow-log/report.html"
+    },
+    "timeline": {
+      "enabled": true,
+      "file": "/tmp/outputs/align-DNA-10.0.0-rc.1/a_mini_n2_picard/log-align-DNA-10.0.0-rc.1-19970704T165655Z//nextflow-log/timeline.html"
+    },
+    "trace": {
+      "enabled": true,
+      "file": "/tmp/outputs/align-DNA-10.0.0-rc.1/a_mini_n2_picard/log-align-DNA-10.0.0-rc.1-19970704T165655Z//nextflow-log/trace.txt"
+    },
+    "workDir": "/scratch/8543",
+    "yaml": {
+      "aligner": {
+        "choices": [
+          "BWA-MEM2",
+          "HISAT2"
+        ],
+        "help": "Aligner to be used (Current Options: BWA-MEM2, HISAT2)",
+        "required": true,
+        "type": "List"
+      },
+      "cache_intermediate_pipeline_steps": {
+        "default": false,
+        "help": "Whether to cache intermediate steps",
+        "required": true,
+        "type": "Bool"
+      },
+      "dataset_id": {
+        "help": "Dataset ID",
+        "required": true,
+        "type": "String"
+      },
+      "disable_alt_aware": {
+        "default": false,
+        "help": "BWA-MEM2 defaults to alt-aware mode, set to true to explicitly disable it",
+        "required": true,
+        "type": "Bool"
+      },
+      "enable_spark": {
+        "default": true,
+        "help": "If the Spark process MarkDuplicatesSpark will be used, else, Picard will be used",
+        "required": true,
+        "type": "Bool"
+      },
+      "hisat_index_prefix": {
+        "help": "HISAT2 index base name",
+        "mode": "r",
+        "required": false,
+        "type": "Path"
+      },
+      "input": {
+        "elements": {
+          "FASTQ": {
+            "elements": {
+              "lane": {
+                "help": "lane",
+                "required": true,
+                "type": "String"
+              },
+              "library_identifier": {
+                "help": "library identifier",
+                "required": true,
+                "type": "String"
+              },
+              "platform_technology": {
+                "help": "Technology used for sequencing",
+                "required": true,
+                "type": "String"
+              },
+              "platform_unit": {
+                "help": "platform unit",
+                "required": true,
+                "type": "String"
+              },
+              "read1_fastq": {
+                "help": "path to first fastq file",
+                "mode": "r",
+                "required": true,
+                "type": "Path"
+              },
+              "read2_fastq": {
+                "help": "path to second fastq file",
+                "mode": "r",
+                "required": true,
+                "type": "Path"
+              },
+              "read_group_identifier": {
+                "help": "Unique RG identifier",
+                "required": true,
+                "type": "String"
+              },
+              "sample": {
+                "help": "sample name",
+                "required": true,
+                "type": "String"
+              },
+              "sequencing_center": {
+                "help": "Where the sequencing was performed",
+                "required": true,
+                "type": "String"
+              }
+            },
+            "help": "FASTQ and metadata",
+            "required": true,
+            "type": "ListFASTQPairs"
+          }
+        },
+        "help": "Input names",
+        "required": true,
+        "type": "InputNamespace"
+      },
+      "input_csv": {
+        "help": "Absolute path to input CSV containing sample information",
+        "mode": "r",
+        "required": false,
+        "type": "Path"
+      },
+      "make_duplicates": {
+        "default": true,
+        "help": "Whether to mark duplicates",
+        "required": true,
+        "type": "Bool"
+      },
+      "output_dir": {
+        "help": "Absolute path to output directory",
+        "mode": "w",
+        "required": true,
+        "type": "Path"
+      },
+      "patient_id": {
+        "help": "Patient ID for saving output bam and log directly to UCLA CDS data storage",
+        "required": false,
+        "type": "String"
+      },
+      "reference_fasta_bwa": {
+        "help": "BWA-MEM2 files",
+        "mode": "r",
+        "required": false,
+        "type": "Path"
+      },
+      "reference_fasta_hisat2": {
+        "help": "HISAT2 reference files",
+        "mode": "r",
+        "required": false,
+        "type": "Path"
+      },
+      "sample_id": {
+        "help": "Sample ID",
+        "required": true,
+        "type": "String"
+      },
+      "save_intermediate_files": {
+        "default": false,
+        "help": "Whether to save intermediate files",
+        "required": true,
+        "type": "Bool"
+      },
+      "spark_metrics": {
+        "default": false,
+        "help": "option for metrics generation in MarkDuplicatesSpark",
+        "required": true,
+        "type": "Bool"
+      },
+      "ucla_cds_registed_dataset_output": {
+        "default": false,
+        "help": "to redirect output files to Boutros Lab data storage",
+        "required": true,
+        "type": "Bool"
+      },
+      "ucla_cds_registered_dataset_input": {
+        "default": false,
+        "help": "If data input fastq files are registered in Boutros Lab",
+        "required": true,
+        "type": "Bool"
+      },
+      "ucla_cds_technology": {
+        "help": "Ex: WGS, WXS",
+        "required": false,
+        "type": "String"
+      }
+    }
+  }
+}
