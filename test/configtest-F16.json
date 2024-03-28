@@ -164,6 +164,12 @@
         "143",
         "247"
       ],
+      "containerOptions": {
+        "1": "--cpu-shares 1024 --cpus $task.cpus",
+        "2": "--cpu-shares 1024 --cpus $task.cpus",
+        "3": "--cpu-shares 1024 --cpus $task.cpus",
+        "closure": "--cpu-shares 1024 --cpus $task.cpus"
+      },
       "cpus": {
         "1": "1",
         "2": "2",
