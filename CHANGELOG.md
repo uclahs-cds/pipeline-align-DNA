@@ -9,7 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-## [10.0.0- - 2024-03-29
+## [10.0.0] - 2024-03-29
 ### Added
 - Add Action to generate documentation in GitHub Pages
 - Add Action to run Nextflow configuration regression tests
