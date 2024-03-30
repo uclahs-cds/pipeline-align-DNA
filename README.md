@@ -27,6 +27,9 @@ The pipeline should be run **WITH A SINGLE SAMPLE AT A TIME**. Otherwise resourc
 
 ## How To Run
 
+**Requirements**
+Currently supported Nextflow versions: `23.04.2`
+
 Below is a summary of how to run the pipeline.  See [here](https://uclahs-cds.atlassian.net/wiki/spaces/BOUTROSLAB/pages/3197004/How+to+run+a+nextflow+pipeline) for full instructions.
 
 Pipelines should be run **WITH A SINGLE SAMPLE AT TIME**. Otherwise resource allocation and Nextflow errors could cause the pipeline to fail.
