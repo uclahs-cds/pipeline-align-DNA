@@ -34,7 +34,7 @@
       "author": "Benjamin Carlin; Chenghao Zhu; Aaron Holmes; Yash Patel; Nicole Zeltser; Jieun Oh; Jaron Arbet",
       "description": "alignment pipeline for paired fastqs DNA samples",
       "name": "align-DNA",
-      "version": "10.0.0-rc.1"
+      "version": "10.0.0"
     },
     "params": {
       "aligner": [
@@ -72,7 +72,7 @@
           }
         ]
       },
-      "log_output_dir": "/tmp/outputs/align-DNA-10.0.0-rc.1/a_mini_n2_picard/log-align-DNA-10.0.0-rc.1-19970704T165655Z/",
+      "log_output_dir": "/tmp/outputs/align-DNA-10.0.0/a_mini_n2_picard/log-align-DNA-10.0.0-19970704T165655Z/",
       "make_duplicates": true,
       "mark_duplicates": true,
       "max_cpus": "16",
@@ -80,7 +80,7 @@
       "min_cpus": "1",
       "min_memory": "1 MB",
       "output_dir": "/tmp/outputs",
-      "output_dir_base": "/tmp/outputs/align-DNA-10.0.0-rc.1/a_mini_n2_picard",
+      "output_dir_base": "/tmp/outputs/align-DNA-10.0.0/a_mini_n2_picard",
       "pipeval_version": "4.0.0-rc.2",
       "proc_resource_params": {
         "align_DNA_BWA_MEM2": {
@@ -283,15 +283,15 @@
     },
     "report": {
       "enabled": true,
-      "file": "/tmp/outputs/align-DNA-10.0.0-rc.1/a_mini_n2_picard/log-align-DNA-10.0.0-rc.1-19970704T165655Z//nextflow-log/report.html"
+      "file": "/tmp/outputs/align-DNA-10.0.0/a_mini_n2_picard/log-align-DNA-10.0.0-19970704T165655Z//nextflow-log/report.html"
     },
     "timeline": {
       "enabled": true,
-      "file": "/tmp/outputs/align-DNA-10.0.0-rc.1/a_mini_n2_picard/log-align-DNA-10.0.0-rc.1-19970704T165655Z//nextflow-log/timeline.html"
+      "file": "/tmp/outputs/align-DNA-10.0.0/a_mini_n2_picard/log-align-DNA-10.0.0-19970704T165655Z//nextflow-log/timeline.html"
     },
     "trace": {
       "enabled": true,
-      "file": "/tmp/outputs/align-DNA-10.0.0-rc.1/a_mini_n2_picard/log-align-DNA-10.0.0-rc.1-19970704T165655Z//nextflow-log/trace.txt"
+      "file": "/tmp/outputs/align-DNA-10.0.0/a_mini_n2_picard/log-align-DNA-10.0.0-19970704T165655Z//nextflow-log/trace.txt"
     },
     "workDir": "/scratch/8543"
   }
