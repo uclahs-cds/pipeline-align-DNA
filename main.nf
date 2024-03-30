@@ -38,7 +38,6 @@ log.info """\
    - BWA-MEM2: ${params.aligner.contains("BWA-MEM2") ? params.docker_image_bwa_and_samtools : "None"}
    - HISAT2:  ${params.aligner.contains("HISAT2") ? params.docker_image_hisat2_and_samtools : "None"}
    - Picard Tools: ${params.docker_image_picardtools}
-   - sha512sum: ${params.docker_image_sha512sum}
    - validate: ${params.docker_image_validate}
    - GATK: ${params.docker_image_gatk}
 
