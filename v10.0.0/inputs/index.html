@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Inputs - pipeline-align-DNA</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Inputs";
+        var mkdocs_page_input_path = "inputs.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> pipeline-align-DNA
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../overview/">Overview</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../how-to-run/">How To Run</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../flow-diagram/">Flow Diagram</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../pipeline-steps/">Pipeline Steps</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../3-mark-duplicates-in-bam-files/">3. Mark Duplicates in BAM Files</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../4-index-bam-files/">4. Index BAM Files</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Inputs</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#input-csv-fields">Input CSV Fields</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#config-file-parameters">Config File Parameters</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../outputs/">Outputs</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../testing-and-validation/">Testing and Validation</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../references/">References</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../license/">License</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">pipeline-align-DNA</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Inputs</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/v10.0.0/README.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="inputs">Inputs</h2>
+<h3 id="input-csv-fields">Input CSV Fields</h3>
+<blockquote>
+<p>The input csv must have all columns below and in the same order. An example of an input csv can be found <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/76c63a162c81b26bc1aaf714bbd35f03c491579b/input/align-DNA.input.csv">here</a></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">read_group_identifier</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">The read group each read belongs to. This is concatenated with the <code>lane</code> column (see below) and then passed to the <code>ID</code> field of the final BAM. No white space is allowed. For more detail see <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups">here</a>.</td>
+</tr>
+<tr>
+<td style="text-align: left;">sequencing_center</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">The sequencing center where the data were produced. This is passed to the <code>CN</code> field of the final BAM. No white space is allowed. For more detail see <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups">here</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">library_identifier</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">The library identifier to be passed to the <code>LB</code> field of the final BAM. No white space is allowed. For more detail see <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups">here</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">platform_technology</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">The platform or technology used to produce the reads. This is passed to the <code>PL</code> field of the final BAM. No white space is allowed. For more detail see <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups">here</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">platform_unit</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">The platform unit to be passed to the <code>PU</code> field of the final BAM. No white space is allowed. For more detail see <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups">here</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">lane</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">The lane name or index. This is concatenated with the <code>read_group_identifier</code> column (see above) and then passed to the <code>ID</code> field of the final BAM. No white space is allowed. For more detail see <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups">here</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">sample</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">The sample name to be passed to the <code>SM</code> field of the final BAM. No white space is allowed. For more detail see <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups">here</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">read1_fastq</td>
+<td style="text-align: left;">path</td>
+<td style="text-align: left;">Absolute path to the R1 fastq file.</td>
+</tr>
+<tr>
+<td style="text-align: left;">read2_fastq</td>
+<td style="text-align: left;">path</td>
+<td style="text-align: left;">Absolute path to the R2 fastq file.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="config-file-parameters">Config File Parameters</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Input Parameter</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>sample_name</code></td>
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">The sample name. This is ignored if the output files are directly saved to the Boutros Lab data storage registry, by setting <code>ucla_cds_registered_dataset_output = true</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>input_csv</code></td>
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">path</td>
+<td style="text-align: left;">Absolute path to the input csv. See <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/76c63a162c81b26bc1aaf714bbd35f03c491579b/input/align-DNA.input.csv">here</a> for example and above for the detail of required fields.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>reference_fasta_bwa</code></td>
+<td style="text-align: left;">yes for BWA-MEM2</td>
+<td style="text-align: left;">path</td>
+<td style="text-align: left;">Absolute path to the reference genome <code>fasta</code> file. The reference genome is used by BWA-MEM2 for alignment.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>reference_fasta_hisat2</code></td>
+<td style="text-align: left;">yes for HISAT2</td>
+<td style="text-align: left;">path</td>
+<td style="text-align: left;">Absolute path to the reference genome <code>fasta</code> file. The reference genome is used by HISAT2 for alignment.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>hisat2_index_prefix</code></td>
+<td style="text-align: left;">yes for HISAT2</td>
+<td style="text-align: left;">path</td>
+<td style="text-align: left;">Absolute path up to the genome index basename. The index must be generated by the <code>hisat2-build</code> command.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>aligner</code></td>
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">list</td>
+<td style="text-align: left;">Which aligners to use as strings in list format. Current options: <code>BWA-MEM2, HISAT2</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>output_dir</code></td>
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">path</td>
+<td style="text-align: left;">Absolute path to the directory where the output files to be saved. This is ignored if the output files are directly saved to the Boutros Lab data storage registry, by setting <code>ucla_cds_registered_dataset_output = true</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>save_intermediate_files</code></td>
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Save intermediate files. If yes, not only the final BAM, but also the unmerged, unsorted, and duplicates unmarked BAM files will also be saved.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cache_intermediate_pipeline_steps</code></td>
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Enable cahcing to resume pipeline and the end of the last successful process completion when a pipeline fails (if true the default submission script must be modified).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>mark_duplicates</code></td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Disable processes which mark duplicates. When false, the pipeline stops at the sorting step, outputting a sorted, indexed, unmerged BAM with unmarked duplicates. Recommended for high coverage targeted panel sequencing datasets. Defaults as true to mark duplicates as usual.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>enable_spark</code></td>
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Enable use of Spark processes. When true, <code>MarkDuplicatesSpark</code> will be used. When false, <code>MarkDuplicates</code> will be used. Default value is true.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>spark_temp_dir</code></td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">path</td>
+<td style="text-align: left;">Path to temp dir for Spark processes. When included in the sample config file, Spark intermediate files will be saved to this directory. Defaults to <code>/scratch</code> and should only be changed for testing/development. Changing this directory to <code>/hot</code> or <code>/tmp</code> can lead to high server latency and potential disk space limitations, respectively.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>spark_metrics</code></td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">should Spark generate *.mark_dup.metrics</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>work_dir</code></td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">path</td>
+<td style="text-align: left;">Path of working directory for Nextflow. When included in the sample config file, Nextflow intermediate files and logs will be saved to this directory. With ucla_cds, the default is <code>/scratch</code> and should only be changed for testing/development. Changing this directory to <code>/hot</code> or <code>/tmp</code> can lead to high server latency and potential disk space limitations, respectively.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>max_number_of_parallel_jobs</code></td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">int</td>
+<td style="text-align: left;">The maximum number of jobs or steps of the pipeline that can be ran in parallel. Default is 1. Be very cautious setting this to any value larger than 1, as it may cause out-of-memory error. It may be helpful when running on a big memory computing node.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>bwa_mem_number_of_cpus</code></td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">int</td>
+<td style="text-align: left;">Number of cores to use for BWA-MEM2. If not set, this will be calculated to ensure at least 2.5Gb memory per core.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>ucla_cds_registered_dataset_input</code></td>
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Input FASTQs are from the Boutros Lab data registry.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>ucla_cds_registered_dataset_output</code></td>
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Enable saving final files including BAM and BAM index, and logging files directory to the Boutros Lab Data registry.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>dataset_id</code></td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">The registered dataset ID of this dataset from the Boutros Lab data registry. Ignored if <code>ucla_cds_registered_data_input = true</code> or <code>ucla_cds_registered_output = false</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>patient_id</code></td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">The registered patient ID of this sample from the Boutros Lab data registry. Ignored if <code>ucla_cds_registered_data_input = true</code> or <code>ucla_cds_registered_output = false</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>sample_id</code></td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">The registered sample ID from the Boutros Lab data registry. Ignored if <code>ucla_cds_registered_data_input = true</code> or <code>ucla_cds_registered_output = false</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>disable_alt_aware</code></td>
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Whether to disable the default alt-aware mode for BWA-MEM2. The default behavior of alt-aware mode is to consider the <code>.alt</code> file if it exists in the directory with the reference file.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>ucla_cds_data_dir</code></td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">The directory where registered data is located. Default: <code>/hot/data</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>ucla_cds_reference_genome_version</code></td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Identifier for the version of the reference genome version</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>check_node_config</code></td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Whether to check pre-configured node settings used to set CPU and memory constraints. The default behavior, whether <code>true</code> or undefined is to check the pre-configured node settings. Set to <code>false</code> to skip this check.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>docker_container_registry</code></td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;">Registry containing tool Docker images. Default: <code>ghcr.io/uclahs-cds</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../4-index-bam-files/" class="btn btn-neutral float-left" title="4. Index BAM Files"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../outputs/" class="btn btn-neutral float-right" title="Outputs">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/uclahs-cds/pipeline-align-DNA/tree/v10.0.0" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../4-index-bam-files/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../outputs/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
