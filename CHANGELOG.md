@@ -8,10 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [10.0.0] - 2024-03-29
 ### Added
 - Add Action to generate documentation in GitHub Pages
 - Add Action to run Nextflow configuration regression tests
-- Add setup_docker_cpus method
+- Add `setup_docker_cpus` method
+### Removed
+- Remove old `bl-base` Docker image
 
 ## [10.0.0-rc.1] - 2024-01-24
 ### Changed

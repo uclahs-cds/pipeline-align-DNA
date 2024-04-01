@@ -1,6 +1,6 @@
 // produce checksum for the bam and bam index
 process generate_sha512sum {    
-   container params.docker_image_sha512sum
+   container params.docker_image_validate
 
    publishDir path: "${checksum_output_dir}",
       mode: "copy",
