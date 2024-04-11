@@ -1,5 +1,5 @@
 ---
-name: Nextflow
+name: Nextflow config tests
 
 on:
   workflow_run:
