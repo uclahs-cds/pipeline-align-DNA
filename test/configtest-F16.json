@@ -41,19 +41,21 @@
         "BWA-MEM2",
         "HISAT2"
       ],
+      "bwa_and_samtools_version": "2.2.1_samtools-1.17",
       "bwa_version": "BWA-MEM2-2.2.1",
       "cache_intermediate_pipeline_steps": false,
       "dataset_id": "0000000",
       "disable_alt_aware": false,
       "docker_container_registry": "ghcr.io/uclahs-cds",
-      "docker_image_bwa_and_samtools": "ghcr.io/uclahs-cds/bwa-mem2_samtools-1.12:2.2.1",
+      "docker_image_bwa_and_samtools": "ghcr.io/uclahs-cds/bwa-mem2:2.2.1_samtools-1.17",
       "docker_image_gatk": "broadinstitute/gatk:4.2.4.1",
-      "docker_image_hisat2_and_samtools": "ghcr.io/uclahs-cds/hisat2_samtools-1.12:2.2.1",
-      "docker_image_picardtools": "ghcr.io/uclahs-cds/picard:3.0.0",
+      "docker_image_hisat2_and_samtools": "ghcr.io/uclahs-cds/hisat2:2.2.1_samtools-1.17",
+      "docker_image_picardtools": "ghcr.io/uclahs-cds/picard:3.1.1",
       "docker_image_samtools": "ghcr.io/uclahs-cds/samtools:1.17",
       "docker_image_validate": "ghcr.io/uclahs-cds/pipeval:4.0.0-rc.2",
       "enable_spark": false,
       "gatk_command_mem_diff": "5 GB",
+      "hisat2_and_samtools_version": "2.2.1_samtools-1.17",
       "hisat2_index_prefix": "/hot/ref/tool-specific-input/HISAT2-2.2.1/GRCh38-BI-20160721/index/Homo_sapiens_assembly38",
       "hisat2_version": "HISAT2-2.2.1",
       "input": {
@@ -80,6 +82,7 @@
       "min_memory": "1 MB",
       "output_dir": "/tmp/outputs",
       "output_dir_base": "/tmp/outputs/align-DNA-10.0.0/a_mini_n2_picard",
+      "picardtools_version": "3.1.1",
       "pipeval_version": "4.0.0-rc.2",
       "proc_resource_params": {
         "align_DNA_BWA_MEM2": {
