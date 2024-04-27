@@ -1,14 +1,25 @@
-# Call DNA Align Nextflow Pipeline for BWA Alignment of Paired-End Reads
+# Pipeline-align-DNA
+Call DNA Align Nextflow Pipeline for BWA Alignment of Paired-End Reads
 
-1. [Overview](#Overview)
-2. [How To Run](#How-To-Run)
-3. [Flow Diagram](#Flow-Diagram)
-4. [Pipeline Steps](#Pipeline-Steps)
-5. [Inputs](#Inputs)
-5. [Outputs](#Outputs)
-6. [Testing and Validation](#Testing-and-Validation)
-7. [References](#References)
-
+- [Pipeline-align-DNA](#Pipeline-align-DNA)
+  - [Overview](#Overview)
+  - [How To Run](#How-To-Run)
+  - [Flow Diagram](#Flow-Diagram)
+  - [Pipeline Steps](#Pipeline-Steps)
+    - [1. Alignment](#1-)
+    - [2. Convert to BAM Format](#2-stepproccess-2)
+    - [3. Step/Proccess n](#3-stepproccess-n)
+  - [Inputs](#Inputs)
+  - [Outputs](#Outputs)
+  - [Testing and Validation](#Testing-and-Validation)
+    - [Test Data Set](#test-data-set)
+    - [Validation <version number\>](#validation-version-number)
+    - [Validation Tool](#validation-tool)
+  - [References](#References)
+  - [Discussions](#Discussions)
+  - [Contributors](#Contributors)
+  - [License](#License)
+   
 ## Overview
 
 The align-DNA Nextflow pipeline, aligns paired-end data utilizing [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) and/or [HISAT2](http://daehwankimlab.github.io/hisat2/main), [Picard](https://github.com/broadinstitute/picard) Tools and [SAMtools](https://github.com/samtools/samtools). The pipeline has been engineered to run in a 4 layer stack in a cloud-based scalable environment of CycleCloud, Slurm, Nextflow and Docker. Additionally, it has been validated with the SMC-HET dataset and reference GRCh38, where paired-end fastq’s were created with BAM Surgeon.
@@ -109,8 +120,6 @@ python path/to/pipeline-align-DNA/script/write_dna_align_config_file.py \
 
 ## Flow Diagram
 
-A directed acyclic graph of your pipeline.
-
 >Following alignment, processes are run separately for each aligner used.
 
 ![align-DNA flow diagram](docs/dna-align-flow.svg?raw=true)
@@ -119,27 +128,27 @@ A directed acyclic graph of your pipeline.
 
 ## Pipeline Steps
 
-### 1A. Alignment
+### 1. Alignment
 
 The first step of the pipeline utilizes [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2) or [HISAT2](http://daehwankimlab.github.io/hisat2/main) to align paired reads. BWA-MEM2 is the successor for the well-known aligner BWA. The bwa-mem2 mem command utilizes the `-M` option for marking shorter splits as secondary. This allows for compatibility with Picard Tools in downstream process and in particular prevents the underlying library of Picard Tools from recognizing these splits as duplicate reads (read names). Additionally, the `-t` option is utilized to increase the number of threads used for alignment. The number of threads used in this step is by default to allow at least 2.5Gb memory per CPU, because of the large memory usage by BWA-MEM2. This can be overwritten by setting the `bwa_mem_number_of_cpus` parameter from the config file.
 
-### 1B. Convert Align SAM File to BAM Format
+### 2. Convert Align SAM File to BAM Format
 
 SAMtools `view` command is used to convert the aligned SAM files into the compressed BAM format. The SAMtools `view` command utilizes the `-S` option for increasing the speed by removing duplicates and outputs the reads as they are ordered in the file.  Additionally, the `-b` option ensures the output is in BAM format and the `-@` option is utilized to increase the number of threads.
 
-### 2. Sort BAM Files in Coordinate or Queryname Order
+### 3. Sort BAM Files in Coordinate or Queryname Order
 
 The next step of the pipeline utilizes SAMtools `sort` command to sort the aligned BAM files in coordinate order or queryname order that is needed for downstream duplicate marking tools. Specifically, the `sort_order` option is utilized to ensure the file is sorted in coordinate order for Picard or queryname order for Spark.
 
 For certain use-cases the pipeline may be configured to stop after this step using the `mark_duplicates=false` parameter in the config file. This option is intended for datasets generated with targeted sequencing panels (like our custom Proseq-G Prostate panel). High coverage target enrichment sequencing (like Illumina's [protocol](https://www.illumina.com/techniques/sequencing/dna-sequencing/targeted-resequencing/target-enrichment.html)) results in a large amount of read duplication that is not an artifact of PCR amplification. Marking these reads as duplicates will severely reduce coverage, and it is recommended that the pipeline be configured to not mark duplicates in this case.
 
-## 3. Mark Duplicates in BAM Files
+## 4. Mark Duplicates in BAM Files
 
 If `mark_duplicates=true` then the next step of the pipeline utilizes Picard Tool’s `MarkDuplicates` command to mark duplicates in the BAM files. The `MarkDuplicates` command utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. Additionally, the `Program_Record_Id` is set to `MarkDuplicates`.
 
 A faster Spark implementation of `MarkDuplicates` can also be used (`MarkDuplicatesSpark` from GATK). The process matches the output of Picard's `MarkDuplicates` with significant runtime improvements. An important note, however, the Spark version requires more disk space and can fail with large inputs with multiple aligners being specified due to insufficient disk space. In such cases, Picard's `MarkDuplicates` should be used instead.
 
-## 4. Index BAM Files
+## 5. Index BAM Files
 
 After marking duplicated reads in BAM files, the BAM files are then indexed by using `--CREATE_INDEX true` for Picard's `MarkDuplicates`, or `--create-output-bam-index` for `MarkDuplicatesSpark`. This utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible.
 
