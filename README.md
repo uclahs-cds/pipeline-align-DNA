@@ -6,15 +6,17 @@ Call DNA Align Nextflow Pipeline for BWA Alignment of Paired-End Reads
   - [How To Run](#How-To-Run)
   - [Flow Diagram](#Flow-Diagram)
   - [Pipeline Steps](#Pipeline-Steps)
-    - [1. Alignment](#1-)
-    - [2. Convert to BAM Format](#2-stepproccess-2)
-    - [3. Step/Proccess n](#3-stepproccess-n)
+    - [1. Alignment](#1-Alignment)
+    - [2. Convert Align SAM File to BAM Format](#2-Convert-Align-SAM-File-To-BAM-Format)
+    - [3. Sort BAM Files in Coordinate or Queryname Order](#3-Sort-BAM-Files-In-Coordinate-Or-Queryname-Order)
+    - [4. Mark Duplicates in BAM Files](#4-Mark-Duplicates-in-BAM-Files)
+    - [5. Index BAM Files](#5-Index-BAM-Files)
   - [Inputs](#Inputs)
   - [Outputs](#Outputs)
   - [Testing and Validation](#Testing-and-Validation)
-    - [Test Data Set](#test-data-set)
-    - [Validation <version number\>](#validation-version-number)
-    - [Validation Tool](#validation-tool)
+    - [Test Data Set](#Test-Data-Set)
+    - [Validation <version number\>](#Validation-Version-Number)
+    - [Validation Tool](#Validation-Tool)
   - [References](#References)
   - [Discussions](#Discussions)
   - [Contributors](#Contributors)
@@ -142,13 +144,13 @@ The next step of the pipeline utilizes SAMtools `sort` command to sort the align
 
 For certain use-cases the pipeline may be configured to stop after this step using the `mark_duplicates=false` parameter in the config file. This option is intended for datasets generated with targeted sequencing panels (like our custom Proseq-G Prostate panel). High coverage target enrichment sequencing (like Illumina's [protocol](https://www.illumina.com/techniques/sequencing/dna-sequencing/targeted-resequencing/target-enrichment.html)) results in a large amount of read duplication that is not an artifact of PCR amplification. Marking these reads as duplicates will severely reduce coverage, and it is recommended that the pipeline be configured to not mark duplicates in this case.
 
-## 4. Mark Duplicates in BAM Files
+### 4. Mark Duplicates in BAM Files
 
 If `mark_duplicates=true` then the next step of the pipeline utilizes Picard Tool’s `MarkDuplicates` command to mark duplicates in the BAM files. The `MarkDuplicates` command utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible. Additionally, the `Program_Record_Id` is set to `MarkDuplicates`.
 
 A faster Spark implementation of `MarkDuplicates` can also be used (`MarkDuplicatesSpark` from GATK). The process matches the output of Picard's `MarkDuplicates` with significant runtime improvements. An important note, however, the Spark version requires more disk space and can fail with large inputs with multiple aligners being specified due to insufficient disk space. In such cases, Picard's `MarkDuplicates` should be used instead.
 
-## 5. Index BAM Files
+### 5. Index BAM Files
 
 After marking duplicated reads in BAM files, the BAM files are then indexed by using `--CREATE_INDEX true` for Picard's `MarkDuplicates`, or `--create-output-bam-index` for `MarkDuplicatesSpark`. This utilizes the `VALIDATION_STRINGENCY=LENIENT` option to indicate how errors should be handled and keep the process running if possible.
 
@@ -262,6 +264,10 @@ This pipeline was tested using the synthesized SMC-HET dataset as well as a mult
 | pairs with other orientation | 0.9999726 |
 | pairs on different chromosomes | 1.0000416 |
 
+### Validation Tool
+
+Included is a template for validating your input files. For more information on the tool check out the following link: https://github.com/uclahs-cds/package-PipeVal
+
 ---
 
 ## References
@@ -272,15 +278,29 @@ Daehwan Kim, Ben Langmead, Steven L Salzberg. HISAT: a fast spliced aligner with
 
 ---
 
+## Discussions 
+
+- [Issue tracker](https://github.com/uclahs-cds/pipeline-align-DNA/issues/) to report errors and enhancement ideas.
+- Discussions can take place in [<pipeline> discussions](https://github.com/uclahs-cds/pipeline-align-DNA/discussions/)
+- [<pipeline> Pull Requests](https://github.com/uclahs-cds/pipeline-align-DNA/pulls) are also open for discussion.
+
+---
+
+## Contributors
+
+Please see list of [Contributors](https://github.com/uclahs-cds/pipeline-align-DNA/graphs/contributors) at GitHub.
+
+---
+
 ## License
 
-Authors: Benjamin Carlin, Chenghao Zhu (ChenghaoZhu@mednet.ucla.edu), Aaron Holmes (AHolmes@mednet.ucla.edu), Takafumi Yamaguchi (TYamaguchi@mednet.ucla.edu), Aakarsh Anand (AakarshAnand@mednet.ucla.edu), Yash Patel (YashPatel@mednet.ucla.edu)
+Authors: Benjamin Carlin, Chenghao Zhu (ChenghaoZhu@mednet.ucla.edu), Aaron Holmes (AHolmes@mednet.ucla.edu), Takafumi Yamaguchi (TYamaguchi@mednet.ucla.edu), Aakarsh Anand (AakarshAnand@mednet.ucla.edu), Yash Patel (YashPatel@mednet.ucla.edu), Joseph Salmingo (JSalmingo@mednet.ucla.edu)
 
 Align-DNA is licensed under the GNU General Public License version 2. See the file LICENSE for the terms of the GNU GPL license.
 
 Align-DNA aligned paired-end reads using the BWA-MEM2 and/or HISAT2 aligners.
 
-Copyright (C) 2020-2022 University of California Los Angeles ("Boutros Lab") All rights reserved.
+Copyright (C) 2020-2024 University of California Los Angeles ("Boutros Lab") All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
