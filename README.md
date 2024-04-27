@@ -228,7 +228,7 @@ After marking duplicated reads in BAM files, the BAM files are then indexed by u
 
 This pipeline was tested using the synthesized SMC-HET dataset as well as a multi-lane real sample CPCG0196-B1, using reference genome version GRCh38. Some benchmarking has been done comparing BWA-MEM2 v2.1, v2.0, and the original BWA. BWA-MEM2 is able to reduce approximately half of the runtime comparing to the original BWA, with the output BAM almost identical. See [here](docs/benchmarking.rst) for the benchmarking.
 
-### Validation <version number\>
+### Validation <10.0.0>
 
 | metric | Result |
 |:-------|:-------|
@@ -281,8 +281,8 @@ Daehwan Kim, Ben Langmead, Steven L Salzberg. HISAT: a fast spliced aligner with
 ## Discussions 
 
 - [Issue tracker](https://github.com/uclahs-cds/pipeline-align-DNA/issues/) to report errors and enhancement ideas.
-- Discussions can take place in [<pipeline> discussions](https://github.com/uclahs-cds/pipeline-align-DNA/discussions/)
-- [<pipeline> Pull Requests](https://github.com/uclahs-cds/pipeline-align-DNA/pulls) are also open for discussion.
+- Discussions can take place in [align-DNA discussions](https://github.com/uclahs-cds/pipeline-align-DNA/discussions/)
+- [align-DNA Pull Requests](https://github.com/uclahs-cds/pipeline-align-DNA/pulls) are also open for discussion.
 
 ---
 
