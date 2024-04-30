@@ -11,9 +11,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Update Picard version to 3.1.1
 - Update BWA-MEM2, HISAT2 images to use SAMTools version 1.17
-
-### [Changed]
 - Update Nextflow configuration test workflows
+- Update README.md to match template
 
 ## [10.0.0] - 2024-03-29
 ### Added
