@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>3. Mark Duplicates in BAM Files - pipeline-align-DNA</title>
+    <title>Discussions - pipeline-align-DNA</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -13,8 +13,8 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "3. Mark Duplicates in BAM Files";
-        var mkdocs_page_input_path = "3-mark-duplicates-in-bam-files.md";
+        var mkdocs_page_name = "Discussions";
+        var mkdocs_page_input_path = "discussions.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -56,16 +56,6 @@
                 <li class="toctree-l1"><a class="reference internal" href="../pipeline-steps/">Pipeline Steps</a>
                 </li>
               </ul>
-              <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="./">3. Mark Duplicates in BAM Files</a>
-    <ul class="current">
-    </ul>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../4-index-bam-files/">4. Index BAM Files</a>
-                </li>
-              </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../inputs/">Inputs</a>
                 </li>
@@ -80,6 +70,16 @@
               </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../references/">References</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Discussions</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../contributors/">Contributors</a>
                 </li>
               </ul>
               <ul>
@@ -100,9 +100,9 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">3. Mark Duplicates in BAM Files</li>
+      <li class="breadcrumb-item active">Discussions</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/a6769c332aeaade8a2128d402e1e0bc34638eda2/README.md" class="icon icon-github"> Edit on GitHub</a>
+          <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/4cc44ce2013f51df46500c317d55655424080392/README.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
   <hr/>
@@ -110,15 +110,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h2 id="3-mark-duplicates-in-bam-files">3. Mark Duplicates in BAM Files</h2>
-<p>If <code>mark_duplicates=true</code> then the next step of the pipeline utilizes Picard Tool’s <code>MarkDuplicates</code> command to mark duplicates in the BAM files. The <code>MarkDuplicates</code> command utilizes the <code>VALIDATION_STRINGENCY=LENIENT</code> option to indicate how errors should be handled and keep the process running if possible. Additionally, the <code>Program_Record_Id</code> is set to <code>MarkDuplicates</code>.</p>
-<p>A faster Spark implementation of <code>MarkDuplicates</code> can also be used (<code>MarkDuplicatesSpark</code> from GATK). The process matches the output of Picard's <code>MarkDuplicates</code> with significant runtime improvements. An important note, however, the Spark version requires more disk space and can fail with large inputs with multiple aligners being specified due to insufficient disk space. In such cases, Picard's <code>MarkDuplicates</code> should be used instead.</p>
+                <h2 id="discussions">Discussions</h2>
+<ul>
+<li><a href="https://github.com/uclahs-cds/pipeline-align-DNA/issues/">Issue tracker</a> to report errors and enhancement ideas.</li>
+<li>Discussions can take place in <a href="https://github.com/uclahs-cds/pipeline-align-DNA/discussions/">align-DNA discussions</a></li>
+<li><a href="https://github.com/uclahs-cds/pipeline-align-DNA/pulls">align-DNA Pull Requests</a> are also open for discussion.</li>
+</ul>
+<hr />
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../pipeline-steps/" class="btn btn-neutral float-left" title="Pipeline Steps"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../4-index-bam-files/" class="btn btn-neutral float-right" title="4. Index BAM Files">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../references/" class="btn btn-neutral float-left" title="References"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../contributors/" class="btn btn-neutral float-right" title="Contributors">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -145,10 +149,10 @@
         </span>
     
     
-      <span><a href="../pipeline-steps/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../references/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../4-index-bam-files/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../contributors/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

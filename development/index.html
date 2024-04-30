@@ -59,14 +59,6 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="3-mark-duplicates-in-bam-files/">3. Mark Duplicates in BAM Files</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="4-index-bam-files/">4. Index BAM Files</a>
-                </li>
-              </ul>
-              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="inputs/">Inputs</a>
                 </li>
               </ul>
@@ -80,6 +72,14 @@
               </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="references/">References</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="discussions/">Discussions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="contributors/">Contributors</a>
                 </li>
               </ul>
               <ul>
@@ -102,7 +102,7 @@
     <li><a href="." class="icon icon-home" aria-label="Docs"></a></li>
       <li class="breadcrumb-item active">Home</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/a6769c332aeaade8a2128d402e1e0bc34638eda2/README.md" class="icon icon-github"> Edit on GitHub</a>
+          <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/4cc44ce2013f51df46500c317d55655424080392/README.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
   <hr/>
@@ -110,17 +110,34 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="call-dna-align-nextflow-pipeline-for-bwa-alignment-of-paired-end-reads">Call DNA Align Nextflow Pipeline for BWA Alignment of Paired-End Reads</h1>
-<ol>
+                <h1 id="pipeline-align-dna">Pipeline-align-DNA</h1>
+<p>Call DNA Align Nextflow Pipeline for BWA Alignment of Paired-End Reads</p>
+<ul>
+<li><a href="./#Pipeline-align-DNA">Pipeline-align-DNA</a></li>
 <li><a href="overview/#Overview">Overview</a></li>
 <li><a href="how-to-run/#How-To-Run">How To Run</a></li>
 <li><a href="flow-diagram/#Flow-Diagram">Flow Diagram</a></li>
-<li><a href="pipeline-steps/#Pipeline-Steps">Pipeline Steps</a></li>
+<li><a href="pipeline-steps/#Pipeline-Steps">Pipeline Steps</a><ul>
+<li><a href="pipeline-steps/#1-Alignment">1. Alignment</a></li>
+<li><a href="pipeline-steps/#2-Convert-Align-SAM-File-To-BAM-Format">2. Convert Align SAM File to BAM Format</a></li>
+<li><a href="pipeline-steps/#3-Sort-BAM-Files-In-Coordinate-Or-Queryname-Order">3. Sort BAM Files in Coordinate or Queryname Order</a></li>
+<li><a href="pipeline-steps/#4-Mark-Duplicates-in-BAM-Files">4. Mark Duplicates in BAM Files</a></li>
+<li><a href="pipeline-steps/#5-Index-BAM-Files">5. Index BAM Files</a></li>
+</ul>
+</li>
 <li><a href="inputs/#Inputs">Inputs</a></li>
 <li><a href="outputs/#Outputs">Outputs</a></li>
-<li><a href="testing-and-validation/#Testing-and-Validation">Testing and Validation</a></li>
+<li><a href="testing-and-validation/#Testing-and-Validation">Testing and Validation</a><ul>
+<li><a href="testing-and-validation/#Test-Data-Set">Test Data Set</a></li>
+<li><a href="#Validation-Version-Number">Validation \<version number></a></li>
+<li><a href="testing-and-validation/#Validation-Tool">Validation Tool</a></li>
+</ul>
+</li>
 <li><a href="references/#References">References</a></li>
-</ol>
+<li><a href="discussions/#Discussions">Discussions</a></li>
+<li><a href="contributors/#Contributors">Contributors</a></li>
+<li><a href="license/#License">License</a></li>
+</ul>
               
             </div>
           </div><footer>
@@ -173,5 +190,5 @@
 
 <!--
 MkDocs version : 1.5.3
-Build Date UTC : 2024-04-17 19:39:16.487180+00:00
+Build Date UTC : 2024-04-30 18:08:27.673901+00:00
 -->

@@ -57,14 +57,6 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../3-mark-duplicates-in-bam-files/">3. Mark Duplicates in BAM Files</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../4-index-bam-files/">4. Index BAM Files</a>
-                </li>
-              </ul>
-              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../inputs/">Inputs</a>
                 </li>
               </ul>
@@ -77,13 +69,23 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#test-data-set">Test Data Set</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#validation">Validation \</a>
+    <li class="toctree-l2"><a class="reference internal" href="#validation-1000">Validation \&lt;10.0.0&gt;</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#validation-tool">Validation Tool</a>
     </li>
     </ul>
                 </li>
               </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../references/">References</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../discussions/">Discussions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../contributors/">Contributors</a>
                 </li>
               </ul>
               <ul>
@@ -106,7 +108,7 @@
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
       <li class="breadcrumb-item active">Testing and Validation</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/a6769c332aeaade8a2128d402e1e0bc34638eda2/README.md" class="icon icon-github"> Edit on GitHub</a>
+          <a href="https://github.com/uclahs-cds/pipeline-align-DNA/blob/4cc44ce2013f51df46500c317d55655424080392/README.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
   <hr/>
@@ -117,7 +119,7 @@
                 <h2 id="testing-and-validation">Testing and Validation</h2>
 <h3 id="test-data-set">Test Data Set</h3>
 <p>This pipeline was tested using the synthesized SMC-HET dataset as well as a multi-lane real sample CPCG0196-B1, using reference genome version GRCh38. Some benchmarking has been done comparing BWA-MEM2 v2.1, v2.0, and the original BWA. BWA-MEM2 is able to reduce approximately half of the runtime comparing to the original BWA, with the output BAM almost identical. See <a href="../benchmarking.rst">here</a> for the benchmarking.</p>
-<h3 id="validation">Validation \<version number></h3>
+<h3 id="validation-1000">Validation \&lt;10.0.0&gt;</h3>
 <table>
 <thead>
 <tr>
@@ -252,6 +254,8 @@
 </tr>
 </tbody>
 </table>
+<h3 id="validation-tool">Validation Tool</h3>
+<p>Included is a template for validating your input files. For more information on the tool check out the following link: https://github.com/uclahs-cds/package-PipeVal</p>
 <hr />
               
             </div>
