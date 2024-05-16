@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [10.1.0] - 2024-05-15
 ### Changed
 - Update Picard version to 3.1.1
 - Update BWA-MEM2, HISAT2 images to use SAMTools version 1.17
