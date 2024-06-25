@@ -32,10 +32,8 @@ process align_DNA_BWA_MEM2 {
       pattern: "*.bam",
       mode: 'copy'
 
-   publishDir path: "${params.log_output_dir}/process-log/${params.bwa_version}/${task.process.split(':')[1].replace('_', '-')}",
-      pattern: ".command.*",
-      mode: "copy",
-      saveAs: { "${library}/${lane}/log${file(it).getName()}" }
+   ext log_dir: { "${params.bwa_version}/${task.process.split(':')[1].replace('_', '-')}" }
+   ext log_dir_suffix: { "/${library}/${lane}" }
 
    // use "each" so the the reference files are passed through for each fastq pair alignment
    input:
@@ -54,7 +52,6 @@ process align_DNA_BWA_MEM2 {
       tuple val(library),
          val(lane),
          path("${lane_level_bam}"), emit: bam
-      path(".command.*")
 
    script:
 
