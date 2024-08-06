@@ -16,9 +16,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Update Nextflow configuration test workflows
 - Update README.md to match template
 
-### Added
-- Add `params` object dump
-
 ## [10.0.0] - 2024-03-29
 ### Added
 - Add Action to generate documentation in GitHub Pages
