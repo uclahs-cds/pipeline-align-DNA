@@ -14,3 +14,7 @@ updates:
           - "*/pipeline-Nextflow-module"
           - "*/nextflow-config"
           - "*/nextflow-modules"
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

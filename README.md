@@ -1,6 +1,8 @@
 # Pipeline-align-DNA
 Call DNA Align Nextflow Pipeline for BWA Alignment of Paired-End Reads
 
+[![GitHub release](https://img.shields.io/github/v/release/uclahs-cds/pipeline-align-DNA)](https://github.com/uclahs-cds/pipeline-align-DNA/actions/workflows/prepare-release.yaml)
+
 - [Pipeline-align-DNA](#Pipeline-align-DNA)
   - [Overview](#Overview)
   - [How To Run](#How-To-Run)
