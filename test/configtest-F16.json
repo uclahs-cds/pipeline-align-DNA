@@ -64,7 +64,7 @@
       "enable_spark": false,
       "gatk_command_mem_diff": "5 GB",
       "hisat2_and_samtools_version": "2.2.1_samtools-1.17",
-      "hisat2_index_prefix": "/hot/ref/tool-specific-input/HISAT2-2.2.1/GRCh38-BI-20160721/index/Homo_sapiens_assembly38",
+      "hisat2_index_prefix": "/hot/resource/tool-specific-input/HISAT2-2.2.1/GRCh38-BI-20160721/index/Homo_sapiens_assembly38",
       "hisat2_version": "HISAT2-2.2.1",
       "input": {
         "FASTQ": [
@@ -149,10 +149,10 @@
           "memory": "1 GB"
         }
       },
-      "reference_fasta_bwa": "/hot/ref/tool-specific-input/BWA-MEM2-2.2.1/GRCh38-BI-20160721/index/genome.fa",
-      "reference_fasta_hisat2": "/hot/ref/reference/GRCh38-BI-20160721/Homo_sapiens_assembly38.fasta",
-      "reference_fasta_index_files_bwa": "/hot/ref/tool-specific-input/BWA-MEM2-2.2.1/GRCh38-BI-20160721/index/genome.fa.*",
-      "reference_fasta_index_files_hisat2": "/hot/ref/tool-specific-input/HISAT2-2.2.1/GRCh38-BI-20160721/index/Homo_sapiens_assembly38.*.ht2",
+      "reference_fasta_bwa": "/hot/resource/tool-specific-input/BWA-MEM2-2.2.1/GRCh38-BI-20160721/index/genome.fa",
+      "reference_fasta_hisat2": "/hot/resource/reference-genome/GRCh38-BI-20160721/Homo_sapiens_assembly38.fasta",
+      "reference_fasta_index_files_bwa": "/hot/resource/tool-specific-input/BWA-MEM2-2.2.1/GRCh38-BI-20160721/index/genome.fa.*",
+      "reference_fasta_index_files_hisat2": "/hot/resource/tool-specific-input/HISAT2-2.2.1/GRCh38-BI-20160721/index/Homo_sapiens_assembly38.*.ht2",
       "sample_id": "a_mini_n2_picard",
       "save_intermediate_files": false,
       "spark_metrics": false,
