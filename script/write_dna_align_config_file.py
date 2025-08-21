@@ -84,7 +84,7 @@ def print_example():
         + "--cache_intermediate_pipeline_steps --HISAT2_fasta_index=path/to/index " \
         + "--blcds_disease_id=my_disease_id --blcds_patient_id=my_patient_id " \
         + "--blcds_sample_id=my_sample_id --blcds_analyte=RNA --blcds_technology=WTS " \
-        + "--blcds_mount_dir=/hot --blcds_dataset_id=my_dataset-i"
+        + "--blcds_mount_dir=/path/to/hot --blcds_dataset_id=my_dataset-i"
     print(example)
 
 def aligner_type_choice(args):
